@@ -7,7 +7,9 @@ import Accordion from "@/components/ui/Accordion";
 import SanityPortableText from "./SanityPortableText";
 import SectionShell from "./SectionShell";
 import ScrollNavButton from "./ScrollNavButton";
+import TransferOfferDetails from "./TransferOfferDetails";
 import { sanityImageUrl } from "@/sanity/lib/image";
+import { getSanityResultGalleries } from "@/sanity/lib/content";
 import { TREATMENT_CATEGORIES } from "@/data/treatments";
 import { resultGroups } from "@/data/results";
 import type {
@@ -129,6 +131,8 @@ export function FeatureGridBlock({ section }: { section: FeatureGridSection }) {
       <div className={`mt-14 grid gap-px bg-hairline ${gridColumns[section.columns || 3]}`}>
         {section.items.map((item, index) => {
           const src = sanityImageUrl(item.image);
+          const isTransferOffer = item.title === "Enjoy the Complimentary Transfer*";
+          const isAirlineOffer = item.title === "Special Discount for Airline Staffs";
           return (
             <Reveal key={item._key} delay={index * 60} className={dark ? "bg-ink-brown" : "bg-paper"}>
               <article className="h-full p-7 lg:p-9">
@@ -144,10 +148,37 @@ export function FeatureGridBlock({ section }: { section: FeatureGridSection }) {
                 <h3 className={`font-sans text-h4 ${dark ? "text-white" : "text-ink"}`}>
                   {item.title}
                 </h3>
-                {item.text && (
-                  <p className={`mt-4 font-sans text-body leading-body ${dark ? "text-white/65" : "text-text-secondary"}`}>
-                    {item.text}
+                {item.note && (
+                  <p className={`mt-1.5 font-sans text-caption italic ${dark ? "text-white/50" : "text-muted"}`}>
+                    {item.note}
                   </p>
+                )}
+                {item.text && (
+                  <div className="mt-4">
+                    {/* text moved from a plain string to portable text so
+                        offer cards could carry real bullets/bold — but a
+                        page whose content hasn't been republished since
+                        still has the old string shape until it is. This
+                        keeps that page readable in the meantime instead
+                        of handing an unexpected type to PortableText. */}
+                    {Array.isArray(item.text) ? (
+                      isTransferOffer ? (
+                        <TransferOfferDetails value={item.text} tone={dark ? "dark" : "light"} />
+                      ) : (
+                        <SanityPortableText
+                          value={item.text}
+                          tone={dark ? "dark" : "light"}
+                          smallPrint={isAirlineOffer}
+                        />
+                      )
+                    ) : (
+                      <p
+                        className={`whitespace-pre-line font-sans text-body leading-body ${dark ? "text-white/65" : "text-text-secondary"}`}
+                      >
+                        {item.text as unknown as string}
+                      </p>
+                    )}
+                  </div>
                 )}
                 {item.action && <LinkedButton action={item.action} dark={dark} />}
               </article>
@@ -161,6 +192,15 @@ export function FeatureGridBlock({ section }: { section: FeatureGridSection }) {
 
 export function GalleryBlock({ section }: { section: GallerySection }) {
   const dark = section.tone === "brown";
+  const isResultGallery = resultGroups.some((group) => group.slug === section.anchor);
+  const seenImageAssets = new Set<string>();
+  const images = section.images.filter((image) => {
+    const assetRef = image.asset._ref;
+    if (seenImageAssets.has(assetRef)) return false;
+    seenImageAssets.add(assetRef);
+    return true;
+  });
+
   return (
     <SectionShell tone={section.tone} anchor={section.anchor}>
       <SectionHeading
@@ -174,13 +214,30 @@ export function GalleryBlock({ section }: { section: GallerySection }) {
         }
         tone={dark ? "dark" : "light"}
       />
-      <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {section.images.map((image, index) => {
+      <div className={`mt-14 grid sm:grid-cols-2 lg:grid-cols-3 ${isResultGallery ? "gap-6" : "gap-4"}`}>
+        {images.map((image, index) => {
           const src = sanityImageUrl(image);
           if (!src) return null;
+          const genericAlt = /before and after result\s*$/i.test(image.alt?.trim() ?? "");
+          const alt =
+            isResultGallery && (!image.alt?.trim() || genericAlt)
+              ? `Before and after result ${index + 1} for ${section.title} treatment at Healthy Look Aesthetic`
+              : image.alt;
           return (
             <Reveal key={image._key || `${section._key}-${index}`} delay={index * 50} variant="image">
-              <Img src={src} alt={image.alt} aspect="square" sizes="(max-width: 640px) 100vw, 34vw" />
+              {isResultGallery ? (
+                <div className="border border-hairline bg-white p-4 sm:p-6">
+                  <Img
+                    src={src}
+                    alt={alt}
+                    aspect="square"
+                    rounded="rounded-none"
+                    sizes="(max-width: 640px) 100vw, 34vw"
+                  />
+                </div>
+              ) : (
+                <Img src={src} alt={alt} aspect="square" sizes="(max-width: 640px) 100vw, 34vw" />
+              )}
             </Reveal>
           );
         })}
@@ -321,18 +378,47 @@ export function CategoryNavBlock({ section }: { section: CategoryNavSection }) {
           only from lg up: centering a row that's still narrower than the
           viewport is fine once everything fits on one line, but doing it
           while the row is still scrollable would start the scroll
-          position off-centre instead of flush at the first category. */}
-      <Container className="flex snap-x gap-x-8 overflow-x-auto [scrollbar-width:none] lg:justify-center [&::-webkit-scrollbar]:hidden">
-        {TREATMENT_CATEGORIES.map((category) => (
-          <a
-            key={category.id}
-            href={`#price-${category.id}`}
-            className="shrink-0 snap-start whitespace-nowrap py-3.5 font-sans text-caption uppercase tracking-caps text-text-secondary transition-colors hover:text-primary-strong"
-          >
-            {category.label}
-          </a>
-        ))}
-      </Container>
+          position off-centre instead of flush at the first category.
+          Below lg, the four labels don't all fit — same problem as
+          ResultsNavBlock, so the same fade + scroll-button treatment,
+          just hidden from lg up where there's nothing to scroll to. */}
+      <div className="relative">
+        <Container
+          id="category-nav-scroll"
+          className="flex snap-x gap-x-8 overflow-x-auto [-webkit-mask-image:linear-gradient(to_right,transparent,black_32px,black_calc(100%-32px),transparent_100%)] [mask-image:linear-gradient(to_right,transparent,black_32px,black_calc(100%-32px),transparent_100%)] [scrollbar-width:none] lg:[mask-image:none] lg:[-webkit-mask-image:none] lg:justify-center [&::-webkit-scrollbar]:hidden"
+        >
+          {/* The overlay buttons are 56px wide (w-14) — wider than the
+              container's own edge padding (as little as 20px on a narrow
+              phone) — so without this, the buttons sit on top of part of
+              the first/last label instead of framing empty space next to
+              it. These spacers give the row enough runway to scroll the
+              full label clear of the button on each side. Hidden with the
+              buttons at lg, where the row doesn't scroll at all. */}
+          <div className="w-10 shrink-0 snap-start lg:hidden" aria-hidden="true" />
+          {TREATMENT_CATEGORIES.map((category) => (
+            <a
+              key={category.id}
+              href={`#price-${category.id}`}
+              className="shrink-0 snap-start whitespace-nowrap py-3.5 font-sans text-caption uppercase tracking-caps text-text-secondary transition-colors hover:text-primary-strong"
+            >
+              {category.label}
+            </a>
+          ))}
+          <div className="w-10 shrink-0 lg:hidden" aria-hidden="true" />
+        </Container>
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-y-0 left-0 flex w-14 items-center justify-start bg-gradient-to-r from-paper from-40% to-transparent pl-[var(--spacing-gutter)] lg:hidden"
+        >
+          <ScrollNavButton targetId="category-nav-scroll" direction="left" />
+        </div>
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-y-0 right-0 flex w-14 items-center justify-end bg-gradient-to-l from-paper from-40% to-transparent pr-[var(--spacing-gutter)] lg:hidden"
+        >
+          <ScrollNavButton targetId="category-nav-scroll" direction="right" />
+        </div>
+      </div>
     </section>
   );
 }
@@ -378,7 +464,14 @@ export function DisclaimerBlock({ section }: { section: DisclaimerSection }) {
  * order and counts come from the results catalogue, not from Sanity — see
  * the schema's own comment.
  */
-export function ResultsNavBlock({ section }: { section: ResultsNavSection }) {
+export async function ResultsNavBlock({ section }: { section: ResultsNavSection }) {
+  // The count on each pill used to be resultGroups' own (static) photo
+  // count — which drifts the moment someone edits a gallery in Sanity
+  // Studio, exactly as happened when Botox's 24 became 16 after removing
+  // near-duplicates there. Sanity is what the page actually renders, so
+  // it's what the count reads from too; the static count is only a
+  // fallback for a group Sanity doesn't have yet.
+  const sanityGalleries = await getSanityResultGalleries();
   return (
     <nav
       id={section.anchor}
@@ -397,6 +490,11 @@ export function ResultsNavBlock({ section }: { section: ResultsNavSection }) {
           id="results-nav-scroll"
           className="flex snap-x snap-mandatory gap-2 overflow-x-auto py-3 [-webkit-mask-image:linear-gradient(to_right,transparent,black_56px,black_calc(100%-56px),transparent_100%)] [mask-image:linear-gradient(to_right,transparent,black_56px,black_calc(100%-56px),transparent_100%)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
+          {/* Same reasoning as CategoryNavBlock's spacers: the 56px button
+              overlay is wider than the container's own edge padding, so
+              without runway to scroll into, it sits on top of part of the
+              first/last pill instead of framing clear space beside it. */}
+          <div className="w-10 shrink-0 snap-start" aria-hidden="true" />
           {resultGroups.map((group) => (
             <a
               key={group.slug}
@@ -404,9 +502,12 @@ export function ResultsNavBlock({ section }: { section: ResultsNavSection }) {
               className="flex min-h-11 snap-start items-center whitespace-nowrap rounded-brand border border-hairline px-4 py-2 font-sans text-caption uppercase tracking-caps text-text-secondary transition-colors duration-300 hover:border-primary/50 hover:text-primary-strong"
             >
               {group.label}
-              <span className="ml-2 text-muted">{group.images.length}</span>
+              <span className="ml-2 text-muted">
+                {sanityGalleries?.get(group.slug)?.length ?? group.images.length}
+              </span>
             </a>
           ))}
+          <div className="w-10 shrink-0" aria-hidden="true" />
         </Container>
         <div
           aria-hidden="true"

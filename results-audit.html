@@ -1,0 +1,1122 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Before/After results audit</title>
+<style>
+  :root { color-scheme: light; }
+  body { margin: 0; padding: 24px 32px 80px; font: 14px/1.4 -apple-system, Segoe UI, sans-serif; background: #faf8f5; color: #2b2118; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .sub { color: #7a6f63; margin: 0 0 28px; }
+  .group { margin-bottom: 40px; }
+  h2 { font-size: 15px; text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid #e2d9cc; padding-bottom: 8px; margin-bottom: 14px; }
+  .count { font-weight: 400; text-transform: none; letter-spacing: 0; color: #a08f7a; margin-left: 8px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+  .card { margin: 0; background: #fff; border: 1px solid #e2d9cc; border-radius: 6px; overflow: hidden; }
+  .card img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; background: #efe8dc; }
+  .card.broken img { opacity: 0.15; }
+  .card.broken::after { content: "failed to load — is the dev server running?"; display: block; padding: 6px; font-size: 10px; color: #b33; }
+  figcaption { display: flex; gap: 6px; align-items: baseline; padding: 6px 8px; font-size: 11px; }
+  .idx { color: #a08f7a; font-variant-numeric: tabular-nums; }
+  .fname { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+</head>
+<body>
+  <h1>Before/After results — visual audit</h1>
+  <p class="sub">Every image currently in src/data/results.ts, grouped and labeled by filename. Open this file in a browser while <code>npm run dev</code> is running on port 3006. Scan each row for near-duplicate shots, then send back the filenames to remove.</p>
+  
+      <section class="group">
+        <h2>Botox <span class="count">24 images</span></h2>
+        <div class="grid">
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/botox/01.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">01</span>
+            <span class="fname">01.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/botox/02.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">02</span>
+            <span class="fname">02.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/botox/03.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">03</span>
+            <span class="fname">03.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/botox/04.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">04</span>
+            <span class="fname">04.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/botox/05.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">05</span>
+            <span class="fname">05.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/botox/06.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">06</span>
+            <span class="fname">06.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/botox/07.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">07</span>
+            <span class="fname">07.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/botox/08.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">08</span>
+            <span class="fname">08.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/botox/09.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">09</span>
+            <span class="fname">09.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/botox/13.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">10</span>
+            <span class="fname">13.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/botox/14.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">11</span>
+            <span class="fname">14.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/botox/15.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">12</span>
+            <span class="fname">15.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/botox/16.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">13</span>
+            <span class="fname">16.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/botox/17.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">14</span>
+            <span class="fname">17.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/botox/18.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">15</span>
+            <span class="fname">18.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/botox/19.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">16</span>
+            <span class="fname">19.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/botox/20.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">17</span>
+            <span class="fname">20.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/botox/21.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">18</span>
+            <span class="fname">21.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/botox/22.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">19</span>
+            <span class="fname">22.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/botox/23.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">20</span>
+            <span class="fname">23.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/botox/24.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">21</span>
+            <span class="fname">24.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/botox/29.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">22</span>
+            <span class="fname">29.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/botox/30.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">23</span>
+            <span class="fname">30.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/botox/31.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">24</span>
+            <span class="fname">31.webp</span>
+          </figcaption>
+        </figure></div>
+      </section>
+      <section class="group">
+        <h2>Lip Filler <span class="count">49 images</span></h2>
+        <div class="grid">
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/01.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">01</span>
+            <span class="fname">01.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/02.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">02</span>
+            <span class="fname">02.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/03.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">03</span>
+            <span class="fname">03.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/04.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">04</span>
+            <span class="fname">04.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/05.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">05</span>
+            <span class="fname">05.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/06.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">06</span>
+            <span class="fname">06.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/07.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">07</span>
+            <span class="fname">07.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/08.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">08</span>
+            <span class="fname">08.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/09.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">09</span>
+            <span class="fname">09.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/10.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">10</span>
+            <span class="fname">10.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/11.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">11</span>
+            <span class="fname">11.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/12.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">12</span>
+            <span class="fname">12.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/13.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">13</span>
+            <span class="fname">13.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/14.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">14</span>
+            <span class="fname">14.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/15.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">15</span>
+            <span class="fname">15.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/16.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">16</span>
+            <span class="fname">16.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/17.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">17</span>
+            <span class="fname">17.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/18.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">18</span>
+            <span class="fname">18.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/19.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">19</span>
+            <span class="fname">19.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/20.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">20</span>
+            <span class="fname">20.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/21.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">21</span>
+            <span class="fname">21.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/22.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">22</span>
+            <span class="fname">22.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/23.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">23</span>
+            <span class="fname">23.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/24.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">24</span>
+            <span class="fname">24.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/25.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">25</span>
+            <span class="fname">25.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/26.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">26</span>
+            <span class="fname">26.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/27.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">27</span>
+            <span class="fname">27.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/28.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">28</span>
+            <span class="fname">28.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/29.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">29</span>
+            <span class="fname">29.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/30.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">30</span>
+            <span class="fname">30.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/31.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">31</span>
+            <span class="fname">31.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/32.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">32</span>
+            <span class="fname">32.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/33.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">33</span>
+            <span class="fname">33.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/34.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">34</span>
+            <span class="fname">34.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/35.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">35</span>
+            <span class="fname">35.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/36.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">36</span>
+            <span class="fname">36.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/37.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">37</span>
+            <span class="fname">37.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/38.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">38</span>
+            <span class="fname">38.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/39.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">39</span>
+            <span class="fname">39.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/40.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">40</span>
+            <span class="fname">40.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/41.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">41</span>
+            <span class="fname">41.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/42.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">42</span>
+            <span class="fname">42.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/43.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">43</span>
+            <span class="fname">43.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/44.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">44</span>
+            <span class="fname">44.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/45.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">45</span>
+            <span class="fname">45.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/46.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">46</span>
+            <span class="fname">46.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/47.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">47</span>
+            <span class="fname">47.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/48.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">48</span>
+            <span class="fname">48.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lip-filler/49.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">49</span>
+            <span class="fname">49.webp</span>
+          </figcaption>
+        </figure></div>
+      </section>
+      <section class="group">
+        <h2>Dermal Filler <span class="count">26 images</span></h2>
+        <div class="grid">
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/dermal-filler/01.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">01</span>
+            <span class="fname">01.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/dermal-filler/02.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">02</span>
+            <span class="fname">02.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/dermal-filler/03.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">03</span>
+            <span class="fname">03.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/dermal-filler/04.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">04</span>
+            <span class="fname">04.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/dermal-filler/05.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">05</span>
+            <span class="fname">05.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/dermal-filler/06.jpg" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">06</span>
+            <span class="fname">06.jpg</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/dermal-filler/07.jpg" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">07</span>
+            <span class="fname">07.jpg</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/dermal-filler/08.jpg" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">08</span>
+            <span class="fname">08.jpg</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/dermal-filler/11.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">09</span>
+            <span class="fname">11.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/dermal-filler/12.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">10</span>
+            <span class="fname">12.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/dermal-filler/13.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">11</span>
+            <span class="fname">13.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/dermal-filler/14.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">12</span>
+            <span class="fname">14.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/dermal-filler/15.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">13</span>
+            <span class="fname">15.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/dermal-filler/16.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">14</span>
+            <span class="fname">16.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/dermal-filler/17.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">15</span>
+            <span class="fname">17.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/dermal-filler/18.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">16</span>
+            <span class="fname">18.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/dermal-filler/19.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">17</span>
+            <span class="fname">19.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/dermal-filler/20.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">18</span>
+            <span class="fname">20.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/dermal-filler/21.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">19</span>
+            <span class="fname">21.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/dermal-filler/22.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">20</span>
+            <span class="fname">22.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/dermal-filler/24.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">21</span>
+            <span class="fname">24.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/dermal-filler/25.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">22</span>
+            <span class="fname">25.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/dermal-filler/26.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">23</span>
+            <span class="fname">26.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/dermal-filler/27.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">24</span>
+            <span class="fname">27.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/dermal-filler/28.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">25</span>
+            <span class="fname">28.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/dermal-filler/29.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">26</span>
+            <span class="fname">29.webp</span>
+          </figcaption>
+        </figure></div>
+      </section>
+      <section class="group">
+        <h2>Premium HIFU by Linear Z <span class="count">16 images</span></h2>
+        <div class="grid">
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/premium-hifu-by-linear-z/01.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">01</span>
+            <span class="fname">01.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/premium-hifu-by-linear-z/02.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">02</span>
+            <span class="fname">02.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/premium-hifu-by-linear-z/03.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">03</span>
+            <span class="fname">03.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/premium-hifu-by-linear-z/04.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">04</span>
+            <span class="fname">04.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/premium-hifu-by-linear-z/05.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">05</span>
+            <span class="fname">05.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/premium-hifu-by-linear-z/06.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">06</span>
+            <span class="fname">06.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/premium-hifu-by-linear-z/07.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">07</span>
+            <span class="fname">07.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/premium-hifu-by-linear-z/08.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">08</span>
+            <span class="fname">08.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/premium-hifu-by-linear-z/09.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">09</span>
+            <span class="fname">09.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/premium-hifu-by-linear-z/10.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">10</span>
+            <span class="fname">10.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/premium-hifu-by-linear-z/11.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">11</span>
+            <span class="fname">11.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/premium-hifu-by-linear-z/12.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">12</span>
+            <span class="fname">12.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/premium-hifu-by-linear-z/13.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">13</span>
+            <span class="fname">13.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/premium-hifu-by-linear-z/14.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">14</span>
+            <span class="fname">14.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/premium-hifu-by-linear-z/15.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">15</span>
+            <span class="fname">15.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/premium-hifu-by-linear-z/16.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">16</span>
+            <span class="fname">16.webp</span>
+          </figcaption>
+        </figure></div>
+      </section>
+      <section class="group">
+        <h2>CE Certified Muscle Sculpting by CM Slim <span class="count">15 images</span></h2>
+        <div class="grid">
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/ce-certified-muscle-sculpting-by-cm-slim/01.jpg" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">01</span>
+            <span class="fname">01.jpg</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/ce-certified-muscle-sculpting-by-cm-slim/02.jpg" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">02</span>
+            <span class="fname">02.jpg</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/ce-certified-muscle-sculpting-by-cm-slim/03.jpg" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">03</span>
+            <span class="fname">03.jpg</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/ce-certified-muscle-sculpting-by-cm-slim/04.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">04</span>
+            <span class="fname">04.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/ce-certified-muscle-sculpting-by-cm-slim/05.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">05</span>
+            <span class="fname">05.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/ce-certified-muscle-sculpting-by-cm-slim/06.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">06</span>
+            <span class="fname">06.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/ce-certified-muscle-sculpting-by-cm-slim/07.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">07</span>
+            <span class="fname">07.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/ce-certified-muscle-sculpting-by-cm-slim/08.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">08</span>
+            <span class="fname">08.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/ce-certified-muscle-sculpting-by-cm-slim/09.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">09</span>
+            <span class="fname">09.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/ce-certified-muscle-sculpting-by-cm-slim/10.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">10</span>
+            <span class="fname">10.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/ce-certified-muscle-sculpting-by-cm-slim/11.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">11</span>
+            <span class="fname">11.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/ce-certified-muscle-sculpting-by-cm-slim/12.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">12</span>
+            <span class="fname">12.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/ce-certified-muscle-sculpting-by-cm-slim/13.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">13</span>
+            <span class="fname">13.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/ce-certified-muscle-sculpting-by-cm-slim/14.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">14</span>
+            <span class="fname">14.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/ce-certified-muscle-sculpting-by-cm-slim/15.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">15</span>
+            <span class="fname">15.webp</span>
+          </figcaption>
+        </figure></div>
+      </section>
+      <section class="group">
+        <h2>Hair &amp; Skin Treatment <span class="count">3 images</span></h2>
+        <div class="grid">
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/hair-and-skin-treatment/01.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">01</span>
+            <span class="fname">01.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/hair-and-skin-treatment/02.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">02</span>
+            <span class="fname">02.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/hair-and-skin-treatment/03.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">03</span>
+            <span class="fname">03.webp</span>
+          </figcaption>
+        </figure></div>
+      </section>
+      <section class="group">
+        <h2>Lysiwave <span class="count">7 images</span></h2>
+        <div class="grid">
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lysiwave/01.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">01</span>
+            <span class="fname">01.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lysiwave/02.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">02</span>
+            <span class="fname">02.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lysiwave/03.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">03</span>
+            <span class="fname">03.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lysiwave/04.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">04</span>
+            <span class="fname">04.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lysiwave/05.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">05</span>
+            <span class="fname">05.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lysiwave/06.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">06</span>
+            <span class="fname">06.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/lysiwave/07.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">07</span>
+            <span class="fname">07.webp</span>
+          </figcaption>
+        </figure></div>
+      </section>
+      <section class="group">
+        <h2>Hair Treatment <span class="count">3 images</span></h2>
+        <div class="grid">
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/hair-treatment/01.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">01</span>
+            <span class="fname">01.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/hair-treatment/02.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">02</span>
+            <span class="fname">02.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/hair-treatment/03.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">03</span>
+            <span class="fname">03.webp</span>
+          </figcaption>
+        </figure></div>
+      </section>
+      <section class="group">
+        <h2>Skin Treatment <span class="count">8 images</span></h2>
+        <div class="grid">
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/skin-treatment/01.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">01</span>
+            <span class="fname">01.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/skin-treatment/02.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">02</span>
+            <span class="fname">02.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/skin-treatment/03.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">03</span>
+            <span class="fname">03.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/skin-treatment/04.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">04</span>
+            <span class="fname">04.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/skin-treatment/05.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">05</span>
+            <span class="fname">05.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/skin-treatment/06.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">06</span>
+            <span class="fname">06.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/skin-treatment/07.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">07</span>
+            <span class="fname">07.webp</span>
+          </figcaption>
+        </figure>
+        <figure class="card">
+          <img src="http://localhost:3006/images/results/skin-treatment/08.webp" alt="" loading="lazy" onerror="this.closest('.card').classList.add('broken')" />
+          <figcaption>
+            <span class="idx">08</span>
+            <span class="fname">08.webp</span>
+          </figcaption>
+        </figure></div>
+      </section>
+</body>
+</html>

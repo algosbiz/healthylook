@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { publishedDocuments } from "@/lib/content";
 
 import {
@@ -100,7 +101,19 @@ import { sanityImageUrl } from "@/sanity/lib/image";
  * page — which for a clinic's price list matters more than freshness.
  */
 
-export async function getTreatments(): Promise<Treatment[]> {
+/**
+ * `cache()`d because this is called many times over in a single treatment
+ * page render — generateStaticParams, generateMetadata, the page body,
+ * category cross-links — with no shared request context otherwise. Without
+ * it, every call re-runs Promise.all([...]) independently, including a
+ * fresh Sanity Live Content fetch each time; those compete rather than
+ * share a connection, and most of them were losing that race and
+ * resolving null, silently falling back to stale data. One treatment
+ * ending up on the wrong image, seemingly at random, was the symptom —
+ * every caller now gets the exact same result for the request, not
+ * whichever of ~10 concurrent fetches happened to finish (or fail) first.
+ */
+export const getTreatments = cache(async (): Promise<Treatment[]> => {
   const [rows, sanity] = await Promise.all([
     publishedDocuments<Treatment>("treatments"),
     getSanityTreatments(),
@@ -114,7 +127,7 @@ export async function getTreatments(): Promise<Treatment[]> {
   const merged = base.map((treatment) => incoming.get(treatment.slug) ?? treatment);
   const known = new Set(base.map((treatment) => treatment.slug));
   return [...merged, ...sanity.treatments.filter((treatment) => !known.has(treatment.slug))];
-}
+});
 
 export async function getTreatmentBySlug(slug: string): Promise<Treatment | undefined> {
   return (await getTreatments()).find((t) => t.slug === slug);
