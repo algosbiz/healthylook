@@ -71,10 +71,19 @@ export async function sanityFetch<TResult>(
       params: options.params ?? {},
       tags: options.tags ?? ["sanity"],
     });
-    // At build time Live Content can resolve successfully with no data instead
-    // of throwing. Confirm that result through the published API before the
-    // caller concludes that a document is missing.
-    if (result.data === null || result.data === undefined) {
+    // At build time, or in the seconds right after a dev server restart
+    // before Live Content's subscription has finished its first sync, it
+    // can resolve successfully with no data yet rather than throwing — for
+    // an array query that comes back as `[]`, not `null`. Confirm through
+    // the published API (a plain, un-subscribed fetch with no warm-up
+    // window) before the caller concludes the data doesn't exist. Safe for
+    // a genuinely-empty result too: fetchPublished would return the same
+    // empty array, just via a reliable path instead of a racy one.
+    const isEmpty =
+      result.data === null ||
+      result.data === undefined ||
+      (Array.isArray(result.data) && result.data.length === 0);
+    if (isEmpty) {
       return await fetchPublished<TResult>(query, options);
     }
     return result.data as TResult;

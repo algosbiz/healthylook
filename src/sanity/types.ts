@@ -75,7 +75,10 @@ export type SplitContentSection = SectionBase<"splitContentSection"> & {
 export type FeatureItem = SanityKeyed & {
   _type: "featureItem";
   title: string;
-  text?: string;
+  text?: PortableTextBlock[];
+  /** A short annotation shown smaller, separate from `text` — e.g. an
+   *  asterisked "T&C Applied" note under the title. */
+  note?: string;
   image?: SanityImage;
   action?: SanityLink;
 };
