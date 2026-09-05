@@ -510,6 +510,63 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
         </section>
       )}
 
+      {/* ── CLIENT REVISION — BEFORE/AFTER EMBEDDED PER TREATMENT ────────
+          "Be Empowered to Feel Truly Confident" is the clinic's own
+          heading for this band. What changed is what sits under it: where
+          the clinic has published a results category for THIS treatment
+          (`resultGroup`), a real sample from that category now renders
+          inline, matched to the page it's on. Where it hasn't — most
+          treatments, since only 5 of the clinic's 6 categories name a
+          specific one — the band falls back to its original form: the
+          heading, and a link to the full gallery. Never someone else's
+          before/after photos captioned with this treatment's name; see
+          `getResultsForTreatment`'s own note for why that's a hard line.
+          Positioned right after Treatment Journey per the client's own
+          request (via Irene, WhatsApp): people should see proof of results
+          right after learning what the visit itself involves. */}
+      <section className="bg-section py-16">
+        <Container>
+          <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+            <div>
+              <h2 className="font-script text-h2 leading-heading text-primary">
+                {sectionHeadings.resultsTitle}
+              </h2>
+              <p className="mt-3 measure font-sans text-sm leading-relaxed text-text-secondary">
+                {resultGroup
+                  ? `Real ${treatment.name} results from our Ubud clinic. Individual results vary. Your doctor will discuss what is realistic for you.`
+                  : "See real patient results from our Ubud clinic. Individual results vary. Your doctor will discuss what is realistic for you."}
+              </p>
+            </div>
+            <Button
+              href={resultGroup ? `/before-after#${resultGroup.slug}` : "/before-after"}
+              variant="outline"
+              withArrow
+              className="shrink-0"
+            >
+              {resultGroup
+                ? `View all ${resultGroup.images.length} results`
+                : "View before & after"}
+            </Button>
+          </div>
+
+          {resultGroup && (
+            <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {resultGroup.images.slice(0, 4).map((src) => (
+                <Reveal key={src} variant="image">
+                  <Img
+                    src={src}
+                    alt={`Before and after ${resultGroup.label} at Healthy Look Aesthetic, Ubud`}
+                    aspect="square"
+                    rounded="rounded-none"
+                    sizes="(max-width: 640px) 50vw, 25vw"
+                  />
+                </Reveal>
+              ))}
+            </div>
+          )}
+        </Container>
+      </section>
+
       {/* Clinic safety commitments — the clinic's own published protocols,
           shown on every treatment page because they apply to every one. */}
       <section className="bg-ink-brown py-section text-white">
@@ -650,60 +707,6 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
           </Container>
         </section>
       )}
-
-      {/* ── CLIENT REVISION — BEFORE/AFTER EMBEDDED PER TREATMENT ────────
-          "Be Empowered to Feel Truly Confident" is the clinic's own
-          heading for this band. What changed is what sits under it: where
-          the clinic has published a results category for THIS treatment
-          (`resultGroup`), a real sample from that category now renders
-          inline, matched to the page it's on. Where it hasn't — most
-          treatments, since only 5 of the clinic's 6 categories name a
-          specific one — the band falls back to its original form: the
-          heading, and a link to the full gallery. Never someone else's
-          before/after photos captioned with this treatment's name; see
-          `getResultsForTreatment`'s own note for why that's a hard line. */}
-      <section className="bg-section py-16">
-        <Container>
-          <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-            <div>
-              <h2 className="font-script text-h2 leading-heading text-primary">
-                {sectionHeadings.resultsTitle}
-              </h2>
-              <p className="mt-3 measure font-sans text-sm leading-relaxed text-text-secondary">
-                {resultGroup
-                  ? `Real ${treatment.name} results from our Ubud clinic. Individual results vary. Your doctor will discuss what is realistic for you.`
-                  : "See real patient results from our Ubud clinic. Individual results vary. Your doctor will discuss what is realistic for you."}
-              </p>
-            </div>
-            <Button
-              href={resultGroup ? `/before-after#${resultGroup.slug}` : "/before-after"}
-              variant="outline"
-              withArrow
-              className="shrink-0"
-            >
-              {resultGroup
-                ? `View all ${resultGroup.images.length} results`
-                : "View before & after"}
-            </Button>
-          </div>
-
-          {resultGroup && (
-            <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {resultGroup.images.slice(0, 4).map((src) => (
-                <Reveal key={src} variant="image">
-                  <Img
-                    src={src}
-                    alt={`Before and after ${resultGroup.label} at Healthy Look Aesthetic, Ubud`}
-                    aspect="square"
-                    rounded="rounded-none"
-                    sizes="(max-width: 640px) 50vw, 25vw"
-                  />
-                </Reveal>
-              ))}
-            </div>
-          )}
-        </Container>
-      </section>
 
       {/* The products strip runs on every treatment page of the live site
           ("Only the Best Worldwide Products"); the rebuild had it on the

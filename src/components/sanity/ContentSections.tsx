@@ -434,7 +434,11 @@ export function TaglineBlock({ section }: { section: TaglineSection }) {
   return (
     <section id={section.anchor} className="scroll-mt-24 border-b border-hairline bg-paper">
       <Container className="py-8 text-center">
-        <p className="font-sans text-lead font-bold italic text-primary">{section.text}</p>
+        {/* Poppins at its normal weight, upright: the clinic asked for "the
+            standard font" here, and the live site sets the same line in
+            plain Poppins 400. Bold italic read as a third voice next to the
+            two the type scale actually defines. */}
+        <p className="font-sans text-lead text-primary">{section.text}</p>
       </Container>
     </section>
   );
@@ -469,8 +473,7 @@ export async function ResultsNavBlock({ section }: { section: ResultsNavSection 
   // count — which drifts the moment someone edits a gallery in Sanity
   // Studio, exactly as happened when Botox's 24 became 16 after removing
   // near-duplicates there. Sanity is what the page actually renders, so
-  // it's what the count reads from too; the static count is only a
-  // fallback for a group Sanity doesn't have yet.
+  // it is the only thing the count reads from.
   const sanityGalleries = await getSanityResultGalleries();
   return (
     <nav
@@ -503,7 +506,7 @@ export async function ResultsNavBlock({ section }: { section: ResultsNavSection 
             >
               {group.label}
               <span className="ml-2 text-muted">
-                {sanityGalleries?.get(group.slug)?.length ?? group.images.length}
+                {sanityGalleries?.get(group.slug)?.length ?? 0}
               </span>
             </a>
           ))}
