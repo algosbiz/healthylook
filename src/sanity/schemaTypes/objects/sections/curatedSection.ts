@@ -9,7 +9,6 @@ const components = [
   ["Treatment highlights", "treatmentHighlights"],
   ["Why us", "whyUs"],
   ["Doctors", "doctors"],
-  ["Results", "results"],
   ["Testimonials", "testimonials"],
   ["Clinic experience", "clinicExperience"],
   ["International patients", "internationalPatients"],

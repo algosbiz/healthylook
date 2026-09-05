@@ -5,7 +5,6 @@ import Treatments from "@/components/home/Treatments";
 import TreatmentHighlights from "@/components/home/TreatmentHighlights";
 import WhyUs from "@/components/home/WhyUs";
 import Doctors from "@/components/home/Doctors";
-import Results from "@/components/home/Results";
 import Testimonials from "@/components/home/Testimonials";
 import ClinicExperience from "@/components/home/ClinicExperience";
 import InternationalPatients from "@/components/home/InternationalPatients";
@@ -51,8 +50,6 @@ export default async function CuratedSection({ section }: { section: CuratedSect
       return <WhyUs />;
     case "doctors":
       return <Doctors />;
-    case "results":
-      return <Results />;
     case "testimonials":
       return <Testimonials />;
     case "clinicExperience":
