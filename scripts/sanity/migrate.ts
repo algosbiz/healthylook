@@ -377,12 +377,10 @@ async function migratePosts() {
 
 async function migrateHomepage() {
   const seo = getPageSeo("/");
-  const resultImages = [];
-  for (const [groupIndex, group] of resultGroups.entries()) {
-    const path = group.images[0];
-    const image = await migratedImage(path, `${group.label} before and after result`);
-    if (image) resultImages.push({ ...image, _key: key("home-result", groupIndex) });
-  }
+  // The result photographs live only in the CMS now — data/results.ts keeps
+  // the categories but no longer mirrors the images, so this seeds the
+  // teaser's structure and the clinic picks its photos in the Studio.
+  const resultImages: Array<Record<string, unknown>> = [];
   const clinicImages = [];
   for (const [index, value] of [
     ["/images/clinic/reception.jpg", "The reception at Healthy Look Aesthetic, Ubud"],
@@ -788,24 +786,19 @@ async function innerPageSections(path: string): Promise<unknown[]> {
         curated("pricing-booking", "booking"),
       ];
     case "/before-after": {
-      const galleries = [];
-      for (const [groupIndex, group] of resultGroups.entries()) {
-        const images = [];
-        for (const [imageIndex, imagePath] of group.images.entries()) {
-          const image = await migratedImage(imagePath, `${group.label} before and after result`);
-          if (image) images.push({ ...image, _key: key(`result-${groupIndex}`, imageIndex) });
-        }
-        galleries.push({
-          _type: "gallerySection",
-          _key: `results-${group.slug}`,
-          anchor: group.slug,
-          eyebrow: String(groupIndex + 1).padStart(2, "0"),
-          title: group.label,
-          description: "Published treatment outcomes shared with patient consent.",
-          images,
-          tone: groupIndex % 2 ? "wash" : "paper",
-        });
-      }
+      // One empty gallery per category: the photographs themselves are only
+      // in the CMS now (see data/results.ts), so this lays out the sections
+      // and the clinic fills each one in the Studio.
+      const galleries = resultGroups.map((group, groupIndex) => ({
+        _type: "gallerySection",
+        _key: `results-${group.slug}`,
+        anchor: group.slug,
+        eyebrow: String(groupIndex + 1).padStart(2, "0"),
+        title: group.label,
+        description: "Published treatment outcomes shared with patient consent.",
+        images: [] as Array<Record<string, unknown>>,
+        tone: groupIndex % 2 ? "wash" : "paper",
+      }));
       return [
         await hero("results", {
           eyebrow: "Results",

@@ -144,7 +144,6 @@ export const CURATED_SECTION_COMPONENTS = [
   "treatmentHighlights",
   "whyUs",
   "doctors",
-  "results",
   "testimonials",
   "clinicExperience",
   "internationalPatients",

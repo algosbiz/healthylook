@@ -387,7 +387,7 @@ export type PricingPromiseSection = {
 
 export type CuratedSection = {
   _type: "curatedSection";
-  component?: "homeHero" | "brandStory" | "partners" | "treatments" | "treatmentHighlights" | "whyUs" | "doctors" | "results" | "testimonials" | "clinicExperience" | "internationalPatients" | "homeFaq" | "blogTeaser" | "booking";
+  component?: "homeHero" | "brandStory" | "partners" | "treatments" | "treatmentHighlights" | "whyUs" | "doctors" | "testimonials" | "clinicExperience" | "internationalPatients" | "homeFaq" | "blogTeaser" | "booking";
   anchor?: string;
   isHidden?: boolean;
 };
@@ -561,7 +561,25 @@ export type JourneyStep = {
 export type FeatureItem = {
   _type: "featureItem";
   title?: string;
-  text?: string;
+  text?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal";
+    listItem?: "bullet";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+  note?: string;
   image?: ImageWithAlt;
   action?: Link;
 };
@@ -735,7 +753,7 @@ export type PageByPathQueryResult = {
   } | {
     _key: string;
     _type: "curatedSection";
-    component?: "blogTeaser" | "booking" | "brandStory" | "clinicExperience" | "doctors" | "homeFaq" | "homeHero" | "internationalPatients" | "partners" | "results" | "testimonials" | "treatmentHighlights" | "treatments" | "whyUs";
+    component?: "blogTeaser" | "booking" | "brandStory" | "clinicExperience" | "doctors" | "homeFaq" | "homeHero" | "internationalPatients" | "partners" | "testimonials" | "treatmentHighlights" | "treatments" | "whyUs";
     anchor?: string;
     isHidden?: boolean;
     image: null;
@@ -779,7 +797,25 @@ export type PageByPathQueryResult = {
       _key: string;
       _type: "featureItem";
       title?: string;
-      text?: string;
+      text?: Array<{
+        children?: Array<{
+          marks?: Array<string>;
+          text?: string;
+          _type: "span";
+          _key: string;
+        }>;
+        style?: "normal";
+        listItem?: "bullet";
+        markDefs?: Array<{
+          href?: string;
+          _type: "link";
+          _key: string;
+        }>;
+        level?: number;
+        _type: "block";
+        _key: string;
+      }>;
+      note?: string;
       image: {
         _type: "imageWithAlt";
         asset: {

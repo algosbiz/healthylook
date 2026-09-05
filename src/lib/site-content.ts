@@ -442,6 +442,9 @@ export async function getSiteCopy(): Promise<SiteCopy> {
   };
 }
 
+/** A result category together with the photographs the CMS holds for it. */
+export type ResultGroupWithImages = ResultGroup & { images: string[] };
+
 /**
  * The before/after sample embedded in a treatment page.
  *
@@ -449,15 +452,18 @@ export async function getSiteCopy(): Promise<SiteCopy> {
  * in the Studio updates both. Which category a treatment maps to stays in
  * code — that is a structural link, not copy, and a treatment with no
  * matching category still gets no gallery rather than someone else's photos.
+ *
+ * The CMS is the only source of the photographs, so a category whose
+ * gallery is empty yields no section at all rather than an empty grid.
  */
 export async function getResultsForTreatment(
   slug: string,
-): Promise<ResultGroup | undefined> {
+): Promise<ResultGroupWithImages | undefined> {
   const base = sourceResultsForTreatment(slug);
   if (!base) return undefined;
   const galleries = await getSanityResultGalleries();
   const images = galleries?.get(base.slug);
-  return images?.length ? { ...base, images } : base;
+  return images?.length ? { ...base, images } : undefined;
 }
 
 export async function getPartners(): Promise<Partner[]> {
