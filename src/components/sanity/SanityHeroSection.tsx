@@ -3,6 +3,7 @@ import Container from "@/components/ui/Container";
 import Button from "@/components/ui/Button";
 import Reveal from "@/components/ui/Reveal";
 import PageHero from "@/components/shared/PageHero";
+import SanityImage from "@/components/ui/SanityImage";
 import { sanityImageUrl, isSanityHostedImage } from "@/sanity/lib/image";
 import type { HeroSection, SanityLink } from "@/sanity/types";
 
@@ -24,6 +25,10 @@ function Action({ action, variant }: { action?: SanityLink; variant: "accent" | 
 export default function SanityHeroSection({ section }: { section: HeroSection }) {
   const image = sanityImageUrl(section.image, 2200);
   if (!image) return null;
+
+  // Sanity URLs render through <SanityImage>, which builds their srcset
+  // from cdn.sanity.io; anything else stays on Vercel's optimizer.
+  const HeroImage = isSanityHostedImage(image) ? SanityImage : Image;
 
   if (section.presentation !== "home") {
     return (
@@ -50,14 +55,13 @@ export default function SanityHeroSection({ section }: { section: HeroSection })
       className="relative isolate flex min-h-[100svh] scroll-mt-24 flex-col justify-end overflow-hidden bg-ink-brown"
     >
       <div className="absolute inset-0 -z-10">
-        <Image
+        <HeroImage
           src={image}
           alt={section.image.alt}
           fill
           priority
           sizes="100vw"
           quality={85}
-          unoptimized={isSanityHostedImage(image)}
           className="object-cover object-center"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-ink-warm/80 via-ink-warm/28 to-ink-warm/0" />

@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import Container from "@/components/ui/Container";
 import Reveal from "@/components/ui/Reveal";
+import SanityImage from "@/components/ui/SanityImage";
 import { isSanityHostedImage } from "@/sanity/lib/image";
 import type { ReactNode } from "react";
 
@@ -76,6 +77,8 @@ export default function PageHero({
   imagePosition?: string;
   children?: ReactNode;
 }) {
+  const HeroImage = isSanityHostedImage(image) ? SanityImage : Image;
+
   return (
     <section className="relative isolate bg-blush pt-20 lg:pt-24">
       <div className="grid lg:min-h-[72svh] lg:grid-cols-12">
@@ -93,7 +96,7 @@ export default function PageHero({
             A wider band would look more conventionally "hero" and would
             bin a third of every photograph to do it. */}
         <div className="relative order-1 aspect-square sm:aspect-[9/8] lg:order-2 lg:col-span-5 lg:aspect-auto">
-          <Image
+          <HeroImage
             src={image}
             alt={imageAlt}
             fill
@@ -109,8 +112,8 @@ export default function PageHero({
             // `image` is either a Sanity CDN URL (already resized and
             // format-negotiated there) or one of a handful of local
             // fallback paths (e.g. when a post has no cover image) — only
-            // the Sanity case should skip Vercel's optimizer.
-            unoptimized={isSanityHostedImage(image)}
+            // the Sanity case should skip Vercel's optimizer, which it
+            // does via <SanityImage> so it still gets a srcset.
             className={`object-cover ${imagePosition}`}
           />
           {/* No scrim any more: the header is solid on these routes, so

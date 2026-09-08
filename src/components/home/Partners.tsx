@@ -1,4 +1,6 @@
 import Image from "next/image";
+import SanityImage from "@/components/ui/SanityImage";
+import { isSanityHostedImage } from "@/sanity/lib/image";
 import Reveal from "@/components/ui/Reveal";
 import Container from "@/components/ui/Container";
 import { getPartners } from "@/lib/site-content";
@@ -72,9 +74,14 @@ export default async function Partners() {
               aria-hidden={copy === 1 ? "true" : undefined}
               className="flex shrink-0 animate-marquee items-center gap-12 pr-12 group-hover:[animation-play-state:paused] lg:gap-16 lg:pr-16"
             >
-              {partners.map((partner) => (
+              {partners.map((partner) => {
+                // Partner logos come from the clinic's Sanity media
+                // library, so they take the same cdn.sanity.io srcset path
+                // as every other CMS image rather than Vercel's optimizer.
+                const Logo = isSanityHostedImage(partner.logo) ? SanityImage : Image;
+                return (
                 <li key={`${copy}-${partner.name}`} className="shrink-0">
-                  <Image
+                  <Logo
                     src={partner.logo}
                     alt={partner.name}
                     width={250}
@@ -83,7 +90,8 @@ export default async function Partners() {
                     className="h-16 w-auto object-contain opacity-90 transition-opacity duration-500 hover:opacity-100 lg:h-20"
                   />
                 </li>
-              ))}
+                );
+              })}
             </ul>
           ))}
         </div>
