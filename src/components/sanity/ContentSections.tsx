@@ -111,6 +111,40 @@ const gridColumns = {
   4: "md:grid-cols-2 lg:grid-cols-4",
 } as const;
 
+/**
+ * Reads a field the schema declares as a plain string, tolerating Portable
+ * Text found in it.
+ *
+ * `featureItem.text` is `type: "text"` in the schema and `text?: string`
+ * in the generated types, but 24 items across /, /gift-card, /our-doctor
+ * and /special-offers currently hold Portable Text blocks instead — an
+ * earlier edit or migration wrote rich text into a plain-text field. React
+ * cannot render a block object, so one malformed field fails the whole
+ * prerender with:
+ *
+ *   Objects are not valid as a React child (found: object with keys
+ *   {_key, _type, children, markDefs, style})
+ *
+ * That is a real build failure on `main` today; the deployed site only
+ * still works because it serves a prerender from before the content
+ * changed. Flattening to plain text renders what the schema promises and
+ * what the editor actually typed — every affected value is ordinary prose
+ * with no marks or links — and stops a single bad field being able to
+ * break a deploy again. The documents are still worth correcting in
+ * Studio; this only makes them non-fatal.
+ */
+function asPlainText(value: unknown): string {
+  if (typeof value === "string") return value;
+  if (!Array.isArray(value)) return "";
+  return value
+    .map((block) => {
+      const children = (block as { children?: Array<{ text?: string }> })?.children;
+      return Array.isArray(children) ? children.map((c) => c?.text ?? "").join("") : "";
+    })
+    .filter(Boolean)
+    .join("\n\n");
+}
+
 export function FeatureGridBlock({ section }: { section: FeatureGridSection }) {
   const dark = section.tone === "brown";
   return (
@@ -129,6 +163,7 @@ export function FeatureGridBlock({ section }: { section: FeatureGridSection }) {
       <div className={`mt-14 grid gap-px bg-hairline ${gridColumns[section.columns || 3]}`}>
         {section.items.map((item, index) => {
           const src = sanityImageUrl(item.image);
+          const text = asPlainText(item.text);
           return (
             <Reveal key={item._key} delay={index * 60} className={dark ? "bg-ink-brown" : "bg-paper"}>
               <article className="h-full p-7 lg:p-9">
@@ -144,9 +179,9 @@ export function FeatureGridBlock({ section }: { section: FeatureGridSection }) {
                 <h3 className={`font-sans text-h4 ${dark ? "text-white" : "text-ink"}`}>
                   {item.title}
                 </h3>
-                {item.text && (
-                  <p className={`mt-4 font-sans text-body leading-body ${dark ? "text-white/65" : "text-text-secondary"}`}>
-                    {item.text}
+                {text && (
+                  <p className={`mt-4 whitespace-pre-line font-sans text-body leading-body ${dark ? "text-white/65" : "text-text-secondary"}`}>
+                    {text}
                   </p>
                 )}
                 {item.action && <LinkedButton action={item.action} dark={dark} />}
