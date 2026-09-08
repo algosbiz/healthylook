@@ -45,23 +45,26 @@ const nextConfig: NextConfig = {
   },
 
   images: {
-    // EMERGENCY, TEMPORARY: the Hobby plan's Image Transformations quota
-    // (5,000/month) is already exhausted for this billing cycle — Vercel is
-    // returning a hard 402 Payment Required for any image size/quality
-    // combination that isn't already cached, so visitors were seeing
-    // outright broken images, not just slow ones. `unoptimized: true` here
-    // overrides every component-level `unoptimized` prop (including the
-    // Sanity-specific ones below, which were already effectively free of
-    // this problem) and stops ALL new Vercel image transformations, local
-    // and remote alike — images render as their original files with no
-    // resizing, which beats them not rendering at all.
+    // The `unoptimized: true` emergency switch that used to sit here is
+    // gone. It was added when the Hobby plan's Image Transformations quota
+    // (5,000/month) ran out mid-cycle and Vercel started returning 402 for
+    // any uncached size/quality combination, and it was documented as
+    // removable once the cycle reset on 2026-09-03 — which has passed.
     //
-    // The billing cycle resets 2026-09-03. Once it does, this line can come
-    // out — the Sanity bypass and the trimmed formats/sizes/cache-TTL below
-    // stay either way, and together they should keep this from happening
-    // again on a normal month's traffic.
-    unoptimized: true,
-
+    // Leaving it in was not free. Because it is a global override it also
+    // switched off srcset generation, so every image on the site shipped
+    // as a single fixed-width file: the homepage hero at its full 1920px
+    // regardless of viewport, and the local `public/images/` set as raw
+    // unresized JPEG/PNG with no WebP. That is a large part of why
+    // PageSpeed measured a 5.9s Largest Contentful Paint on mobile.
+    //
+    // What keeps the quota safe now is narrower and does not cost
+    // responsiveness: Sanity-hosted images — the large majority of image
+    // volume on this content-heavy site — are routed to `sanityImageLoader`
+    // (see sanity/lib/image.ts), so their srcset is built from cdn.sanity.io
+    // URLs and never touches Vercel's optimizer at all. What is left on the
+    // optimizer is the small fixed local set plus Blob uploads, across the
+    // trimmed formats/sizes below and a 31-day cache TTL.
     remotePatterns: [
       { protocol: "https", hostname: "*.public.blob.vercel-storage.com" },
       // Sanity's image pipeline. The path remains restricted to image
@@ -104,6 +107,37 @@ const nextConfig: NextConfig = {
     // redeploys, so this is effectively a monthly ceiling per image, not
     // a per-deploy one.
     minimumCacheTTL: 2678400, // 31 days
+  },
+
+  /**
+   * Cache headers for the static files served straight out of `public/`.
+   *
+   * Vercel serves everything in `public/` with `Cache-Control: public,
+   * max-age=0, must-revalidate` unless told otherwise. Files under
+   * `_next/static` get a fingerprinted filename and a one-year immutable
+   * header for free, but `public/` files keep the name they were authored
+   * with, so Next cannot assume they are safe to cache and defaults to
+   * revalidating every one of them on every visit. On this site that is
+   * ~580KB of photography and brand assets paying a conditional request
+   * each — Pingdom scores the site D (67) on "Add Expires headers"
+   * because of it, and repeat visitors get none of the benefit of having
+   * already downloaded the images.
+   *
+   * 30 days rather than a year, and deliberately not `immutable`: these
+   * filenames are stable, so a photograph swapped in under an existing
+   * name would otherwise be invisible to anyone who had already cached
+   * it. A month bounds that, and giving the replacement a new filename
+   * busts the cache immediately if it ever needs to be faster than that.
+   */
+  async headers() {
+    return [
+      {
+        source: "/images/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=2592000" },
+        ],
+      },
+    ];
   },
 
   /**

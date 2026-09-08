@@ -1,4 +1,5 @@
 import Image from "next/image";
+import SanityImage from "@/components/ui/SanityImage";
 import { isSanityHostedImage } from "@/sanity/lib/image";
 
 type Aspect = "portrait" | "tall" | "landscape" | "wide" | "cinema" | "square" | "fill";
@@ -61,18 +62,21 @@ export default function Img({
   quality?: number;
   scrim?: boolean;
 }) {
+  // Sanity URLs render through <SanityImage>, which builds their srcset
+  // from cdn.sanity.io; local and Blob images stay on Vercel's optimizer.
+  const Picture = isSanityHostedImage(src) ? SanityImage : Image;
+
   return (
     <div
       className={`relative isolate overflow-hidden bg-wash ${aspects[aspect]} ${rounded} ${className}`}
     >
-      <Image
+      <Picture
         src={src}
         alt={alt}
         fill
         sizes={sizes}
         quality={quality}
         priority={priority}
-        unoptimized={isSanityHostedImage(src)}
         className={`object-cover ${position}`}
       />
       {scrim && (

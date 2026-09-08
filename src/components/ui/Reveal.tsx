@@ -57,6 +57,24 @@ export default function Reveal({
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduced) return;
 
+    // Content already on screen at mount is never armed.
+    //
+    // Arming runs after hydration, so for an element the server had
+    // already painted above the fold the real sequence was: paint it
+    // visible → hydrate → `opacity: 0` → observer fires → fade back in
+    // over --dur-slow (900ms) plus whatever stagger `delay` adds. The
+    // browser scores the *final* paint as Largest Contentful Paint, so
+    // the homepage <h1> was being measured a full hydration-plus-
+    // animation after it was actually readable: PageSpeed's throttled
+    // mobile run reported LCP 5.9s against an FCP of 1.1s.
+    //
+    // An element already in view has nothing to reveal — the reader has
+    // seen it. Skipping it here lands in exactly the same state as the
+    // reduced-motion path above: never armed, so never hidden. Sections
+    // below the fold are untouched and still animate on scroll.
+    const box = node.getBoundingClientRect();
+    if (box.top < window.innerHeight && box.bottom > 0) return;
+
     setArmed(true);
 
     const observer = new IntersectionObserver(

@@ -149,6 +149,27 @@ export default async function RootLayout({
       className={`${poppins.variable} ${retroSignature.variable} antialiased`}
     >
       <body className="flex min-h-screen flex-col bg-background text-text">
+        {/*
+          Every hero photograph is served from Sanity's CDN — a different
+          origin from the document — and it is the first and largest image
+          the page requests. Discovering it costs a fresh DNS lookup, TCP
+          connection and TLS handshake before its first byte can arrive,
+          which on PageSpeed's throttled mobile profile (400ms RTT) is
+          roughly three round trips of dead time.
+
+          (Lighthouse reports the homepage's LCP element as the <h1>, not
+          the photograph — but the two compete for the same early
+          bandwidth, and the inner pages built on PageHero lead with the
+          image, so getting the connection open early still pays.)
+
+          `preconnect` starts that handshake immediately rather than when
+          the preloaded <img> is parsed. React hoists this into <head>.
+          crossOrigin is required: images are fetched anonymously, and a
+          preconnect that doesn't match the eventual request's CORS mode
+          opens a connection the image can't reuse.
+        */}
+        <link rel="preconnect" href="https://cdn.sanity.io" crossOrigin="anonymous" />
+
         <script
           type="application/ld+json"
           // Next.js requires JSON-LD to be injected this way; the content is
