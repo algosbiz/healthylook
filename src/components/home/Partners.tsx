@@ -82,6 +82,7 @@ export default async function Partners() {
                 return (
                 <li key={`${copy}-${partner.name}`} className="shrink-0">
                   <Logo
+                    unoptimized={!isSanityHostedImage(partner.logo)}
                     src={partner.logo}
                     alt={partner.name}
                     width={250}

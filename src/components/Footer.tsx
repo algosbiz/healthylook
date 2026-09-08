@@ -103,6 +103,7 @@ export default async function Footer() {
         {/* Brand + contact */}
         <div>
           <Image
+            unoptimized
             src="/images/brand/logo.png"
             alt={copy.siteName}
             width={300}

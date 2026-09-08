@@ -45,26 +45,34 @@ const nextConfig: NextConfig = {
   },
 
   images: {
-    // The `unoptimized: true` emergency switch that used to sit here is
-    // gone. It was added when the Hobby plan's Image Transformations quota
-    // (5,000/month) ran out mid-cycle and Vercel started returning 402 for
-    // any uncached size/quality combination, and it was documented as
-    // removable once the cycle reset on 2026-09-03 — which has passed.
+    // Vercel's image optimizer is NOT used by this site. Do not re-enable
+    // it without checking the quota first.
     //
-    // Leaving it in was not free. Because it is a global override it also
-    // switched off srcset generation, so every image on the site shipped
-    // as a single fixed-width file: the homepage hero at its full 1920px
-    // regardless of viewport, and the local `public/images/` set as raw
-    // unresized JPEG/PNG with no WebP. That is a large part of why
-    // PageSpeed measured a 5.9s Largest Contentful Paint on mobile.
+    // The Hobby plan's Image Transformations quota is still exhausted:
+    // every /_next/image request returns 402 Payment Required, months
+    // after the billing cycle the original emergency note expected it to
+    // reset on. That note said the global `unoptimized: true` here could
+    // come out once 2026-09-03 passed; acting on that was wrong, and it
+    // briefly shipped a homepage whose logo and photographs 402'd.
     //
-    // What keeps the quota safe now is narrower and does not cost
-    // responsiveness: Sanity-hosted images — the large majority of image
-    // volume on this content-heavy site — are routed to `sanityImageLoader`
-    // (see sanity/lib/image.ts), so their srcset is built from cdn.sanity.io
-    // URLs and never touches Vercel's optimizer at all. What is left on the
-    // optimizer is the small fixed local set plus Blob uploads, across the
-    // trimmed formats/sizes below and a 31-day cache TTL.
+    // So bypassing the optimizer is now done per image rather than
+    // globally, because the two image sources need opposite treatment:
+    //
+    //   - Sanity-hosted images (the large majority) render through
+    //     <SanityImage>, whose loader builds a real srcset out of
+    //     cdn.sanity.io URLs. Sanity does the resizing and format
+    //     negotiation, it costs nothing here, and it is unaffected by the
+    //     Vercel quota.
+    //   - Local public/images and Blob uploads pass `unoptimized`, so they
+    //     are served as their original files. No resizing, but they render.
+    //
+    // A global `unoptimized: true` cannot express that split: it also
+    // switches off srcset generation, which is what made every image on
+    // the site ship at a single fixed width in the first place.
+    //
+    // The formats/sizes/qualities below only matter if the optimizer is
+    // ever turned back on, and are kept for that day.
+
     remotePatterns: [
       { protocol: "https", hostname: "*.public.blob.vercel-storage.com" },
       // Sanity's image pipeline. The path remains restricted to image

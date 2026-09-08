@@ -97,6 +97,7 @@ export default function PageHero({
             bin a third of every photograph to do it. */}
         <div className="relative order-1 aspect-square sm:aspect-[9/8] lg:order-2 lg:col-span-5 lg:aspect-auto">
           <HeroImage
+            unoptimized={!isSanityHostedImage(image)}
             src={image}
             alt={imageAlt}
             fill

@@ -56,6 +56,7 @@ export default async function Hero() {
     <section className="relative isolate flex min-h-[100svh] flex-col justify-end overflow-hidden bg-ink-brown">
       <div className="absolute inset-0 -z-10">
         <Image
+          unoptimized
           src="/images/clinic/hero-banner.webp"
           alt="A guest at Healthy Look Aesthetic, in the clinic's garden setting in Ubud, Bali"
           fill

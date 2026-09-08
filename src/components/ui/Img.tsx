@@ -71,6 +71,7 @@ export default function Img({
       className={`relative isolate overflow-hidden bg-wash ${aspects[aspect]} ${rounded} ${className}`}
     >
       <Picture
+        unoptimized={!isSanityHostedImage(src)}
         src={src}
         alt={alt}
         fill

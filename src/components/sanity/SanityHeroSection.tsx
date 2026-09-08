@@ -56,6 +56,7 @@ export default function SanityHeroSection({ section }: { section: HeroSection })
     >
       <div className="absolute inset-0 -z-10">
         <HeroImage
+          unoptimized={!isSanityHostedImage(image)}
           src={image}
           alt={section.image.alt}
           fill

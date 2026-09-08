@@ -40,6 +40,7 @@ export default function Brand({
       className="flex shrink-0 items-center"
     >
       <Image
+        unoptimized
         src="/images/brand/logo.png"
         alt={siteName}
         width={300}

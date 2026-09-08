@@ -60,6 +60,7 @@ export default async function ClinicExperience() {
               }`}
             >
               <Image
+                unoptimized
                 src={shot.src}
                 alt={shot.alt}
                 fill
