@@ -58,6 +58,26 @@ export async function generateMetadata(): Promise<Metadata> {
   description: copy.description,
   metadataBase: new URL("https://healthylook-aesthetic.com"),
   alternates: { canonical: "/" },
+  // ── WHY THESE ARE DECLARED AND NOT src/app/icon.jpg ──────────────────
+  // Next's file-based metadata convention (an `icon.jpg` sitting in
+  // src/app) generates a route module that inlines the image's ABSOLUTE
+  // path into a single-quoted JavaScript string — part of a file-size
+  // guard that never even fires for files this small.
+  //
+  // An apostrophe anywhere in the checkout path therefore closes that
+  // string early and the whole build dies with "Expecting Unicode escape
+  // sequence \uXXXX", naming a file nobody touched. It is not the image
+  // that is wrong; it is where the repo happens to live. Vercel checks out
+  // to /vercel/path0 and never hits it, so this only ever breaks locally —
+  // which is the worst place for it, because that is where you are trying
+  // to work.
+  //
+  // Serving the same two files from /public and naming them here emits the
+  // same <link> tags, and builds anywhere.
+  icons: {
+    icon: { url: "/icon.jpg", type: "image/jpeg", sizes: "512x512" },
+    apple: { url: "/apple-icon.jpg", type: "image/jpeg", sizes: "180x180" },
+  },
   openGraph: {
     title: `${copy.siteName} | ${copy.tagline}`,
     description: copy.description,

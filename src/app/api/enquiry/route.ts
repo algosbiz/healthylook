@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSiteCopy } from "@/lib/site-content";
+import { whatsappHrefFor } from "@/lib/constants";
 
 /**
  * POST /api/enquiry — the booking/enquiry form's backend.
@@ -16,23 +17,48 @@ import { getSiteCopy } from "@/lib/site-content";
  * desktop.
  *
  * ── WHY THERE IS NO SDK DEPENDENCY ────────────────────────────────────
- * This talks to Resend over its plain HTTP API with `fetch`, rather than
- * `npm i resend`. The SDK is a thin wrapper over exactly this one request,
- * and not adding it keeps the dependency list at three packages. Swapping
- * providers means changing `sendEmail` below and nothing else.
+ * This talks to SendGrid's v3 Mail Send API over plain HTTP with `fetch`,
+ * rather than `npm i @sendgrid/mail`. The SDK is a thin wrapper over
+ * exactly this one request, and not adding it keeps the dependency list
+ * short. Swapping providers means changing `sendEmail` below and nothing
+ * else — which this route has now done twice, so the claim is tested.
+ *
+ * ── WHY SENDGRID ALONGSIDE GOOGLE WORKSPACE ───────────────────────────
+ * The domain's mail is Google Workspace (MX → *.aspmx.l.google.com), and
+ * the two do not collide: SendGrid authenticates by CNAME on subdomains it
+ * owns and never touches MX, so inbound mail keeps working untouched. The
+ * agency's dmgmasonry.ca runs exactly this pairing.
+ *
+ * The alternative — SMTP through Workspace itself — was built and then
+ * backed out. It works, but it authenticates as a human account's app
+ * password (dies silently when that password is reset) and gives the
+ * application no delivery record at all: when an enquiry goes missing the
+ * only trail is Email Log Search in the admin console. For a form that is
+ * the clinic's main intake channel, "we cannot tell you what happened to
+ * it" was the wrong trade.
  *
  * ── CONFIGURATION ─────────────────────────────────────────────────────
- * See .env.example. Three variables:
+ * See .env.example and README-EMAIL.md. Four variables:
  *
- *   RESEND_API_KEY      required — from resend.com/api-keys
- *   ENQUIRY_FROM_EMAIL  required — an address on a domain verified in
- *                       Resend. It CANNOT be the clinic's Gmail/Zoho
- *                       address unless that domain is verified there;
- *                       sending "from" an unverified domain is what makes
- *                       mail land in spam. e.g. no-reply@healthylook-aesthetic.com
- *   ENQUIRY_TO_EMAIL    optional — defaults to the published clinic address
+ *   SENDGRID_API_KEY    required — app.sendgrid.com → Settings → API Keys.
+ *                       Starts with "SG.". Restricted Access with Mail Send
+ *                       is enough; it never needs Full Access.
+ *   ENQUIRY_FROM_EMAIL  required — an address on a domain authenticated in
+ *                       SendGrid (Settings → Sender Authentication). It is
+ *                       a sending identity, not a mailbox anyone reads.
+ *                       Sending "from" an unauthenticated domain — or from
+ *                       a free @gmail.com address — is what makes mail land
+ *                       in spam. e.g. no-reply@healthylook-aesthetic.com
+ *   ENQUIRY_TO_EMAIL    optional — where enquiries land. Comma-separated
+ *                       for several inboxes; defaults to the published
+ *                       clinic address in Site settings.
+ *   ENQUIRY_BCC_EMAIL   optional — comma-separated silent copies. This is
+ *                       the app-side half of "send a copy to the agency for
+ *                       testing": it only copies mail THIS form sends —
+ *                       mail a patient sends to info@ directly never
+ *                       reaches this code, see README-EMAIL.md.
  *
- * ⚠ Until RESEND_API_KEY is set this route returns 503 `not_configured`,
+ * ⚠ Until SENDGRID_API_KEY is set this route returns 503 `not_configured`,
  * and the form falls back to WhatsApp rather than silently swallowing the
  * enquiry. That is deliberate: a form that shows "thank you" while posting
  * to nothing is the worst possible outcome here, and it is the usual one.
@@ -95,6 +121,29 @@ function escapeHtml(value: string): string {
 }
 
 /**
+ * Splits a comma- (or semicolon-) separated env var into addresses.
+ *
+ * Deduplicated case-insensitively because SendGrid rejects the whole
+ * request — "Each email address in the personalization block should be
+ * unique between to, cc, and bcc" — if one address appears twice, which is
+ * exactly what happens the day someone puts the same inbox in both
+ * ENQUIRY_TO_EMAIL and ENQUIRY_BCC_EMAIL.
+ */
+function parseRecipients(value: string | undefined): string[] {
+  const seen = new Set<string>();
+  return (value ?? "")
+    .split(/[,;]/)
+    .map((address) => address.trim())
+    .filter((address) => address !== "" && isPlausibleEmail(address))
+    .filter((address) => {
+      const key = address.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+}
+
+/**
  * Strips CR/LF from anything that goes into a header-ish field (the
  * subject, the reply-to display name). Newlines in a header are how header
  * injection works — without this, a name of "Bob\nBcc: someone@evil.com"
@@ -146,44 +195,61 @@ function isRateLimited(ip: string): boolean {
 
 async function sendEmail(payload: {
   from: string;
-  to: string;
+  fromName: string;
+  to: string[];
+  bcc: string[];
   replyTo: string;
+  replyToName: string;
   subject: string;
   text: string;
   html: string;
 }): Promise<{ ok: true } | { ok: false; detail: string }> {
-  const response = await fetch("https://api.resend.com/emails", {
+  const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+      Authorization: `Bearer ${process.env.SENDGRID_API_KEY}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: payload.from,
-      to: [payload.to],
-      reply_to: payload.replyTo,
+      personalizations: [
+        {
+          to: payload.to.map((email) => ({ email })),
+          // Omitted rather than sent empty: SendGrid 400s on `bcc: []`.
+          ...(payload.bcc.length > 0
+            ? { bcc: payload.bcc.map((email) => ({ email })) }
+            : {}),
+        },
+      ],
+      from: { email: payload.from, name: payload.fromName },
+      reply_to: { email: payload.replyTo, name: payload.replyToName },
       subject: payload.subject,
-      text: payload.text,
-      html: payload.html,
+      // Order matters to SendGrid: text/plain must come before text/html,
+      // and it rejects the request outright if they are the other way up.
+      content: [
+        { type: "text/plain", value: payload.text },
+        { type: "text/html", value: payload.html },
+      ],
     }),
   });
 
+  // 202 Accepted, not 200 — SendGrid queues rather than delivers inline.
   if (response.ok) return { ok: true };
 
-  // Read the provider's own error rather than a generic failure: the two
-  // things that actually go wrong here are an unverified `from` domain and
-  // an expired key, and Resend names both explicitly.
+  // Read the provider's own error rather than a generic failure: the three
+  // things that actually go wrong here are an unauthenticated `from`
+  // domain, a key without the Mail Send permission, and a revoked key.
+  // SendGrid names all three explicitly in the response body.
   const detail = await response.text().catch(() => "");
   return { ok: false, detail: `${response.status} ${detail}`.trim() };
 }
 
 export async function POST(request: Request) {
-  if (!process.env.RESEND_API_KEY || !process.env.ENQUIRY_FROM_EMAIL) {
+  if (!process.env.SENDGRID_API_KEY || !process.env.ENQUIRY_FROM_EMAIL) {
     return NextResponse.json(
       {
         error: "not_configured",
         message:
-          "Email delivery is not configured. Set RESEND_API_KEY and ENQUIRY_FROM_EMAIL.",
+          "Email delivery is not configured. Set SENDGRID_API_KEY and ENQUIRY_FROM_EMAIL.",
       },
       { status: 503 },
     );
@@ -315,11 +381,32 @@ export async function POST(request: Request) {
   // without an editor being able to redirect the clinic's own enquiries.
   // Below it, the address the clinic publishes in Site settings, so changing
   // it there actually changes where enquiries land.
+  // Resolved once and shared: the To fallback below needs the clinic's
+  // published address, and so does the visitor's confirmation at the end.
+  // It is cached upstream, so asking for it on every submission is cheap.
+  const copy = await getSiteCopy();
+
+  const configuredTo = parseRecipients(process.env.ENQUIRY_TO_EMAIL);
+  const to = configuredTo.length > 0 ? configuredTo : [copy.email];
+
+  // Silent copies — the agency inbox, during testing. Filtered against
+  // `to` so listing one address in both variables is a no-op rather than a
+  // 400 from SendGrid.
+  const toKeys = new Set(to.map((address) => address.toLowerCase()));
+  const bcc = parseRecipients(process.env.ENQUIRY_BCC_EMAIL).filter(
+    (address) => !toKeys.has(address.toLowerCase()),
+  );
+
   const result = await sendEmail({
     from: process.env.ENQUIRY_FROM_EMAIL,
-    to: process.env.ENQUIRY_TO_EMAIL || (await getSiteCopy()).email,
+    // Named, because "no-reply@…" alone in an inbox list says nothing about
+    // which of the clinic's systems sent it.
+    fromName: "Healthy Look Aesthetic — Website",
+    to,
+    bcc,
     // The clinic replies to the patient, not to the no-reply sender.
     replyTo: email,
+    replyToName: name,
     // The page's own subject wins over the treatment, so a gift card
     // enquiry is filterable in the clinic's inbox without opening it.
     subject: `Website enquiry — ${name}${
@@ -335,6 +422,89 @@ export async function POST(request: Request) {
     // business. They get a generic failure and the WhatsApp fallback.
     console.error("[enquiry] send failed:", result.detail);
     return NextResponse.json({ error: "send_failed" }, { status: 502 });
+  }
+
+  // ── The visitor's own copy ──────────────────────────────────────────
+  //
+  // Sent only after the clinic's copy succeeded. An acknowledgement to
+  // someone whose enquiry never arrived is worse than no acknowledgement:
+  // it stops them chasing it up.
+  //
+  // Its Reply-To is the clinic, not the enquirer — the mirror of the email
+  // above. Someone who hits Reply on "we've received your enquiry" is
+  // adding something to it, and that has to reach a person.
+  const confirmation = await sendEmail({
+    from: process.env.ENQUIRY_FROM_EMAIL,
+    fromName: copy.siteName,
+    to: [email],
+    bcc: [],
+    replyTo: copy.email,
+    replyToName: copy.siteName,
+    subject: `We’ve received your enquiry — ${copy.siteName}`,
+    text: [
+      `Hello ${name},`,
+      "",
+      "Thank you for getting in touch. Your enquiry has reached our team",
+      `and we reply during opening hours ${copy.openingHours.toLowerCase()}.`,
+      "",
+      "Here is what you sent us:",
+      "",
+      ...rows.map(([label, value]) => `${label}: ${value}`),
+      ...(message ? ["", "Your message:", message] : []),
+      "",
+      `If you would like an answer sooner, message us on WhatsApp: ${whatsappHrefFor(
+        copy.whatsappNumber,
+      )}`,
+      "",
+      copy.siteName,
+      copy.address,
+      `${copy.phoneDisplay} · ${copy.email}`,
+    ].join("\n"),
+    html: `
+    <div style="font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:#404040;line-height:1.6">
+      <p style="margin:0 0 20px;font-size:15px;color:#2b2c27">Hello ${escapeHtml(name)},</p>
+      <p style="margin:0 0 24px;font-size:15px;color:#2b2c27">
+        Thank you for getting in touch. Your enquiry has reached our team and
+        we reply during opening hours, ${escapeHtml(copy.openingHours.toLowerCase())}.
+      </p>
+      <p style="margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:#726d64">What you sent us</p>
+      <table cellpadding="0" cellspacing="0" style="border-collapse:collapse;width:100%;max-width:560px">
+        ${rows
+          .map(
+            ([label, value]) => `
+          <tr>
+            <td style="padding:8px 16px 8px 0;vertical-align:top;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:#726d64;white-space:nowrap">${escapeHtml(label)}</td>
+            <td style="padding:8px 0;vertical-align:top;font-size:15px;color:#2b2c27">${escapeHtml(value)}</td>
+          </tr>`,
+          )
+          .join("")}
+      </table>
+      ${
+        message
+          ? `<div style="margin-top:20px;padding-top:16px;border-top:1px solid #ece6d8">
+               <p style="margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:#726d64">Your message</p>
+               <p style="margin:0;font-size:15px;color:#2b2c27;white-space:pre-wrap">${escapeHtml(message)}</p>
+             </div>`
+          : ""
+      }
+      <p style="margin:28px 0 0;font-size:15px;color:#2b2c27">
+        If you would like an answer sooner,
+        <a href="${escapeHtml(whatsappHrefFor(copy.whatsappNumber))}" style="color:#2b2c27">message us on WhatsApp</a>.
+      </p>
+      <div style="margin-top:28px;padding-top:20px;border-top:1px solid #ece6d8;font-size:13px;color:#726d64">
+        <p style="margin:0 0 4px;color:#2b2c27">${escapeHtml(copy.siteName)}</p>
+        <p style="margin:0 0 4px">${escapeHtml(copy.address)}</p>
+        <p style="margin:0">${escapeHtml(copy.phoneDisplay)} · ${escapeHtml(copy.email)}</p>
+      </div>
+    </div>
+  `.trim(),
+  });
+
+  // Logged, never surfaced. By this point the enquiry IS in the clinic's
+  // inbox; reporting a failure would send the visitor to WhatsApp to send
+  // the whole thing a second time.
+  if (!confirmation.ok) {
+    console.error("[enquiry] confirmation send failed:", confirmation.detail);
   }
 
   return NextResponse.json({ ok: true });

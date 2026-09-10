@@ -21,6 +21,10 @@
 // the category name is the only label, exactly as on the live site.
 // Consent and clinical sign-off sit with the clinic, evidenced by these
 // already being published.
+//
+// One deliberate, acknowledged exception: "hair-treatment" below also maps
+// to the PRP Hair treatment page, even though those photos are not confirmed
+// to be from PRP Hair patients specifically. See its own comment.
 
 export type ResultGroup = {
   slug: string;
@@ -40,21 +44,35 @@ export const resultGroups: ResultGroup[] = [
     label: "CE Certified Muscle Sculpting by CM Slim",
     treatmentSlug: "muscle-sculpting",
   },
-  // The four below are the clinic's own broad categories rather than one
-  // treatment each, so none of them claims a treatment page's embedded
-  // gallery — see getResultsForTreatment below. Lysiwave is the exception
-  // directly under this note.
+  // These broad categories are the clinic's own buckets rather than one
+  // treatment each, so by default none of them claims a treatment page's
+  // embedded gallery — see getResultsForTreatment below. Lysiwave and Hair
+  // Treatment are the two exceptions, directly below each of them.
   //
-  // "Hair & Skin Treatment" predates the separate hair and skin boards and
-  // looks redundant beside them, but the live site still publishes all
-  // three as distinct categories, so the newer boards are additions rather
-  // than a replacement and this one stays.
-  { slug: "hair-and-skin-treatment", label: "Hair & Skin Treatment", treatmentSlug: null },
+  // "Hair & Skin Treatment" (the old combined bucket that predates the
+  // separate hair and skin boards) was removed per the client (via Irene,
+  // WhatsApp): now that "Hair Treatment" and "Skin Treatment" are their own
+  // categories below, the combined one is a pure duplicate rather than an
+  // addition. Its gallery section on the Sanity /before-after page is
+  // hidden to match (see scripts/sanity/hide-hair-and-skin-treatment.ts).
+  //
   // Lysiwave is a single named treatment, unlike the buckets around it, so
   // the client asked for it to appear inline on its own treatment page the
   // way botox and the rest already do.
   { slug: "lysiwave", label: "Lysiwave", treatmentSlug: "fat-cellulite" },
-  { slug: "hair-treatment", label: "Hair Treatment", treatmentSlug: null },
+  // PRP Hair has never had before/after photos of its own — confirmed by
+  // searching every image in the Sanity media library. Per the client (via
+  // Irene, WhatsApp), rather than add a separate "PRP Hair" gallery
+  // duplicating these same photos, this category's existing gallery is
+  // simply also pointed at the PRP Hair treatment page — the same mechanism
+  // Lysiwave uses above. The photos are NOT confirmed to be from PRP Hair
+  // patients specifically ("Hair Treatment" is deliberately a broad,
+  // unverified category, per the note above), which is exactly the
+  // ambiguity getResultsForTreatment's own comment normally exists to
+  // prevent. This is a knowing, temporary exception to that rule, not a
+  // bug: once real PRP Hair photos exist, give them their own category
+  // instead and remove `treatmentSlug: "prp/hair"` here.
+  { slug: "hair-treatment", label: "Hair Treatment", treatmentSlug: "prp/hair" },
   { slug: "skin-treatment", label: "Skin Treatment", treatmentSlug: null },
 ];
 
@@ -67,7 +85,8 @@ export const resultGroups: ResultGroup[] = [
  * treatment's photos on a page for a *different* treatment is the
  * invented-result the brief prohibits, so a treatment page with no
  * matching category gets no embedded gallery, only the existing link out
- * to the full /before-after page.
+ * to the full /before-after page. "hair-treatment" mapping to "prp/hair" is
+ * a knowing, client-requested exception to this — see its own comment above.
  */
 export function getResultsForTreatment(slug: string): ResultGroup | undefined {
   return resultGroups.find((group) => group.treatmentSlug === slug);

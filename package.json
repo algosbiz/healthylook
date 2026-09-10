@@ -10,6 +10,8 @@
     "db:check": "node scripts/db.cjs check",
     "db:migrate": "node scripts/db.cjs migrate",
     "db:admin": "node scripts/db.cjs admin",
+    "email:check": "node scripts/email.cjs check",
+    "email:test": "node scripts/email.cjs test",
     "sanity": "sanity",
     "sanity:deploy": "sanity deploy",
     "sanity:migrate": "sanity exec scripts/sanity/migrate.ts --with-user-token",

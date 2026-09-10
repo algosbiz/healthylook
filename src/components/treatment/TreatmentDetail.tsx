@@ -550,15 +550,15 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
           </div>
 
           {resultGroup && (
-            <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {resultGroup.images.slice(0, 4).map((src) => (
+            <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {resultGroup.images.slice(0, 6).map((src) => (
                 <Reveal key={src} variant="image">
                   <Img
                     src={src}
                     alt={`Before and after ${resultGroup.label} at Healthy Look Aesthetic, Ubud`}
                     aspect="square"
                     rounded="rounded-none"
-                    sizes="(max-width: 640px) 50vw, 25vw"
+                    sizes="(max-width: 640px) 50vw, 33vw"
                   />
                 </Reveal>
               ))}
