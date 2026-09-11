@@ -16,6 +16,7 @@ import {
   SentNotice,
   ErrorNotice,
 } from "./formParts";
+import TurnstileField from "./TurnstileField";
 import { BOOKING_TIME_SLOTS, BOOKING_TREATMENT_OPTIONS } from "@/lib/constants";
 
 /**
@@ -48,7 +49,8 @@ export default function ContactForm({
   treatmentOptions?: string[];
   withSchedule?: boolean;
 }) {
-  const { status, fieldErrors, fallbackHref, formRef, submit } = useEnquirySubmit();
+  const { status, fieldErrors, fallbackHref, formRef, submit, turnstileResetSignal } =
+    useEnquirySubmit();
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -68,7 +70,12 @@ export default function ContactForm({
       .map(([label, value]) => ({ label, value }));
 
     void submit({
-      core: { name: get("name"), email: get("email"), website: get("website") },
+      core: {
+        name: get("name"),
+        email: get("email"),
+        website: get("website"),
+        turnstileToken: get("cf-turnstile-response"),
+      },
       extra,
       whatsappLines: [
         `Name: ${get("name")}`,
@@ -209,6 +216,8 @@ export default function ContactForm({
           className={`mt-3 resize-none ${fieldClass}`}
         />
       </div>
+
+      <TurnstileField resetSignal={turnstileResetSignal} action="enquiry" />
 
       <SubmitRow status={status} />
 

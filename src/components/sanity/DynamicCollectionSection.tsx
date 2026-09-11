@@ -67,36 +67,43 @@ async function TreatmentsDirectory({ section }: { section: CollectionSection }) 
   );
 }
 
+// Articles only — not the treatment-page links also mixed into
+// getBlogPosts(). Client request (via Irene, WhatsApp): clicking through to
+// the blog should show blog, not treatment pages. See src/data/blog.ts's own
+// header for why the two are mixed in getBlogPosts() in the first place
+// (curated headlines for treatment pages, kept from the old WordPress blog
+// index, still used elsewhere — e.g. the site footer) — that data source is
+// unchanged, this page just no longer renders that part of it.
 async function BlogDirectory({ section }: { section: CollectionSection }) {
-  const [posts, treatments] = await Promise.all([getBlogPosts(), getTreatments()]);
+  const posts = (await getBlogPosts()).filter((post) => !post.treatmentSlug);
   return (
     <SectionShell tone={section.tone} anchor={section.anchor}>
       <Heading section={section} />
       <div className="grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
-        {posts.map((post, index) => {
-          const treatment = post.treatmentSlug
-            ? treatments.find((item) => item.slug === post.treatmentSlug)
-            : undefined;
-          return (
-            <Reveal key={post.href} delay={Math.min(index, 5) * 50}>
-              <Link href={post.href} className="group flex h-full flex-col border border-hairline bg-background transition-colors hover:border-primary/40">
-                <TreatmentThumb
-                  src={post.image ?? treatment?.image}
-                  name={post.title}
-                  categoryLabel={post.categoryLabel ?? "Healthy Look"}
-                  aspect="landscape"
-                  position={treatment?.imagePosition}
-                />
-                <div className="flex flex-1 flex-col p-7">
-                  <h2 className="flex items-start justify-between gap-3 font-sans text-h4 leading-snug text-ink transition-colors group-hover:text-primary">
-                    {post.title}
-                    <ArrowUpRightIcon className="mt-1 h-4 w-4 shrink-0 text-primary" />
-                  </h2>
-                </div>
-              </Link>
-            </Reveal>
-          );
-        })}
+        {posts.map((post, index) => (
+          <Reveal key={post.href} delay={Math.min(index, 5) * 50}>
+            <Link href={post.href} className="group flex h-full flex-col border border-hairline bg-background transition-colors hover:border-primary/40">
+              <TreatmentThumb
+                // Same fallback the article's own page already uses when it
+                // has no cover image (src/app/[slug]/page.tsx) — client
+                // request (via Irene, WhatsApp): the cards were showing a
+                // blank placeholder for every post that has none uploaded
+                // in Sanity yet. Real per-post photos still replace this
+                // automatically the moment they're added in Studio.
+                src={post.image ?? "/images/clinic/clinic-04.jpg"}
+                name={post.title}
+                categoryLabel={post.categoryLabel ?? "Healthy Look"}
+                aspect="landscape"
+              />
+              <div className="flex flex-1 flex-col p-7">
+                <h2 className="flex items-start justify-between gap-3 font-sans text-h4 leading-snug text-ink transition-colors group-hover:text-primary">
+                  {post.title}
+                  <ArrowUpRightIcon className="mt-1 h-4 w-4 shrink-0 text-primary" />
+                </h2>
+              </div>
+            </Link>
+          </Reveal>
+        ))}
       </div>
     </SectionShell>
   );

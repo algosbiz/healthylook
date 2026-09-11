@@ -187,6 +187,22 @@ const nextConfig: NextConfig = {
         destination: "/ubud-bali#body-treatments",
         permanent: true,
       },
+      /**
+       * The WordPress site's sitemap lives at three Yoast-specific URLs —
+       * an index plus one file per post type. Next serves a single
+       * /sitemap.xml instead (src/app/sitemap.ts), so all three would
+       * otherwise 404 on launch day, and one of them is the URL currently
+       * submitted in Search Console and named in the old robots.txt.
+       *
+       * Redirecting keeps every existing reference to them working. The
+       * new sitemap should still be submitted in Search Console directly:
+       * Google follows these, but a sitemap it was asked to fetch at one
+       * URL and found at another is reported as a warning rather than
+       * read cleanly.
+       */
+      { source: "/sitemap_index.xml", destination: "/sitemap.xml", permanent: true },
+      { source: "/page-sitemap.xml", destination: "/sitemap.xml", permanent: true },
+      { source: "/post-sitemap.xml", destination: "/sitemap.xml", permanent: true },
     ];
   },
 };

@@ -1,6 +1,24 @@
 // Small site-wide constants that don't belong to any one data file.
 export const SITE_NAME = "Healthy Look Aesthetic";
 
+/**
+ * The site's canonical origin — no trailing slash.
+ *
+ * Three things have to agree on this or they quietly contradict each
+ * other: `metadataBase` (which turns every page's relative canonical into
+ * an absolute one), the `url` in the MedicalBusiness structured data, and
+ * the absolute URLs in sitemap.xml and robots.txt. A sitemap that lists a
+ * different origin from the canonical tags is a sitemap Google discards.
+ *
+ * Hardcoded rather than read from an env var on purpose. On Vercel the
+ * obvious candidates are all wrong for this: VERCEL_URL is the deployment's
+ * own random hostname, and VERCEL_PROJECT_PRODUCTION_URL is the .vercel.app
+ * domain, not the clinic's. A preview deployment that emitted its own
+ * hostname here would publish a sitemap inviting Google to index the
+ * preview — robots.ts blocks previews outright for the same reason.
+ */
+export const SITE_URL = "https://healthylook-aesthetic.com";
+
 export const SITE_TAGLINE = "Aesthetic Clinic in Bali";
 
 export const SITE_DESCRIPTION =

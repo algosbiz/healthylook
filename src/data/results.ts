@@ -38,10 +38,15 @@ export const resultGroups: ResultGroup[] = [
   { slug: "botox", label: "Botox", treatmentSlug: "botox" },
   { slug: "lip-filler", label: "Lip Filler", treatmentSlug: "lip-filler" },
   { slug: "dermal-filler", label: "Dermal Filler", treatmentSlug: "dermal-filler" },
-  { slug: "premium-hifu-by-linear-z", label: "Premium HIFU by Linear Z", treatmentSlug: "hifu" },
+  // label is shortened from the gallery's own full name ("Premium HIFU by
+  // Linear Z") — client request (via Irene, WhatsApp): the nav pill row is a
+  // tight horizontal scroll, and the long name was crowding it. The Sanity
+  // gallery section's own heading is untouched, still the full name.
+  { slug: "premium-hifu-by-linear-z", label: "HIFU", treatmentSlug: "hifu" },
   {
     slug: "ce-certified-muscle-sculpting-by-cm-slim",
-    label: "CE Certified Muscle Sculpting by CM Slim",
+    // Same shortening, same reason, as premium-hifu-by-linear-z above.
+    label: "Muscle Sculpting",
     treatmentSlug: "muscle-sculpting",
   },
   // These broad categories are the clinic's own buckets rather than one

@@ -5,8 +5,7 @@ import Button from "@/components/ui/Button";
 import SectionHeading from "@/components/ui/SectionHeading";
 import TreatmentThumb from "@/components/shared/TreatmentThumb";
 import { ArrowUpRightIcon } from "@/components/ui/icons";
-import { TREATMENT_CATEGORIES } from "@/data/treatments";
-import { getTreatments, getBlogPosts } from "@/lib/site-content";
+import { getBlogPosts } from "@/lib/site-content";
 
 /**
  * OUR BLOG — restored.
@@ -25,21 +24,13 @@ import { getTreatments, getBlogPosts } from "@/lib/site-content";
 const FEATURED_COUNT = 3;
 
 export default async function BlogTeaser() {
-  const [treatments, blogPosts] = await Promise.all([getTreatments(), getBlogPosts()]);
-  const featured = blogPosts.slice(0, FEATURED_COUNT).map((post) => {
-    const treatment = post.treatmentSlug
-      ? treatments.find((candidate) => candidate.slug === post.treatmentSlug)
-      : undefined;
-    const category = treatment
-      ? TREATMENT_CATEGORIES.find((candidate) => candidate.id === treatment.category)
-      : undefined;
-    return {
-      post,
-      image: post.image ?? treatment?.image,
-      imagePosition: treatment?.imagePosition,
-      categoryLabel: post.categoryLabel ?? category?.label,
-    };
-  });
+  const blogPosts = await getBlogPosts();
+  // Articles only, not the treatment-page links also mixed into getBlogPosts()
+  // — client request (via Irene, WhatsApp): don't present a treatment page as
+  // if it were blog content. Treatments already have their own nav and
+  // sections elsewhere; this strip is specifically "Our Blog".
+  const articles = blogPosts.filter((post) => !post.treatmentSlug);
+  const featured = articles.slice(0, FEATURED_COUNT);
 
   return (
     <section className="bg-background py-section">
@@ -54,24 +45,26 @@ export default async function BlogTeaser() {
           />
           <Reveal delay={120} className="shrink-0">
             <Button href="/our-blog" variant="quiet" withArrow>
-              All {blogPosts.length} articles
+              All {articles.length} articles
             </Button>
           </Reveal>
         </div>
 
         <div className="mt-14 grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
-          {featured.map(({ post, image, imagePosition, categoryLabel }, index) => {
-            const cardClass =
-              "group flex h-full flex-col border border-hairline bg-background transition-colors duration-300 hover:border-primary/40";
-
-            const inner = (
-              <>
+          {featured.map((post, index) => (
+            <Reveal key={post.href} delay={index * 90}>
+              <Link
+                href={post.href}
+                className="group flex h-full flex-col border border-hairline bg-background transition-colors duration-300 hover:border-primary/40"
+              >
                 <TreatmentThumb
-                  src={image}
+                  // Same fallback the article's own page uses when it has no
+                  // cover image yet (src/app/[slug]/page.tsx) — see
+                  // DynamicCollectionSection.tsx's BlogDirectory for the same fix.
+                  src={post.image ?? "/images/clinic/clinic-04.jpg"}
                   name={post.title}
-                  categoryLabel={categoryLabel ?? "Healthy Look"}
+                  categoryLabel={post.categoryLabel ?? "Healthy Look"}
                   aspect="landscape"
-                  position={imagePosition}
                 />
                 <div className="flex flex-1 flex-col p-7">
                   <h3 className="flex items-start justify-between gap-3 font-sans text-h4 leading-snug text-ink transition-colors duration-300 group-hover:text-primary">
@@ -79,20 +72,12 @@ export default async function BlogTeaser() {
                     <ArrowUpRightIcon className="mt-1 h-4 w-4 shrink-0 text-primary opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                   </h3>
                   <p className="mt-5 font-sans text-micro uppercase tracking-caps text-muted">
-                    {post.treatmentSlug ? "Read the treatment guide" : "Read the article"}
+                    Read the article
                   </p>
                 </div>
-              </>
-            );
-
-            return (
-              <Reveal key={post.href} delay={index * 90}>
-                <Link href={post.href} className={cardClass}>
-                  {inner}
-                </Link>
-              </Reveal>
-            );
-          })}
+              </Link>
+            </Reveal>
+          ))}
         </div>
       </Container>
     </section>

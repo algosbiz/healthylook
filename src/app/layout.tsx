@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import PublicChrome from "@/components/PublicChrome";
 import { buildNavItems } from "@/components/header/navItems";
 import { getSiteCopy, getTreatments, type SiteCopy } from "@/lib/site-content";
+import { SITE_URL } from "@/lib/constants";
 import StickyCTA from "@/components/ui/StickyCTA";
 import WhatsAppFloatingButton from "@/components/ui/WhatsAppFloatingButton";
 import SanityRuntime from "@/components/sanity/SanityRuntime";
@@ -56,7 +57,7 @@ export async function generateMetadata(): Promise<Metadata> {
     template: `%s | ${copy.siteName}`,
   },
   description: copy.description,
-  metadataBase: new URL("https://healthylook-aesthetic.com"),
+  metadataBase: new URL(SITE_URL),
   alternates: { canonical: "/" },
   // ── WHY THESE ARE DECLARED AND NOT src/app/icon.jpg ──────────────────
   // Next's file-based metadata convention (an `icon.jpg` sitting in
@@ -107,7 +108,7 @@ function buildStructuredData(copy: SiteCopy) {
   "@type": "MedicalBusiness",
   name: copy.siteName,
   description: copy.description,
-  url: "https://healthylook-aesthetic.com",
+  url: SITE_URL,
   email: copy.email,
   telephone: copy.phoneE164,
   hasMap: copy.mapsHref,

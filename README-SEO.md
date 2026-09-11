@@ -185,3 +185,99 @@ antaranya bermasalah dan sudah ditandai `FIXME` di file itu:
 
 Masing-masing sudah ada saran penggantinya di komentar `FIXME` pada
 `src/data/seo.ts`. Semua bisa diperbaiki hanya dengan mengganti satu string.
+
+---
+
+# Sitemap & robots.txt
+
+Dua file yang memberi tahu Google halaman mana yang ada dan mana yang tidak
+boleh dibuka:
+
+| URL | Isinya |
+|---|---|
+| `/sitemap.xml` | Daftar semua halaman publik + kapan terakhir diubah |
+| `/robots.txt` | Aturan crawl, plus alamat sitemap di atas |
+
+## Tidak perlu diedit manual
+
+`/sitemap.xml` dibuat otomatis dari isi website — katalog treatment, artikel,
+dan dokumen Sanity. Tambah treatment baru, sitemap-nya ikut bertambah. Hapus
+satu artikel, URL-nya hilang dari sitemap. **Tidak ada daftar URL yang harus
+disinkronkan dengan tangan.**
+
+Sitemap ikut ter-update begitu ada yang di-publish (lewat tag cache yang sama
+dengan halamannya), dan paling lambat satu jam sekali kalau webhook-nya
+meleset.
+
+## Yang diblokir dari Google
+
+Di `src/app/robots.txt/route.ts`:
+
+```
+Disallow: /studio    ← Sanity Studio
+Disallow: /admin     ← dashboard konten
+Disallow: /api/      ← endpoint, bukan halaman
+```
+
+Selain itu semua boleh di-crawl. **Jangan** blokir `/_next/` — Google perlu
+CSS dan JavaScript untuk melihat halaman apa adanya.
+
+Halaman `/studio` dan `/admin` juga sudah mengirim `noindex, nofollow`
+sendiri. Keduanya sengaja dipasang: robots.txt mencegah crawler membuka
+halamannya sama sekali, dan tag `noindex` menjaga kalau ada yang sampai ke
+sana lewat link sebelum robots.txt terbaca.
+
+Preview deployment di Vercel memblokir semuanya (`Disallow: /`), supaya
+website tidak terindeks dua kali di alamat yang bukan domain klinik.
+
+## Menyembunyikan satu halaman dari Google
+
+Di Sanity, buka dokumennya → tab **SEO** → centang **hide from search**
+(`noIndex`). Halaman itu langsung:
+
+- mengirim `noindex` ke Google, dan
+- **hilang dari sitemap** — kedua hal itu harus sejalan, karena sitemap yang
+  mendaftarkan halaman `noindex` adalah website yang menyuruh Google membuka
+  halaman yang sekaligus disuruh dibuang.
+
+## Tanggal `<lastmod>`
+
+Diambil dari yang paling tahu, berurutan:
+
+1. Sanity `_updatedAt` — waktu edit sungguhan
+2. Dashboard (`documents.updated_at`) — waktu simpan sungguhan
+3. Sitemap website lama — `src/data/legacySitemap.ts`
+
+Nomor 3 ada karena isi halaman disalin apa adanya dari website lama, jadi
+"terakhir berubah" memang tanggal website lama, bukan tanggal build. Halaman
+yang tidak punya tanggal dari mana pun tetap masuk sitemap, hanya tanpa
+`lastmod` — itu wajar, dan lebih baik daripada mengarang tanggal.
+
+## Setelah website live
+
+1. Submit `https://healthylook-aesthetic.com/sitemap.xml` di **Google Search
+   Console** (Sitemaps → Add a new sitemap).
+2. Alamat sitemap lama (`/sitemap_index.xml`, `/page-sitemap.xml`,
+   `/post-sitemap.xml`) sudah di-redirect ke yang baru, jadi tidak ada yang
+   mati — tapi tetap submit yang baru, karena Search Console mencatat sitemap
+   yang dialihkan sebagai peringatan.
+
+## Cek isinya
+
+```bash
+curl http://localhost:3006/sitemap.xml
+```
+
+```bash
+curl http://localhost:3006/robots.txt
+```
+
+Hitung jumlah URL-nya:
+
+```bash
+curl -s http://localhost:3006/sitemap.xml | grep -c "<loc>"
+```
+
+Per 10 September 2026 hasilnya **56** — persis 57 URL dari sitemap website
+lama, dikurangi `/ubud-bali/slimming-body-contouring` yang diminta klien
+dihapus dan sekarang di-redirect ke `/ubud-bali#body-treatments`.

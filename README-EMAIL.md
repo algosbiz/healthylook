@@ -38,6 +38,7 @@ sama persis, lihat [bagian 2](#2-referensi-yang-sudah-jalan-dmgmasonryca).
 | 4.3 | Perbaiki DMARC | Cloudflare | ⬜ sebaiknya |
 | 4.4 | Hapus CNAME Hostinger yang basi | Cloudflare | ⬜ sebaiknya |
 | 4.5 | Tembusan ke `contact@` | Admin Console / Gmail | ⬜ selama testing |
+| 9 | Pasang Turnstile | Cloudflare + `.env` | ⬜ sebaiknya |
 
 ---
 
@@ -478,3 +479,95 @@ maupun vendor baru.
 Kalau suatu saat mau pindah lagi, perubahannya terkurung di satu fungsi:
 `sendEmail()`. Sisa route — validasi, honeypot, rate limit, penyusunan
 HTML, `Reply-To`, BCC — tidak tersentuh.
+
+---
+
+## 9. Cloudflare Turnstile (proteksi spam form)
+
+Terpasang di **dua form publik**: enquiry/booking dan gift card. Keduanya
+lewat `/api/enquiry`, jadi satu verifikasi menutup dua-duanya.
+
+Form admin (`/admin/login` dan lainnya) **tidak** dipasangi: yang di dalam
+dashboard ada di balik login sehingga bukan sasaran spam, dan yang di
+halaman login memakai server action — plumbing-nya berbeda. Kalau login
+admin mau ikut dilindungi dari brute force, itu pekerjaan terpisah.
+
+### 9.1 Ambil kunci
+
+1. [dash.cloudflare.com](https://dash.cloudflare.com) → **Turnstile** →
+   **Add widget**
+2. Widget mode: **Managed**
+3. Hostnames: masukkan `healthylook-aesthetic.com` **dan** `localhost`
+   — tanpa `localhost`, widget tidak jalan waktu development
+4. Salin **Site Key** dan **Secret Key**
+
+### 9.2 Isi env var
+
+```
+NEXT_PUBLIC_TURNSTILE_SITE_KEY=0x4AAAAAAA...
+TURNSTILE_SECRET_KEY=0x4AAAAAAA...
+```
+
+`NEXT_PUBLIC_` di depan site key itu wajib — kunci itu memang ikut
+terkompilasi ke halaman dan aman dilihat publik. Secret key **tidak boleh**
+diberi prefix itu.
+
+Isi juga keduanya di **Vercel → Settings → Environment Variables**, lalu
+redeploy.
+
+### 9.3 Rollout-nya sengaja terbagi dua
+
+| Kondisi | Yang terjadi |
+|---|---|
+| Site key kosong | Widget tidak dirender sama sekali |
+| Secret key kosong | Server melewati verifikasi |
+| Dua-duanya kosong | Form persis seperti sebelum Turnstile ada |
+| Dua-duanya terisi | Proteksi aktif |
+
+Jadi tidak ada urutan pemasangan yang bisa membuat form menolak semua
+orang. Tapi **pasang berpasangan di produksi**: site key tanpa secret key
+menampilkan kotak verifikasi yang tidak memverifikasi apa pun.
+
+### 9.4 Keputusan desain yang perlu diketahui
+
+**Widget-nya terlihat, bukan `interaction-only`.** Mode tersembunyi memang
+lebih rapi, tapi setiap cara Turnstile bisa gagal — script diblokir
+extension, proxy kantor, token kedaluwarsa saat orang mengisi sembilan
+kolom — jadi tidak kelihatan: pengunjung menekan Send, dapat error umum,
+dan tidak tahu ada tahap verifikasi. Form ini jalur masuk utama klinik,
+jadi kegagalan yang terlihat lebih baik daripada yang senyap.
+
+**Verifikasi dijalankan SETELAH validasi kolom.** Kalau salah ketik email,
+pengunjung dapat pesan error kolom sementara token-nya belum terpakai —
+perbaiki lalu kirim lagi langsung berhasil. Kalau urutannya dibalik,
+percobaan kedua gagal dengan `timeout-or-duplicate`, error yang tidak bisa
+dipahami pengunjung.
+
+**Gagal-terbuka saat Cloudflare tidak bisa dihubungi.** Kalau siteverify
+timeout atau membalas 5xx, enquiry tetap diteruskan. Alasannya: itu tidak
+mengatakan apa pun tentang si pengunjung, dan menolak semua enquiry selama
+gangguan pihak lain mengorbankan pasien nyata demi mencegah beberapa email
+spam — yang honeypot dan rate limit masih saring. Verdict `success:false`
+yang sungguhan tetap ditolak. Kalau trade-off ini suatu saat dianggap
+salah, tempat mengubahnya cuma satu: blok `catch` di `verifyTurnstile()`.
+
+### 9.5 Test key Cloudflare
+
+Untuk kerja lokal tanpa widget sungguhan:
+
+```
+site   1x00000000000000000000AA             selalu lolos (terlihat)
+       2x00000000000000000000AB             selalu blokir
+secret 1x0000000000000000000000000000000AA  selalu lolos
+       2x0000000000000000000000000000000AA  selalu gagal
+```
+
+### 9.6 Kalau bermasalah
+
+| Gejala | Penyebab |
+|---|---|
+| Form selalu `captcha_failed` di localhost | `localhost` belum ditambahkan ke hostname widget (9.1) |
+| Widget tidak muncul sama sekali | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` kosong, atau belum redeploy setelah diisi |
+| Widget muncul tapi semua kiriman lolos | `TURNSTILE_SECRET_KEY` kosong — server melewati verifikasi |
+| Gagal di percobaan kedua saja | Token sekali pakai. Widget seharusnya di-reset otomatis; kalau tidak, cek `turnstileResetSignal` di `useEnquirySubmit`. |
+| `invalid-input-secret` di log server | Secret key salah ketik, atau site key dan secret dari widget yang berbeda |

@@ -88,6 +88,8 @@ type EnquiryPayload = {
   extra?: unknown;
   /** Honeypot — see below. Must be empty. */
   website?: unknown;
+  /** Cloudflare Turnstile's `cf-turnstile-response`. See verifyTurnstile. */
+  turnstileToken?: unknown;
 };
 
 /** Bounds on the page-supplied fields, so one request can't build a novel. */
@@ -191,6 +193,78 @@ function isRateLimited(ip: string): boolean {
   }
 
   return false;
+}
+
+/**
+ * Cloudflare Turnstile verification.
+ *
+ * Off until TURNSTILE_SECRET_KEY is set, which is what lets the widget and
+ * the check be rolled out in either order without a window where the form
+ * rejects everyone.
+ *
+ * ·· FAIL OPEN OR FAIL CLOSED ··
+ * The two failures are not the same thing and are not treated the same:
+ *
+ *   Cloudflare says "success: false"  →  reject.
+ *     A real verdict on a real token. That is the whole point.
+ *
+ *   Cloudflare cannot be reached at all  →  let it through.
+ *     A timeout, DNS failure, or a 5xx from siteverify says nothing about
+ *     the visitor. This form is the clinic's main intake channel, and
+ *     rejecting every enquiry for the length of someone else's outage
+ *     costs real patients to prevent a handful of spam emails — which
+ *     the honeypot and the rate limit above still filter anyway.
+ *
+ * If that trade is ever wrong for this site, this is the only place to
+ * change it: return { ok: false } from the catch.
+ */
+async function verifyTurnstile(
+  token: string,
+  ip: string,
+): Promise<{ ok: true } | { ok: false; detail: string }> {
+  const secret = process.env.TURNSTILE_SECRET_KEY;
+  if (!secret) return { ok: true };
+
+  if (!token) return { ok: false, detail: "no token submitted" };
+
+  try {
+    const response = await fetch(
+      "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          secret,
+          response: token,
+          // Omitted rather than sent as the literal "unknown" that the IP
+          // helper falls back to, which Cloudflare rejects as malformed.
+          ...(ip !== "unknown" ? { remoteip: ip } : {}),
+        }),
+      },
+    );
+
+    if (!response.ok) {
+      console.error(`[enquiry] siteverify HTTP ${response.status} — allowing`);
+      return { ok: true };
+    }
+
+    const verdict = (await response.json().catch(() => null)) as
+      | { success?: boolean; "error-codes"?: string[] }
+      | null;
+
+    if (verdict?.success === true) return { ok: true };
+
+    return {
+      ok: false,
+      detail: verdict?.["error-codes"]?.join(", ") || "no error code given",
+    };
+  } catch (error) {
+    console.error(
+      `[enquiry] siteverify unreachable — allowing:`,
+      error instanceof Error ? error.message : error,
+    );
+    return { ok: true };
+  }
 }
 
 async function sendEmail(payload: {
@@ -300,6 +374,23 @@ export async function POST(request: Request) {
       { error: "validation_failed", fieldErrors },
       { status: 400 },
     );
+  }
+
+  // Verified only after the fields are known good. A visitor who mistypes
+  // their email gets the field error back with their token still unspent,
+  // so fixing the typo and pressing Send again just works — rather than
+  // failing a second time with a duplicate-token error they cannot see the
+  // cause of.
+  const captcha = await verifyTurnstile(
+    singleLine(clean(body.turnstileToken, 4000)),
+    ip,
+  );
+
+  if (!captcha.ok) {
+    // Logged, not returned: "invalid-input-secret" tells an attacker the
+    // deployment is misconfigured, which is not theirs to know.
+    console.warn("[enquiry] turnstile rejected:", captcha.detail);
+    return NextResponse.json({ error: "captcha_failed" }, { status: 403 });
   }
 
   const enquirySubject = singleLine(clean(body.subject, 80));

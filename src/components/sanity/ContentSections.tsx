@@ -203,15 +203,17 @@ export function GalleryBlock({ section }: { section: GallerySection }) {
 
   return (
     <SectionShell tone={section.tone} anchor={section.anchor}>
+      {/* descriptionClassName intentionally omitted — this used to force a
+          large script face whenever section.title was exactly "Before &
+          After" (only ever true for the homepage's "home-results" teaser;
+          the dedicated /before-after page's own heading is a separate
+          heroSection, unaffected). Client request (via Irene, WhatsApp):
+          plain body text here, matching every other gallery section's
+          description on the site instead of this one special case. */}
       <SectionHeading
         eyebrow={section.eyebrow}
         title={section.title}
         description={section.description}
-        descriptionClassName={
-          section.title === "Before & After"
-            ? "font-script text-[28px] leading-[1.15] lg:text-[45px] lg:leading-[1.1]"
-            : ""
-        }
         tone={dark ? "dark" : "light"}
       />
       <div className={`mt-14 grid sm:grid-cols-2 lg:grid-cols-3 ${isResultGallery ? "gap-6" : "gap-4"}`}>

@@ -35,6 +35,19 @@ export type EnquiryExtra = { label: string; value: string };
 export function useEnquirySubmit({ subject }: { subject?: string } = {}) {
   const [status, setStatus] = useState<Status>("idle");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  /**
+   * Bumped to tell <TurnstileField> to issue a fresh token.
+   *
+   * A Turnstile token is single-use and the server spends it on every
+   * attempt it verifies, so without this the second press of Send fails
+   * with `timeout-or-duplicate` — a different error than the first, which
+   * makes the form look broken rather than retryable.
+   *
+   * Deliberately NOT bumped for a 400: validation runs before verification
+   * on the server, so that token was never spent, and resetting it would
+   * leave someone fixing a typo with no token for a second or two.
+   */
+  const [turnstileResetSignal, setTurnstileResetSignal] = useState(0);
   // Held so the error state's WhatsApp button can offer the message the
   // visitor already typed, rather than making them write it out again.
   const [fallbackHref, setFallbackHref] = useState<string>(whatsappHref());
@@ -51,7 +64,13 @@ export function useEnquirySubmit({ subject }: { subject?: string } = {}) {
     extra,
     whatsappLines,
   }: {
-    core: { name: string; email: string; website: string };
+    core: {
+      name: string;
+      email: string;
+      website: string;
+      /** Turnstile's own hidden field. Empty when Turnstile is not set up. */
+      turnstileToken: string;
+    };
     extra: EnquiryExtra[];
     /** The same answers, formatted for the WhatsApp fallback message. */
     whatsappLines: string[];
@@ -96,14 +115,24 @@ export function useEnquirySubmit({ subject }: { subject?: string } = {}) {
       }
 
       setStatus("error");
+      setTurnstileResetSignal((signal) => signal + 1);
     } catch {
       // Network failure, offline, blocked request — same outcome as a
-      // server error from the visitor's point of view.
+      // server error from the visitor's point of view. The token may or
+      // may not have reached the server, so it is treated as spent.
       setStatus("error");
+      setTurnstileResetSignal((signal) => signal + 1);
     }
   }
 
-  return { status, fieldErrors, fallbackHref, formRef, submit };
+  return {
+    status,
+    fieldErrors,
+    fallbackHref,
+    formRef,
+    submit,
+    turnstileResetSignal,
+  };
 }
 
 /** Reads and trims one field out of a submitted form. */

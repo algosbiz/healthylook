@@ -16,6 +16,7 @@ import {
   SentNotice,
   ErrorNotice,
 } from "./formParts";
+import TurnstileField from "./TurnstileField";
 import { formatIDR } from "@/lib/format";
 import { GIFT_CARD_VALUES, GIFT_CARD_DESIGNS } from "@/data/offers";
 
@@ -57,9 +58,8 @@ import { GIFT_CARD_VALUES, GIFT_CARD_DESIGNS } from "@/data/offers";
  * with the buyer anyway; a wrong constraint is worse than none.
  */
 export default function GiftCardForm() {
-  const { status, fieldErrors, fallbackHref, formRef, submit } = useEnquirySubmit({
-    subject: "Gift card order",
-  });
+  const { status, fieldErrors, fallbackHref, formRef, submit, turnstileResetSignal } =
+    useEnquirySubmit({ subject: "Gift card order" });
 
   const amountOptions = GIFT_CARD_VALUES.map((value) =>
     value === null ? "Custom Amount" : formatIDR(value),
@@ -90,7 +90,12 @@ export default function GiftCardForm() {
       .map(([label, value]) => ({ label, value }));
 
     void submit({
-      core: { name: get("name"), email: get("email"), website: get("website") },
+      core: {
+        name: get("name"),
+        email: get("email"),
+        website: get("website"),
+        turnstileToken: get("cf-turnstile-response"),
+      },
       extra,
       whatsappLines: [
         `Buyer — name: ${get("name")}`,
@@ -316,6 +321,8 @@ export default function GiftCardForm() {
           be settled in the reply — a buyer who does not yet know the
           recipient's email should still be able to start the order rather
           than being stopped by a field they cannot fill today. */}
+      <TurnstileField resetSignal={turnstileResetSignal} action="gift-card" />
+
       <SubmitRow status={status} label="Request this gift card" />
 
       <div role="status" aria-live="polite">

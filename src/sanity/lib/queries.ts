@@ -151,3 +151,46 @@ export const allTestimonialsQuery = defineQuery(`
     "treatmentSlugs": treatments[]->slug.current
   }
 `);
+
+/**
+ * Every Sanity document that decides a public URL, for sitemap.xml.
+ *
+ * Three document types in one query because the sitemap wants one flat
+ * list of paths and does not care which type produced each one. They
+ * spell their URL differently, which is what `select()` untangles:
+ *
+ *   · page      — stores the whole path (`/gift-card`, `/ubud-bali/botox`)
+ *   · post      — stores a slug and always renders at the site root
+ *   · treatment — renders under /ubud-bali/ unless it carries the custom
+ *                 `path` the Studio offers for treatments whose real URL
+ *                 sits elsewhere (Eye Rejuvenation is the live example).
+ *                 The empty-string check matters: that field is normally
+ *                 blank, and a blank is not a path.
+ *
+ * `count(sections) > 0` drops page documents that have none — getSanityPage()
+ * returns null for those, so the route falls through to an article or a 404.
+ * A sectionless page is a draft shell, not a URL.
+ *
+ * `noIndex` is reported rather than filtered on. An editor ticking "hide
+ * from search" has to *remove* a URL the sitemap would otherwise get from
+ * the treatment catalogue or the static page list, and a filtered-out row
+ * cannot do that — the caller needs to see the tick to act on it.
+ */
+export const sitemapEntriesQuery = defineQuery(`
+  *[
+    (_type == "page" && defined(path) && count(sections) > 0) ||
+    (_type == "post" && defined(slug.current)) ||
+    (_type == "treatment" && defined(slug.current))
+  ]{
+    "path": select(
+      _type == "post" => "/" + slug.current,
+      _type == "treatment" => select(
+        defined(path) && path != "" => path,
+        "/ubud-bali/" + slug.current
+      ),
+      path
+    ),
+    _updatedAt,
+    "noIndex": seo.noIndex == true
+  }
+`);

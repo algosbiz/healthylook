@@ -659,3 +659,31 @@ export async function getLegalDocument(
 
   return looksRight ? (stored as unknown as LegalDocument) : fallback;
 }
+
+/**
+ * When each row in a collection was last saved, keyed by slug.
+ *
+ * Only sitemap.xml wants this. Every other getter here returns `row.data`
+ * and drops the row's metadata, which is right for rendering — a page has
+ * no use for its own database timestamp — but it means the one fact the
+ * sitemap needs most, *when did this page's content actually change*, is
+ * thrown away before it reaches any caller. This hands back that column
+ * and nothing else.
+ *
+ * Empty map when the database is not configured, unreachable, or the
+ * collection has not been imported yet, matching `publishedDocuments`'s
+ * own fallback: the caller is then looking at compiled src/data/ content,
+ * for which there is no save time to report and the legacy sitemap's date
+ * is the honest answer.
+ *
+ * Rows are keyed by the same slug the content uses (`botox`,
+ * `botox/korean`, `skin-clinic-bali`) because the importer writes
+ * `documents.slug` from the document's own slug field — so a caller can
+ * look up a treatment or article it already has in hand.
+ */
+export async function getDocumentTimestamps(
+  collection: string,
+): Promise<Map<string, string>> {
+  const rows = await publishedDocuments(collection);
+  return new Map((rows ?? []).map((row) => [row.slug, row.updated_at]));
+}

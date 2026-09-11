@@ -28,6 +28,7 @@ import {
   allPartnersQuery,
   siteSettingsQuery,
   resultGalleriesQuery,
+  sitemapEntriesQuery,
 } from "@/sanity/lib/queries";
 import { sanityImageUrl } from "@/sanity/lib/image";
 
@@ -271,4 +272,47 @@ export async function getSanityTestimonials(): Promise<SanityTestimonialDocument
     tags: ["sanity", "sanity:testimonial"],
   });
   return documents?.length ? documents : null;
+}
+
+/** One Sanity-authored URL, in the shape src/app/sitemap.ts consumes. */
+export type SanitySitemapEntry = {
+  path: string;
+  lastModified: string;
+  /** The editor ticked "hide from search" — see sitemapEntriesQuery. */
+  noIndex: boolean;
+};
+
+/**
+ * Every URL Sanity has an opinion about, with the moment its document was
+ * last published and whether it is meant to be indexed at all.
+ *
+ * `_updatedAt` is the strongest lastmod signal this site has — a real edit
+ * time, recorded by the CMS, not a build date and not the value carried
+ * over from the old site's sitemap. Anything Sanity answers for therefore
+ * wins over both.
+ *
+ * Returns an empty array rather than null when Sanity is not configured or
+ * unreachable: the sitemap still has treatments, articles and static pages
+ * to list, and an empty overlay is exactly right for "Sanity adds nothing
+ * and hides nothing here". A caller needing to tell "no CMS" apart from
+ * "CMS with nothing published" should not be using this function.
+ */
+export async function getSanitySitemapEntries(): Promise<SanitySitemapEntry[]> {
+  const rows = await sanityFetch<
+    Array<{ path?: string | null; _updatedAt?: string | null; noIndex?: boolean | null }>
+  >(sitemapEntriesQuery, {
+    tags: ["sanity", "sanity:page", "sanity:post", "sanity:treatment"],
+  });
+
+  return (rows ?? []).flatMap((row) => {
+    // A path that is not a path is a half-filled document, not a URL.
+    if (!row.path?.startsWith("/") || !row._updatedAt) return [];
+    return [
+      {
+        path: normalizePath(row.path),
+        lastModified: row._updatedAt,
+        noIndex: row.noIndex === true,
+      },
+    ];
+  });
 }
