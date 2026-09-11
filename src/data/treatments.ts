@@ -453,14 +453,25 @@ export const treatments: Treatment[] = [
   // device, and the clinic's own document compares the two at length (see
   // the "HIFU vs Thermage vs XERF" section in treatmentSections.ts).
   //
-  // ⚠ PRICE: the clinic has published a starting figure and nothing else.
-  // There is no `priceGroups` here because no price table was supplied —
-  // the areas list below is what CAN be treated, not a menu with prices
-  // against it, and inventing per-area figures for a 9.8M treatment is not
-  // a gap worth filling with a guess. The consequence is that XERF shows
-  // its "from" price on its own page and in every card, but does not yet
-  // appear on /pricing, which renders only treatments that have a table.
-  // Ask the clinic for the XERF price list.
+  // ── PRICE: ONE FLAT FIGURE, NOT A MENU ──────────────────────────────
+  // The clinic confirmed XERF is sold at a single price with no tiers —
+  // not per area like HIFU, and not per shot count the way monopolar RF is
+  // often sold elsewhere. So `priceGroups` carries exactly one row, which
+  // is the minimum a price table can hold and perfectly valid: it is what
+  // puts XERF on /pricing at all, since that page lists only treatments
+  // that have a table and ignores `startingPrice` entirely.
+  //
+  // The row is labelled "Per session" rather than "XERF". On /pricing the
+  // treatment's own name is already the heading beside the table, so a row
+  // reading "XERF" under a heading reading "XERF" says nothing twice —
+  // and "Per session" is the true unit here, since the clinic's own FAQ
+  // prices repeat treatments one session at a time.
+  //
+  // ⚠ NO PACKAGE ROWS. The clinic's FAQ rules them out in its own words:
+  // "the number of sessions is best evaluated based on how your skin
+  // responds after the first session, instead of offering a package from
+  // the beginning." A "3x session" row here would be contradicted by this
+  // treatment's own page two screens further down.
   {
     slug: "xerf",
     name: "XERF",
@@ -487,6 +498,11 @@ export const treatments: Treatment[] = [
     // disk (lysiwave.jpg, sylfirm.jpg), so no `imagePosition` is needed.
     image: "/images/treatments/xerf.jpg",
     startingPrice: 9800000,
+    priceGroups: [
+      {
+        rows: [{ label: "Per session", price: 9800000 }],
+      },
+    ],
     intro:
       "XERF is the world's first and only dual-frequency monopolar RF technology, combining 6.78 MHz and 2 MHz to deliver targeted thermal energy at three different skin depths, supporting collagen remodeling and gradual skin tightening. Designed with comfort in mind, XERF offers a more comfortable treatment experience with less pain, while delivering controlled thermal energy to the skin. Known as a beauty secret among Hollywood and Korean celebrities, XERF offers an advanced approach to skin tightening without surgery or needle.",
     popularAreasTitle: "What areas can be treated with our XERF",
