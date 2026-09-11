@@ -214,6 +214,79 @@ export const treatmentFaqs: Record<string, TreatmentFaq[]> = {
         "Ulthera, also known as Ultherapy, represents the brand name, whereas HIFU stands for the underlying technology. Additional brands utilizing HIFU include Ultraformer, Liftera, and Sygmalift. All these options are non-invasive facial rejuvenation treatments leveraging ultrasound energy to boost collagen production and firm up the skin. Linear Z, the newest and most advanced HIFU technology, offers both linear and dot cartridges for a more personalized treatment. It’s faster, more effective, and less painful than traditional HIFU, targeting multiple skin layers for superior results, including fat reduction and skin tightening.",
     },
   ],
+  // ── NEW DEVICE — XERF ──────────────────────────────────────────────
+  // The clinic's own 13 questions from "XERF Treatment Bali.docx", in
+  // their order and their wording. These are not extracted from a live
+  // page like the rest of this file — the treatment is new and has no live
+  // page yet — but the rule is the same: clinical answers are reproduced,
+  // not paraphrased. Edits are spelling and punctuation only.
+  "xerf": [
+    {
+      question: "How many sessions of XERF will I need?",
+      answer:
+        "It will depend on the severity of your skin laxity and how your collagen responds. Most patients with mild laxity require a single session, with maintenance suggested after 6–12 months, depending on your lifestyle and skin maintenance. Patients with moderate skin laxity may benefit from a course of treatment. XERF's result is built gradually; therefore, the number of sessions is best evaluated based on how your skin responds after the first session, instead of offering a package from the beginning.",
+    },
+    {
+      question: "What's the difference between HIFU and XERF?",
+      answer:
+        "XERF uses radiofrequency, which heats the dermis and deeper supporting layers through electrical resistance. HIFU, or high-intensity focused ultrasound, uses focused sound energy to create heat at set depths. Both stimulate collagen, but they reach the tissue differently and suit different patterns of laxity. HIFU focuses more on deeper lifting, while XERF helps with skin tightening, skin texture, and overall refinement. Some patients prefer combining both approaches for a multi-layered rejuvenation effect.",
+    },
+    {
+      question: "Is there any downtime with XERF?",
+      answer:
+        "Most patients will experience no downtime and can return to their normal activities immediately. In some very sensitive patients, mild pinkness can occur, but it will usually subside within a few hours.",
+    },
+    {
+      question: "When can I see the result?",
+      answer:
+        "You may notice mild improvement immediately after the treatment. However, the full result develops gradually as we wait for collagen remodeling. More noticeable improvement is expected within 4–6 weeks, with an optimum result around 3 months.",
+    },
+    {
+      question: "How long do the results from XERF last?",
+      answer:
+        "It's hard to say the exact duration, as it will depend on how you take care of your skin, your sun protection habits, and your general lifestyle. Generally speaking, the results may last around 9–12 months with a good and healthy lifestyle.",
+    },
+    {
+      question: "What areas can be treated with XERF?",
+      answer:
+        "It can be used to treat the forehead, brow lift, cheeks, smile lines, marionette lines, jawline, under-chin area, neck, décolletage, arms, and abdomen.",
+    },
+    {
+      question: "Is XERF treatment painful?",
+      answer:
+        "Most patients describe XERF as warmth rather than pain. The handpiece delivers heat in controlled pulses, and the sensation builds and then eases with each one. Comfort varies between people and between areas, and thinner skin, such as the neck, tends to feel more than the cheeks. You should always tell your provider if the heat becomes uncomfortable, as the settings can be adjusted during the session.",
+    },
+    {
+      question: "What can I do to improve my XERF result before the treatment?",
+      answer:
+        "Hydration is important. Drink plenty of water and avoid drinking alcohol 24 hours before the treatment. Please shave any thick hair within the treatment area. Avoid sunbathing or intense sun exposure 3 days before the treatment.",
+    },
+    {
+      question: "What should I do after XERF?",
+      answer:
+        "Keep the area moisturized. Use a hydrating serum that contains hyaluronic acid before applying moisturizer. Avoid using chemical exfoliants and scrubs for 3 days. Always apply sunscreen with a minimum of SPF 50 and limit your time outdoors. Use additional physical sun protection, such as a hat or umbrella, for extra protection. Avoid sun exposure, sauna, steam, and exercise with artificial heat for a minimum of 24 hours.",
+    },
+    {
+      question: "What's the difference between XERF and Thermage?",
+      answer:
+        "Both use similar technology, monopolar RF. XERF is the next generation of monopolar RF with dual-wave frequencies (6.78 MHz and 2 MHz), while Thermage utilizes 6.78 MHz frequency. XERF is designed to provide multi-level structural tightening, while Thermage primarily focuses on the dermal layer. XERF is also equipped with integrated cooling and pulse technology to help improve treatment comfort.",
+    },
+    {
+      question: "Will XERF cause fat loss?",
+      answer:
+        "XERF will not cause fat loss as it heats the tissue within 45–60°C. The temperature of up to 60°C only persists for a maximum of approximately 2 minutes. This is not only a marketing claim, but has also been researched and published in a clinical journal.",
+    },
+    {
+      question: "Is XERF safe?",
+      answer:
+        "Yes. XERF is an FDA-cleared RF device developed by Lutronic, a medical aesthetics company with extensive experience in developing energy-based aesthetic technologies. It also has a real-time temperature monitoring system. The RF will automatically stop if the skin surface temperature exceeds 43°C, providing an additional layer of safety. XERF also has a unique patented Spider Pattern in the effector, designed to prevent RF energy from accumulating at the edges, helping to reduce the risk of burns and provide greater comfort during treatment.",
+    },
+    {
+      question: "Is XERF safe for dark skin types?",
+      answer:
+        "XERF is generally considered safe across different skin types, and real-time impedance monitoring helps tailor the energy delivery safely. Unlike some light-based treatments, radiofrequency does not target melanin, so the risk of pigment-related side effects is comparatively low.",
+    },
+  ],
   "collagen-stimulator": [
     {
       question: "Are collagen stimulators in Bali the same as dermal fillers?",

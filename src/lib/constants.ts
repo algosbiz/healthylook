@@ -158,10 +158,20 @@ export const BOOKING_TIME_SLOTS = [
  * "Lysiwave (Fat & Cellulite Treatment" is missing its closing bracket on
  * the live site. Kept as published — see the note on the Eye Rejuvenation
  * URL for the same reasoning about not silently correcting the client.
+ *
+ * ── XERF ADDED ────────────────────────────────────────────────────────
+ * The one entry here that is NOT from the live form, because the live form
+ * predates the device. It is added rather than left out because this list
+ * is what the enquiry dropdown renders, and without it a visitor reading
+ * the XERF page has no way to say XERF is what they want — they would have
+ * to pick another treatment or "Not sure yet" to send the form at all.
+ * Placed next to HIFU, the other non-surgical tightening device, which is
+ * how the rest of this list groups.
  */
 export const BOOKING_TREATMENT_OPTIONS = [
   "Botox",
   "HIFU",
+  "XERF",
   "Derma filler",
   "Collagen Stimulator",
   "Sylfirm X (RF Microneedling)",

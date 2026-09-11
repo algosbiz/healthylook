@@ -42,6 +42,23 @@ export const treatmentJourney: Record<string, JourneyStep[]> = {
     { label: "Preparation", duration: "5 minutes" },
     { label: "Treatment", duration: "15–30 minutes" },
   ],
+  // XERF is not in the source spreadsheet — it is a new device, and these
+  // three steps are the timed ones from the clinic's own "Our Procedures"
+  // list in "XERF Treatment Bali.docx", with their durations.
+  //
+  // The document's steps 4 and 5 (the wellness elixir at Ubud Nyuh Bali
+  // Resort, and the result timeline) are deliberately NOT here: this
+  // section prints every step under a clock icon, and neither of those
+  // carries a duration the clinic published. Both are on the page in full
+  // — see the "Our XERF Procedure" section in treatmentSections.ts.
+  xerf: [
+    { label: "Consultation & facial assessment", duration: "15 minutes" },
+    { label: "XERF skin prep ritual", duration: "15–20 minutes" },
+    {
+      label: "XERF dual wave RF",
+      duration: "30–60 minutes, depending on the number of shots",
+    },
+  ],
   "collagen-stimulator": [
     { label: "Consultation", duration: "10 minutes" },
     { label: "Preparation", duration: "5 minutes" },

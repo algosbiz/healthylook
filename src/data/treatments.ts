@@ -439,6 +439,70 @@ export const treatments: Treatment[] = [
       },
     ],
   },
+  // ── NEW DEVICE — XERF ───────────────────────────────────────────────
+  // Added on the clinic's own brief ("We have a new device, XERF, the
+  // viral skin tightening treatment… categorized as Facial Enhancement.
+  // The price starts from IDR 9.800.000") plus the full treatment document
+  // they supplied, "XERF Treatment Bali.docx". Every clinical statement
+  // below — the frequencies, the temperatures, the timelines, the
+  // contraindications — is theirs, verbatim or with spelling and grammar
+  // tidied only ("Decolettage" → "Décolletage", "Treatement" → "Treatment",
+  // hyphens in ranges → en dashes to match the rest of this file).
+  //
+  // Sits beside HIFU deliberately: it is the other non-surgical tightening
+  // device, and the clinic's own document compares the two at length (see
+  // the "HIFU vs Thermage vs XERF" section in treatmentSections.ts).
+  //
+  // ⚠ PRICE: the clinic has published a starting figure and nothing else.
+  // There is no `priceGroups` here because no price table was supplied —
+  // the areas list below is what CAN be treated, not a menu with prices
+  // against it, and inventing per-area figures for a 9.8M treatment is not
+  // a gap worth filling with a guess. The consequence is that XERF shows
+  // its "from" price on its own page and in every card, but does not yet
+  // appear on /pricing, which renders only treatments that have a table.
+  // Ask the clinic for the XERF price list.
+  {
+    slug: "xerf",
+    name: "XERF",
+    h1: "XERF Skin Tightening Treatment in Ubud Bali",
+    category: "facial-enhancement",
+    treatmentTime: "30–60 minutes, depending on the number of shots",
+    treatmentTimeShort: "30–60 minutes",
+    anaesthesia: "No",
+    downtime:
+      "None. Mild pinkness, if it occurs, usually subsides within a few hours",
+    initialResult: "Some improvement immediately; 2–4 weeks for noticeable change",
+    fullResult: "Approximately 3 months",
+    performedBy: "Licensed doctor",
+    // Deliberately does NOT open the way `intro` does. The detail page
+    // prints this as the lead and the intro directly underneath it, so a
+    // short description that paraphrased the intro's first sentence — which
+    // this one did — read as the same paragraph twice. Same rule the rest
+    // of the catalogue follows: the description says what the treatment
+    // does for you, the intro says what it is.
+    shortDescription:
+      "A needle-free radiofrequency treatment that tightens and lifts the face, jawline, and neck at three different skin depths — no downtime, and no fat loss.",
+    // The manufacturer's own product shot, taken from the clinic's
+    // document. White-ground square, same as the other device photos on
+    // disk (lysiwave.jpg, sylfirm.jpg), so no `imagePosition` is needed.
+    image: "/images/treatments/xerf.jpg",
+    startingPrice: 9800000,
+    intro:
+      "XERF is the world's first and only dual-frequency monopolar RF technology, combining 6.78 MHz and 2 MHz to deliver targeted thermal energy at three different skin depths, supporting collagen remodeling and gradual skin tightening. Designed with comfort in mind, XERF offers a more comfortable treatment experience with less pain, while delivering controlled thermal energy to the skin. Known as a beauty secret among Hollywood and Korean celebrities, XERF offers an advanced approach to skin tightening without surgery or needle.",
+    popularAreasTitle: "What areas can be treated with our XERF",
+    popularAreas: [
+      "Forehead",
+      "Brow lift",
+      "Cheek",
+      "Smile line",
+      "Marionette",
+      "Jawline",
+      "Under the chin area",
+      "Neck",
+      "Décolletage",
+      "Body",
+    ],
+  },
   {
     slug: "collagen-stimulator",
     name: "Collagen Stimulator",

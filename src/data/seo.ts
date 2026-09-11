@@ -145,6 +145,19 @@ export const TREATMENT_SEO: Record<string, PageSeo> = {
     description:
       "Experience premium Linear HIFU treatments in Ubud, Bali. Achieve firmer, youthful skin with advanced, non-invasive technology.",
   },
+  // ── NEW DEVICE — XERF ───────────────────────────────────────────────
+  // Written here rather than left to the fallback, because this is the one
+  // treatment on the site with no live page to inherit a tag from and the
+  // one the clinic is actively launching. The phrases people are searching
+  // are the brand name and "skin tightening", which is what the title
+  // leads with; "no downtime" and "no fat loss" are in the description
+  // because they are the two objections the clinic's own document answers
+  // at greatest length.
+  xerf: {
+    title: "XERF Bali | Dual-Frequency RF Skin Tightening in Ubud",
+    description:
+      "XERF, the viral skin tightening treatment, is now in Bali. Dual-frequency monopolar RF tightens and lifts at three skin depths — no needles, no downtime, no fat loss.",
+  },
   "collagen-stimulator": {
     title: "Collagen Stimulator Ubud Bali",
     description:
