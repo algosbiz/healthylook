@@ -217,7 +217,7 @@ export async function importFromSourceFiles(opts: {
       }
     });
 
-    revalidateContent(collection);
+    await revalidateContent(collection);
     result.push({ collection, inserted, skipped, overwritten });
   }
 

@@ -1,5 +1,6 @@
 import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
+import { purgeCloudflareCache } from "@/lib/cloudflare";
 
 type WebhookBody = {
   _type?: string;
@@ -32,5 +33,18 @@ export async function POST(request: Request) {
     if (body.slug) revalidateTag(`sanity:post:${body.slug}`);
   }
 
-  return NextResponse.json({ ok: true, revalidated: body });
+  // Cloudflare after the tags, never before: purging first lets it
+  // re-fetch and re-cache the page Next has not rebuilt yet, which puts
+  // the stale copy straight back at the edge. See src/lib/cloudflare.ts.
+  //
+  // Its result is reported but never fatal — the tags are already dropped
+  // by this point, and answering Sanity with an error would make it retry
+  // a webhook whose work is done.
+  const purge = await purgeCloudflareCache();
+
+  return NextResponse.json({
+    ok: true,
+    revalidated: body,
+    cloudflarePurged: purge.ok,
+  });
 }

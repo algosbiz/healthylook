@@ -1,5 +1,6 @@
 import "server-only";
 import { unstable_cache, revalidateTag } from "next/cache";
+import { purgeCloudflareCache } from "@/lib/cloudflare";
 import { query, queryOne, transaction, isDatabaseConfigured } from "@/lib/db";
 import { getCollection } from "@/lib/collections";
 
@@ -150,7 +151,7 @@ export async function saveDocument(opts: {
     }
   });
 
-  revalidateContent(collection);
+  await revalidateContent(collection);
 }
 
 export async function deleteDocument(collection: string, slug: string): Promise<void> {
@@ -158,7 +159,7 @@ export async function deleteDocument(collection: string, slug: string): Promise<
     collection,
     slug,
   ]);
-  revalidateContent(collection);
+  await revalidateContent(collection);
 }
 
 /**
@@ -170,11 +171,23 @@ export async function deleteDocument(collection: string, slug: string): Promise<
  * there is one place to update when a collection starts feeding a new
  * surface.
  */
-export function revalidateContent(collection: string): void {
+export async function revalidateContent(collection: string): Promise<void> {
   revalidateTag(`content:${collection}`);
   for (const tag of getCollection(collection)?.tags ?? []) {
     revalidateTag(`content:${tag}`);
   }
+
+  // Cloudflare last, and awaited rather than fired and forgotten.
+  //
+  // Last, because purging before the tags above are dropped lets
+  // Cloudflare re-fetch and re-cache the page Next has not rebuilt yet.
+  //
+  // Awaited, because this runs in a serverless function: an un-awaited
+  // fetch is cancelled when the response is sent, so the purge would
+  // succeed locally and silently never happen in production. It costs the
+  // editor a few hundred milliseconds on save, which is the right trade
+  // for the change actually being visible when the save returns.
+  await purgeCloudflareCache();
 }
 
 /** Latest revisions for the restore list on an edit screen. */
