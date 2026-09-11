@@ -64,9 +64,45 @@ export const treatment = defineType({
     defineField({ name: "fullResult", title: "Full result", type: "string", group: "clinical" }),
     defineField({ name: "performedBy", title: "Performed by", type: "string", group: "clinical" }),
 
-    defineField({ name: "startingPrice", title: "From price (IDR)", type: "number", group: "pricing", validation: (Rule) => Rule.integer().positive() }),
-    defineField({ name: "priceUnit", title: "Price unit", type: "string", group: "pricing" }),
-    defineField({ name: "priceGroups", title: "Price tables", type: "array", group: "pricing", of: [defineArrayMember({ type: "priceGroup" })] }),
+    /* ── HELP TEXT, BILINGUAL ──────────────────────────────────────────
+     * These three had no description at all, and the distinction between
+     * them is the one thing everybody gets wrong on first contact: filling
+     * in "From price" looks like you have entered the price, but /pricing
+     * reads `priceGroups` and ignores this field entirely, so the treatment
+     * silently stays off the price list. That cost one round of "why isn't
+     * it showing?" before it was written down here.
+     *
+     * Indonesian is included because Studio's labels are English while the
+     * people editing are the clinic's own staff. One string per field, EN
+     * first then ID after " · ID: " — Sanity renders `description` as a
+     * single paragraph and collapses newlines, so a separator is the only
+     * way to split the two. */
+    defineField({
+      name: "startingPrice",
+      title: "From price (IDR)",
+      type: "number",
+      group: "pricing",
+      description:
+        "Shows as the “From IDR …” line on the hero and on every card. This field on its own does NOT list the treatment on the /pricing page — add a price table below for that. · ID: Tampil sebagai baris “From IDR …” di hero dan di semua kartu. Field ini saja TIDAK membuat treatment muncul di halaman /pricing — tambahkan price table di bawah untuk itu.",
+      validation: (Rule) => Rule.integer().positive(),
+    }),
+    defineField({
+      name: "priceUnit",
+      title: "Price unit",
+      type: "string",
+      group: "pricing",
+      description:
+        "Printed straight after the From price, e.g. per ml, per unit. Leave empty for a flat price. · ID: Dicetak tepat setelah From price, misalnya per ml, per unit. Kosongkan kalau harganya flat.",
+    }),
+    defineField({
+      name: "priceGroups",
+      title: "Price tables",
+      type: "array",
+      group: "pricing",
+      description:
+        "What appears on the /pricing page and in the Prices section of this treatment’s own page. One row is enough. Leave this empty and the treatment is not listed on /pricing at all. · ID: Yang tampil di halaman /pricing dan di bagian Prices halaman treatment ini. Satu baris sudah cukup. Kalau dikosongkan, treatment ini tidak muncul sama sekali di /pricing.",
+      of: [defineArrayMember({ type: "priceGroup" })],
+    }),
 
     defineField({ name: "popularAreasTitle", title: "Popular areas heading", type: "string", group: "content" }),
     defineField({ name: "popularAreas", title: "Popular areas", type: "array", group: "content", of: [defineArrayMember({ type: "string" })] }),

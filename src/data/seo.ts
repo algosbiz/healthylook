@@ -153,10 +153,14 @@ export const TREATMENT_SEO: Record<string, PageSeo> = {
   // leads with; "no downtime" and "no fat loss" are in the description
   // because they are the two objections the clinic's own document answers
   // at greatest length.
+  // Updated to match what the clinic actually wrote in Studio after the
+  // treatment was published — theirs is the live tag now, since Sanity's
+  // copy wins over this file for any slug it holds. Kept in sync so the
+  // fallback can never serve a different title from the published one.
   xerf: {
-    title: "XERF Bali | Dual-Frequency RF Skin Tightening in Ubud",
+    title: "XERF Treatment in Bali - Non-Surgical Skin Tightening",
     description:
-      "XERF, the viral skin tightening treatment, is now in Bali. Dual-frequency monopolar RF tightens and lifts at three skin depths — no needles, no downtime, no fat loss.",
+      "Book XERF treatment in Ubud, Bali with a certified doctor. FDA-cleared dual-frequency RF tightens skin and lifts contours, no needles, no downtime required.",
   },
   "collagen-stimulator": {
     title: "Collagen Stimulator Ubud Bali",
