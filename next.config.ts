@@ -203,6 +203,98 @@ const nextConfig: NextConfig = {
       { source: "/sitemap_index.xml", destination: "/sitemap.xml", permanent: true },
       { source: "/page-sitemap.xml", destination: "/sitemap.xml", permanent: true },
       { source: "/post-sitemap.xml", destination: "/sitemap.xml", permanent: true },
+
+      /**
+       * ── THE OLD WORDPRESS URLS ──────────────────────────────────────
+       *
+       * Taken verbatim from "New Redirects for HLA.xlsx" (the client's
+       * SEO hand-off, read 2026-09-13): 41 rows, two blocks, every one
+       * marked 301. None of these paths exists on this site — they are
+       * the old site's flat, keyword-in-the-slug URL scheme, which the
+       * rebuild replaced with /ubud-bali/<treatment>. Each one has its
+       * own inbound links and ranking history, so a 404 would throw all
+       * of it away; a 301 hands it to the page that now covers the topic.
+       *
+       * Three things about how these are written differ from the sheet,
+       * deliberately:
+       *
+       * 1. `statusCode: 301`, not `permanent: true`. `permanent` emits a
+       *    308, which Google treats identically — but the sheet names 301
+       *    explicitly, and 301 is what every SEO auditing tool and older
+       *    crawler expects to see on a moved page. There is no behavioural
+       *    difference for the GET traffic these URLs receive. The
+       *    redirects above this block stay 308; they were authored here
+       *    rather than handed over, and re-issuing them under a new status
+       *    code would only invalidate what crawlers have already recorded.
+       *
+       * 2. No trailing slashes, though most of the sheet's rows carry one.
+       *    Next normalises `/foo/` to `/foo` (308) before redirect matching
+       *    runs, so a source written as `/foo/` would never match anything.
+       *    Written this way both spellings work; the slashed form simply
+       *    arrives via one extra hop.
+       *
+       * 3. The sheet's first block spells its URLs with a doubled slash
+       *    after the hostname — `healthylook-aesthetic.com//botox-in-ubud-bali`.
+       *    That is an export artifact, and even where WordPress really did
+       *    emit such a link, Next collapses repeated slashes before
+       *    matching. The single-slash source catches both.
+       */
+
+      // Block 1 of the sheet — the botox/filler/skin-booster cluster.
+      { source: "/botox-in-ubud-bali", destination: "/ubud-bali/botox", statusCode: 301 },
+      { source: "/filler-in-ubud-bali", destination: "/ubud-bali/dermal-filler", statusCode: 301 },
+      { source: "/skin-booster-in-ubud-bali", destination: "/ubud-bali/skin-booster", statusCode: 301 },
+      { source: "/botox-ubud-bali", destination: "/ubud-bali/botox", statusCode: 301 },
+      { source: "/how-much-is-botox-in-bali", destination: "/ubud-bali/botox", statusCode: 301 },
+      { source: "/botox-pricing-bali", destination: "/ubud-bali/botox", statusCode: 301 },
+      { source: "/best-botox-in-ubud", destination: "/ubud-bali/botox", statusCode: 301 },
+
+      // Block 2 of the sheet — the treatment catalogue, one row per page.
+      { source: "/treatment", destination: "/ubud-bali", statusCode: 301 },
+      { source: "/hifu-ubud-bali", destination: "/ubud-bali/hifu", statusCode: 301 },
+      { source: "/body-hifu-in-bali", destination: "/ubud-bali/hifu/body", statusCode: 301 },
+      { source: "/facial-ubud-bali", destination: "/ubud-bali/facial", statusCode: 301 },
+      { source: "/medi-facial-ubud-bali", destination: "/ubud-bali/facial/medi", statusCode: 301 },
+      { source: "/best-botox-ubud-bali-price-list", destination: "/ubud-bali/botox", statusCode: 301 },
+      { source: "/korean-botox", destination: "/ubud-bali/botox/korean", statusCode: 301 },
+      { source: "/prp-ubud-bali", destination: "/ubud-bali/prp", statusCode: 301 },
+      { source: "/prp-hair-ubud-bali", destination: "/ubud-bali/prp/hair", statusCode: 301 },
+      { source: "/microneedling-ubud-bali", destination: "/ubud-bali/microneedling", statusCode: 301 },
+      { source: "/rf-microneedling-in-ubud-bali", destination: "/ubud-bali/microneedling/rf", statusCode: 301 },
+      { source: "/ipl-hair-removal-ubud-bali", destination: "/ubud-bali/ipl-hair-removal", statusCode: 301 },
+      { source: "/hair-mesotherapy-ubud-bali", destination: "/ubud-bali/hair-mesotherapy", statusCode: 301 },
+      { source: "/lip-filler-in-ubud", destination: "/ubud-bali/lip-filler", statusCode: 301 },
+      { source: "/chemical-peel-ubud-bali", destination: "/ubud-bali/chemical-peel", statusCode: 301 },
+      { source: "/muscle-sculpting-ubud-bali", destination: "/ubud-bali/muscle-sculpting", statusCode: 301 },
+      { source: "/profhilo-ubud-bali", destination: "/ubud-bali/profhilo", statusCode: 301 },
+      { source: "/skin-booster-ubud-bali", destination: "/ubud-bali/skin-booster", statusCode: 301 },
+      { source: "/exosome-ubud-bali", destination: "/ubud-bali/exosome", statusCode: 301 },
+      { source: "/fat-cellulite-treatment-in-bali", destination: "/ubud-bali/fat-cellulite", statusCode: 301 },
+      { source: "/collagen-stimulator-bali", destination: "/ubud-bali/collagen-stimulator", statusCode: 301 },
+      { source: "/dermal-filler-ubud-bali", destination: "/ubud-bali/dermal-filler", statusCode: 301 },
+      { source: "/salmon-dna-treatment-ubud-bali", destination: "/ubud-bali/salmon-dna", statusCode: 301 },
+      { source: "/pelvic-floor-strengthening-ubud-bali", destination: "/ubud-bali/pelvic-floor-strengthening", statusCode: 301 },
+      { source: "/iv-drip-ubud-bali", destination: "/ubud-bali/iv-drip", statusCode: 301 },
+      { source: "/fat-dissolving-injections-ubud-bali", destination: "/ubud-bali/fat-dissolving-injections", statusCode: 301 },
+      { source: "/sculptra-in-bali", destination: "/ubud-bali/sculptra", statusCode: 301 },
+      { source: "/juvelook-in-ubud-bali", destination: "/ubud-bali/juvelook", statusCode: 301 },
+      { source: "/ipl-ubud-bali", destination: "/ubud-bali/ipl", statusCode: 301 },
+      {
+        source: "/autologues-micrograft-hair-restoration",
+        destination: "/ubud-bali/autologues-micrograft-hair-restoration",
+        statusCode: 301,
+      },
+      { source: "/carboxy-therapy-in-ubud-bali", destination: "/ubud-bali/carboxy-therapy", statusCode: 301 },
+      /**
+       * The sheet sends this to /ubud-bali/slimming-body-contouring, which
+       * is the one destination in it that no longer exists: the client
+       * asked for that page to go ("we don't provide RF anymore"), and the
+       * redirect above already forwards it to the Body Treatments section.
+       * Following the sheet literally would make this a two-hop chain
+       * through a URL that is itself retired, so it goes straight to the
+       * same final destination instead.
+       */
+      { source: "/slimming-body-contouring-ubud", destination: "/ubud-bali#body-treatments", statusCode: 301 },
     ];
   },
 };
