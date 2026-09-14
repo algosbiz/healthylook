@@ -34,12 +34,34 @@ const CANONICAL_HOST = new URL(SITE_URL).host;
  * pointed at this deployment. A redirect only survives a client that
  * follows redirects and preserves the method, and a webhook that quietly
  * stops firing is a much worse failure than a duplicate URL.
+ *
+ * Anything arriving through Cloudflare. This is the guard that makes the
+ * rule safe rather than merely correct, and it is worth being explicit
+ * about the failure it prevents: the real domain is proxied by
+ * Cloudflare, and if that proxy were ever configured to send the origin a
+ * Host of the *.vercel.app alias — a Host Header Override, or an origin
+ * pointed at the alias by name — then "host is not canonical" would be
+ * true for EVERY request on the live site. Each one would redirect to the
+ * canonical domain, which resolves back through the same proxy, which
+ * redirects again. That is not a duplicate-content problem, it is the
+ * site down in a loop.
+ *
+ * `cf-ray` is on every request Cloudflare proxies and on nothing else, so
+ * it separates the two populations exactly: real traffic reaches the site
+ * through Cloudflare and is never touched here, while a crawler hitting
+ * the Vercel alias directly does not go through Cloudflare at all and is
+ * redirected. The alias is reachable only from outside the proxy, which
+ * is precisely the traffic this is for.
  */
 function canonicalHostRedirect(request: NextRequest) {
   if (process.env.VERCEL_ENV !== "production") return null;
 
   const { pathname, search } = request.nextUrl;
   if (pathname.startsWith("/api/")) return null;
+
+  // Came through Cloudflare, so it is on the real domain whatever the Host
+  // header says by the time it gets here. Never redirect it.
+  if (request.headers.get("cf-ray")) return null;
 
   // The forwarded header is the one that survives Vercel's proxy; `host`
   // is the fallback for anywhere it is absent.
