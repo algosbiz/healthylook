@@ -12,6 +12,8 @@
     "db:admin": "node scripts/db.cjs admin",
     "email:check": "node scripts/email.cjs check",
     "email:test": "node scripts/email.cjs test",
+    "cache:check": "node scripts/cache.cjs check",
+    "cache:purge": "node scripts/cache.cjs purge",
     "sanity": "sanity",
     "sanity:deploy": "sanity deploy",
     "sanity:migrate": "sanity exec scripts/sanity/migrate.ts --with-user-token",

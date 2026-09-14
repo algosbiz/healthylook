@@ -189,7 +189,125 @@ terlalu pendek untuk aset ber-hash.
 
 ---
 
-## 6. Cara menguji
+## 6. Cache Rules yang diperlukan
+
+Panduan konkret untuk zone `healthylook-aesthetic.com` setelah domain
+pindah ke Vercel. Disusun dengan membandingkan konfigurasi `adding-value.de`
+(Next.js + Sanity, sudah jalan) dengan konfigurasi HLA saat ini.
+
+### 6.1 Baca ini dulu: urutan rule menentukan segalanya
+
+Cache Rules **bertumpuk**. Kalau beberapa rule cocok untuk satu request,
+semuanya diterapkan berurutan, dan untuk setelan yang bentrok:
+
+> "If several matching rules set a value for the same setting, the value in
+> the **last matching rule** wins."
+> — [Cloudflare, Order and priority](https://developers.cloudflare.com/cache/how-to/cache-rules/order/)
+
+Ini **berbeda dari Page Rules lama**, yang berhenti di rule pertama yang
+cocok. Konsekuensinya satu dan menentukan:
+
+> ### Rule *bypass* harus berada DI BAWAH rule *Cache Everything*.
+
+Kalau bypass ditaruh di atas, Cache Everything yang berjalan belakangan
+akan menimpanya dan halaman admin ikut ter-cache.
+
+**Urutan di HLA sekarang sudah benar** (Cache Everything #1, bypass #3–#4).
+Yang perlu diganti isinya, bukan urutannya.
+
+**Urutan di `adding-value.de` justru terbalik** — bypass di #1–#5, Cache
+Everything di #6. Itu hanya aman kalau expression Cache Everything-nya
+secara eksplisit mengecualikan path-path tersebut. Di screenshot teks
+match-nya terpotong (`...URI Path starts with /login or /sign-up or URI…`)
+sehingga tidak bisa dipastikan. **Jangan salin urutannya** — salin daftar
+rule-nya saja.
+
+### 6.2 Rule yang dibutuhkan HLA
+
+Lima rule, dalam urutan ini:
+
+| # | Nama | Match against | Action |
+|---|---|---|---|
+| 1 | `Cache Everything` | Hostname equals `healthylook-aesthetic.com` **or** `www.healthylook-aesthetic.com` | Eligible for cache · Edge TTL **1 hari** · Browser TTL **Respect origin** |
+| 2 | `Bypass API` | URI Path starts with `/api/` | Bypass cache |
+| 3 | `Bypass Admin` | URI Path starts with `/admin` | Bypass cache |
+| 4 | `Bypass Studio` | URI Path starts with `/studio` | Bypass cache |
+| 5 | `Bypass sesi & preview` | Cookie contains `hla_session` **or** Cookie contains `__prerender_bypass` | Bypass cache |
+
+Kenapa masing-masing:
+
+**1 — Cache Everything.** Pakai **Hostname**, bukan `URI Full wildcard`
+seperti rule HLA sekarang. Rule yang ada sekarang cuma cocok untuk
+`https://healthylook-aesthetic.com/*` sehingga `www.` tidak tercakup.
+Edge TTL 1 hari: cukup panjang untuk berguna, cukup pendek supaya kalau
+auto-purge pernah gagal, situs pulih sendiri dalam sehari.
+
+**2 — `/api/`.** Paling kritis. Di situ ada `/api/enquiry` (form),
+`/api/revalidate/sanity` (webhook), dan `/api/draft-mode/*`. Response
+yang ter-cache di sini berarti webhook revalidasi berhenti bekerja dan
+form bisa membalas response milik orang lain.
+
+**3 — `/admin`.** Dashboard admin. Middleware hanya mengecek keberadaan
+cookie; halamannya sendiri berisi data per-user.
+
+**4 — `/studio`.** Sanity Studio, aplikasi ber-autentikasi.
+
+**5 — cookie.** Jaring pengaman untuk dua hal yang tidak terikat path:
+editor yang sedang login (`hla_session`) tidak boleh dilayani halaman
+cache, dan halaman preview draft (`__prerender_bypass`, cookie milik Next
+draft mode) tidak boleh ikut tersimpan di edge lalu tersaji ke publik.
+
+### 6.3 Rule WordPress yang dihapus
+
+Ketiganya menunjuk path yang tidak ada di Next.js:
+
+| Rule sekarang | Nasib |
+|---|---|
+| `Bypass wp admin` — `/wp-admin/*` | **Hapus** — tidak ada WordPress lagi |
+| `Bypass login` — `/wp-login.php*` | **Hapus** — sama |
+| `_GRECAPTCHA` (Disabled) | **Hapus** — sudah mati, dan situs baru pakai Turnstile |
+| `Cache Everything [Template]` | **Edit**, jangan hapus — ubah match ke Hostname dan set TTL seperti 6.2 |
+
+### 6.4 Dibandingkan `adding-value.de`
+
+| Rule di adding-value.de | Perlu di HLA? |
+|---|---|
+| Bypass Account (`/login`, `/sign-up`) | ❌ HLA tidak punya akun pengunjung |
+| Bypass Billingpage | ❌ tidak ada billing |
+| Bypass API (`/api/*`) | ✅ **ya** — rule #2 |
+| Bypass Admin (`/studio/*`) | ✅ **ya** — rule #4, plus `/admin` yang tidak dipunya mereka |
+| Bypass Login | ❌ sudah tercakup rule #3 dan #5 |
+| Cache Everything | ✅ **ya** — rule #1 |
+| Course Page (`/course/*`) | ❌ jenis konten mereka; halaman HLA sudah tercakup rule #1 |
+
+HLA butuh satu yang mereka tidak punya: **bypass berbasis cookie** (#5).
+Situs mereka memisahkan area login lewat path, situs ini lewat cookie
+sesi dan draft mode.
+
+### 6.5 Setelan di luar Cache Rules
+
+**Caching → Configuration → Browser Cache TTL → `Respect Existing Headers`.**
+
+Ini bukan Cache Rule dan sering terlewat. Sekarang disetel 2 jam untuk
+seluruh zone, dan **cache browser tidak bisa di-purge oleh siapa pun** —
+lihat 5.3. Next.js mengirim header yang benar per jenis file; biarkan
+header itu yang menang.
+
+### 6.6 Yang tidak perlu dikhawatirkan
+
+**Form submit dan server action aman.** Cloudflare tidak meng-cache
+request `POST` — Cache Everything hanya berlaku untuk `GET` dan `HEAD`.
+Jadi kiriman form enquiry tidak akan pernah dilayani dari cache, bahkan
+tanpa rule #2. Rule #2 tetap diperlukan untuk melindungi response `GET`
+di bawah `/api/`.
+
+**Aset statis sudah beres.** File di `/_next/static/` punya hash di
+namanya dan aman di-cache selamanya. Rule #1 sudah mencakupnya, dan
+karena namanya berubah setiap build, tidak pernah ada masalah basi.
+
+---
+
+## 7. Cara menguji
 
 Setelah domain pindah ke Vercel dan env var terisi:
 
@@ -209,7 +327,7 @@ jalan.
 
 ---
 
-## 7. Kalau bermasalah
+## 8. Kalau bermasalah
 
 | Gejala | Penyebab |
 |---|---|
