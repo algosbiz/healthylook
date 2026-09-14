@@ -9,29 +9,28 @@ import {
 } from "@/sanity/env";
 
 /**
- * ── WHY THE CDN IS OFF, INCLUDING IN PRODUCTION ──────────────────────
+ * ── WHY THE CDN IS OFF, INCLUDING IN PRODUCTION ──────────────────
  * This was `useCdn: process.env.NODE_ENV === "production"`, which reads as
- * the obvious optimisation and was the opposite of one here.
+ * the obvious optimisation and buys nothing here.
  *
- * The dataset is private and this client is deliberately token-free — Live
- * Content’s internals use it, and a token on it would leak. An
- * unauthenticated read of a private dataset through apicdn does not fail;
- * it succeeds with nothing. Measured against the site’s own treatments
- * query: 0 documents through apicdn without a token, 32 through the API
- * with one.
+ * This client is deliberately token-free — Live Content’s internals use it,
+ * and a token on it would leak. An unauthenticated read of this dataset
+ * returns nothing: not an error, a successful response with `result: null`.
+ * Verified by direct HTTP against both hosts, no token:
  *
- * So in production every fetch went out twice — once to a CDN that could
- * only ever answer empty, then again through the authenticated client that
- * sanityFetch falls back to on an empty result. The site ran entirely on
- * that fallback. It worked, which is why it went unnoticed, and it left no
- * way to tell a genuinely empty result from an unreadable one.
+ *   apicdn.sanity.io  → result: null
+ *   api.sanity.io     → result: null
+ *   api.sanity.io with a token → the document, 32 treatments
  *
- * Turning the CDN off removes the call that cannot succeed. It is not a
- * performance loss: that call was never returning data to cache.
+ * The dataset’s aclMode reads "public", so the reason is not the obvious
+ * one and is worth not guessing at in a comment. What is certain is the
+ * behaviour: this client cannot read the dataset, with or without the CDN.
  *
- * If the dataset is ever made public, this is worth revisiting — but then
- * the fallback below should go at the same time, or the double fetch comes
- * back in a subtler form.
+ * So turning the CDN off does NOT make this client work — nothing would.
+ * What it removes is a second network hop on a call that fails either way.
+ * The site runs, as it already did, on sanityFetch’s fallback to the
+ * authenticated client below, and that is the thing actually holding the
+ * content up. Worth knowing before anyone "simplifies" that fallback away.
  */
 export const client = createClient({
   projectId: resolvedSanityProjectId,
