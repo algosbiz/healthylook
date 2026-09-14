@@ -54,6 +54,7 @@ import { clinicFaqs as sourceClinicFaqs, type ClinicFaq } from "@/data/clinicFaq
 import { partners as sourcePartners, type Partner } from "@/data/partners";
 import {
   getResultsForTreatment as sourceResultsForTreatment,
+  resultGroups as sourceResultGroups,
   type ResultGroup,
 } from "@/data/results";
 import {
@@ -469,13 +470,74 @@ export type ResultGroupWithImages = ResultGroup & { images: string[] };
  * The CMS is the only source of the photographs, so a category whose
  * gallery is empty yields no section at all rather than an empty grid.
  */
+/**
+ * The before/after boards, in the order they sit on the /before-after page
+ * — which is the order the jump bar shows and the order an editor can
+ * drag. Read from Sanity, because that is where a new board is created;
+ * src/data/results.ts is the fallback for a CMS that is unreachable, and
+ * the record of what the boards were before they became editable.
+ */
+/**
+ * The short name a board goes by in the jump bar.
+ *
+ * Order matters and is not arbitrary. An editor’s own "Short name for the
+ * jump bar" wins. Failing that, the code list — because two of its labels
+ * are deliberate shortenings the client asked for ("Premium HIFU by Linear
+ * Z" → "HIFU", "CE Certified Muscle Sculpting by CM Slim" → "Muscle
+ * Sculpting"), made because the pill row is a tight horizontal scroll. If
+ * the heading were used instead, moving this list into the CMS would
+ * silently undo that request. Only a board the code has never heard of
+ * falls through to its heading.
+ */
+function navLabelFor(slug: string, fromSanity: string, title: string): string {
+  if (fromSanity !== title) return fromSanity;
+  return sourceResultGroups.find((group) => group.slug === slug)?.label ?? fromSanity;
+}
+
+export async function getResultGroups(): Promise<ResultGroup[]> {
+  const galleries = await getSanityResultGalleries();
+  if (!galleries?.size) return sourceResultGroups;
+  return [...galleries.entries()].map(([slug, gallery]) => ({
+    slug,
+    label: navLabelFor(slug, gallery.navLabel, gallery.title),
+    treatmentSlug: gallery.treatmentSlug,
+  }));
+}
+
+/**
+ * The board embedded in one treatment page, or undefined where that
+ * treatment has none.
+ *
+ * Undefined is the important case and it is deliberate: showing one
+ * treatment’s photos on a page for a different treatment is the invented
+ * result the brief prohibits, so a treatment with no board of its own gets
+ * the link to the full gallery and nothing else.
+ *
+ * Sanity’s own answer wins — an editor who picks a treatment on the
+ * gallery has said which page it belongs to, and that is more current than
+ * anything in the code. The code mapping still answers for the boards
+ * created before the field existed, none of which have to be touched.
+ */
 export async function getResultsForTreatment(
   slug: string,
 ): Promise<ResultGroupWithImages | undefined> {
+  const galleries = await getSanityResultGalleries();
+
+  if (galleries) {
+    for (const [anchor, gallery] of galleries) {
+      if (gallery.treatmentSlug !== slug) continue;
+      return {
+        slug: anchor,
+        label: navLabelFor(anchor, gallery.navLabel, gallery.title),
+        treatmentSlug: slug,
+        images: gallery.images,
+      };
+    }
+  }
+
   const base = sourceResultsForTreatment(slug);
   if (!base) return undefined;
-  const galleries = await getSanityResultGalleries();
-  const images = galleries?.get(base.slug);
+  const images = galleries?.get(base.slug)?.images;
   return images?.length ? { ...base, images } : undefined;
 }
 

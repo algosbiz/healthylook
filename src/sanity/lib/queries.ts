@@ -108,8 +108,11 @@ export const siteSettingsQuery = defineQuery(`
  * which the migration sets to the result group's slug.
  */
 export const resultGalleriesQuery = defineQuery(`
-  *[_id == "page.before-after"][0].sections[_type == "gallerySection"]{
+  *[_id == "page.before-after"][0].sections[_type == "gallerySection" && isHidden != true]{
     anchor,
+    title,
+    navLabel,
+    "treatmentSlug": treatment->slug.current,
     images[] ${imageProjection}
   }
 `);

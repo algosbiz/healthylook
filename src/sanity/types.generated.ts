@@ -207,59 +207,6 @@ export type PricingSection = {
   } & PriceGroup>;
 };
 
-export type Treatment = {
-  _id: string;
-  _type: "treatment";
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  name?: string;
-  h1?: string;
-  slug?: Slug;
-  path?: string;
-  category?: "facial-enhancement" | "skin-treatments" | "body-treatments" | "hair-booster";
-  aboutHeading?: string;
-  aboutHeadingLevel?: "h2" | "h3" | "h4";
-  shortDescription?: string;
-  intro?: string;
-  image?: ImageWithAlt;
-  imagePosition?: "object-center" | "object-top" | "object-bottom" | "object-left" | "object-right";
-  featuredOnHomepage?: boolean;
-  featuredOrder?: number;
-  mostPopular?: boolean;
-  treatmentTime?: string;
-  treatmentTimeShort?: string;
-  anaesthesia?: string;
-  downtime?: string;
-  initialResult?: string;
-  fullResult?: string;
-  performedBy?: string;
-  startingPrice?: number;
-  priceUnit?: string;
-  priceGroups?: Array<{
-    _key: string;
-  } & PriceGroup>;
-  popularAreasTitle?: string;
-  popularAreasHeadingLevel?: "h2" | "h3" | "h4";
-  popularAreas?: Array<string>;
-  journey?: Array<{
-    _key: string;
-  } & JourneyStep>;
-  sections?: Array<{
-    _key: string;
-  } & TreatmentSection>;
-  faqs?: Array<{
-    _key: string;
-  } & FaqItem>;
-  seo?: Seo;
-};
-
-export type Slug = {
-  _type: "slug";
-  current?: string;
-  source?: string;
-};
-
 export type Category = {
   _id: string;
   _type: "category";
@@ -269,6 +216,12 @@ export type Category = {
   title?: string;
   slug?: Slug;
   description?: string;
+};
+
+export type Slug = {
+  _type: "slug";
+  current?: string;
+  source?: string;
 };
 
 export type Post = {
@@ -457,9 +410,63 @@ export type GallerySection = {
   images?: Array<{
     _key: string;
   } & ImageWithAlt>;
+  navLabel?: string;
+  treatment?: {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "treatment";
+  };
   tone?: "paper" | "white" | "wash" | "blush" | "lime" | "brown";
   anchor?: string;
   isHidden?: boolean;
+};
+
+export type Treatment = {
+  _id: string;
+  _type: "treatment";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  name?: string;
+  h1?: string;
+  slug?: Slug;
+  path?: string;
+  category?: "facial-enhancement" | "skin-treatments" | "body-treatments" | "hair-booster";
+  aboutHeading?: string;
+  aboutHeadingLevel?: "h2" | "h3" | "h4";
+  shortDescription?: string;
+  intro?: string;
+  image?: ImageWithAlt;
+  imagePosition?: "object-center" | "object-top" | "object-bottom" | "object-left" | "object-right";
+  featuredOnHomepage?: boolean;
+  featuredOrder?: number;
+  mostPopular?: boolean;
+  treatmentTime?: string;
+  treatmentTimeShort?: string;
+  anaesthesia?: string;
+  downtime?: string;
+  initialResult?: string;
+  fullResult?: string;
+  performedBy?: string;
+  startingPrice?: number;
+  priceUnit?: string;
+  priceGroups?: Array<{
+    _key: string;
+  } & PriceGroup>;
+  popularAreasTitle?: string;
+  popularAreasHeadingLevel?: "h2" | "h3" | "h4";
+  popularAreas?: Array<string>;
+  journey?: Array<{
+    _key: string;
+  } & JourneyStep>;
+  sections?: Array<{
+    _key: string;
+  } & TreatmentSection>;
+  faqs?: Array<{
+    _key: string;
+  } & FaqItem>;
+  seo?: Seo;
 };
 
 export type FeatureGridSection = {
@@ -726,7 +733,7 @@ export type Geopoint = {
   alt?: number;
 };
 
-export type AllSanitySchemaTypes = SiteSettings | Seo | Testimonial | Doctor | ImageWithAlt | Partner | SanityImageCrop | SanityImageHotspot | PricingSection | Treatment | Slug | Category | Post | PortableText | Page | ResultsNavSection | DisclaimerSection | TaglineSection | CategoryNavSection | PricingPromiseSection | CuratedSection | CollectionSection | CtaSection | Link | FaqSection | GallerySection | FeatureGridSection | SplitContentSection | RichTextSection | HeroSection | TreatmentSection | TreatmentContentBlock | PriceGroup | PriceRow | InternationalPoint | SafetyProtocol | ClinicHighlight | JourneyStep | FeatureItem | FaqItem | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageMetadata | SanityFileAsset | SanityAssetSourceData | SanityImageAsset | Geopoint;
+export type AllSanitySchemaTypes = SiteSettings | Seo | Testimonial | Doctor | ImageWithAlt | Partner | SanityImageCrop | SanityImageHotspot | PricingSection | Category | Slug | Post | PortableText | Page | ResultsNavSection | DisclaimerSection | TaglineSection | CategoryNavSection | PricingPromiseSection | CuratedSection | CollectionSection | CtaSection | Link | FaqSection | GallerySection | Treatment | FeatureGridSection | SplitContentSection | RichTextSection | HeroSection | TreatmentSection | TreatmentContentBlock | PriceGroup | PriceRow | InternationalPoint | SafetyProtocol | ClinicHighlight | JourneyStep | FeatureItem | FaqItem | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageMetadata | SanityFileAsset | SanityAssetSourceData | SanityImageAsset | Geopoint;
 export declare const internalGroqTypeReferenceTo: unique symbol;
 // Source: ./src/sanity/lib/queries.ts
 // Variable: pageByPathQuery
@@ -896,6 +903,13 @@ export type PageByPathQueryResult = {
       crop: SanityImageCrop | null;
       hotspot: SanityImageHotspot | null;
     }> | null;
+    navLabel?: string;
+    treatment?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "treatment";
+    };
     tone?: "blush" | "brown" | "lime" | "paper" | "wash" | "white";
     anchor?: string;
     isHidden?: boolean;
@@ -1523,9 +1537,12 @@ export type SiteSettingsQueryResult = {
   defaultSeo: null;
 } | null;
 // Variable: resultGalleriesQuery
-// Query: *[_id == "page.before-after"][0].sections[_type == "gallerySection"]{    anchor,    images[] {  _type,  asset,  alt,  caption,  crop,  hotspot}  }
+// Query: *[_id == "page.before-after"][0].sections[_type == "gallerySection" && isHidden != true]{    anchor,    title,    navLabel,    "treatmentSlug": treatment->slug.current,    images[] {  _type,  asset,  alt,  caption,  crop,  hotspot}  }
 export type ResultGalleriesQueryResult = Array<{
   anchor: string | null;
+  title: string | null;
+  navLabel: string | null;
+  treatmentSlug: string | null;
   images: Array<{
     _type: "imageWithAlt";
     asset: {
@@ -1623,7 +1640,7 @@ declare module "@sanity/client" {
     "\n  *[_type == \"treatment\" && defined(slug.current)] | order(name asc){\n    ...,\n    \"slug\": slug.current,\n    image {\n  _type,\n  asset,\n  alt,\n  caption,\n  crop,\n  hotspot\n},\n    seo {\n  title,\n  description,\n  image {\n  _type,\n  asset,\n  alt,\n  caption,\n  crop,\n  hotspot\n},\n  noIndex\n}\n  }\n": AllTreatmentsQueryResult;
     "\n  *[_type == \"pricingSection\"] | order(order asc, title asc){\n    _id,\n    _type,\n    title,\n    category,\n    order,\n    groups\n  }\n": AllPricingSectionsQueryResult;
     "\n  *[_id == \"siteSettings\"][0]{\n    ...,\n    defaultSeo {\n  title,\n  description,\n  image {\n  _type,\n  asset,\n  alt,\n  caption,\n  crop,\n  hotspot\n},\n  noIndex\n}\n  }\n": SiteSettingsQueryResult;
-    "\n  *[_id == \"page.before-after\"][0].sections[_type == \"gallerySection\"]{\n    anchor,\n    images[] {\n  _type,\n  asset,\n  alt,\n  caption,\n  crop,\n  hotspot\n}\n  }\n": ResultGalleriesQueryResult;
+    "\n  *[_id == \"page.before-after\"][0].sections[_type == \"gallerySection\" && isHidden != true]{\n    anchor,\n    title,\n    navLabel,\n    \"treatmentSlug\": treatment->slug.current,\n    images[] {\n  _type,\n  asset,\n  alt,\n  caption,\n  crop,\n  hotspot\n}\n  }\n": ResultGalleriesQueryResult;
     "\n  *[_type == \"partner\"] | order(order asc, name asc){\n    _id,\n    _type,\n    name,\n    order,\n    logo {\n  _type,\n  asset,\n  alt,\n  caption,\n  crop,\n  hotspot\n}\n  }\n": AllPartnersQueryResult;
     "\n  *[_type == \"doctor\"] | order(order asc, name asc){\n    _id,\n    _type,\n    name,\n    shortName,\n    title,\n    bio,\n    registrationNumber,\n    registryUrl,\n    order,\n    photo {\n  _type,\n  asset,\n  alt,\n  caption,\n  crop,\n  hotspot\n}\n  }\n": AllDoctorsQueryResult;
     "\n  *[_type == \"testimonial\"] | order(order asc, name asc){\n    _id,\n    _type,\n    name,\n    quote,\n    source,\n    featured,\n    order,\n    \"treatmentSlugs\": treatments[]->slug.current\n  }\n": AllTestimonialsQueryResult;

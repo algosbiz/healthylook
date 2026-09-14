@@ -236,20 +236,62 @@ export async function getSanityPartners(): Promise<Array<{ name: string; logo: s
 
 /** Clinic FAQ answers are portable text in Sanity and plain strings in code. */
 /** Result-group slug → image URLs, as published in the CMS. */
-export async function getSanityResultGalleries(): Promise<Map<string, string[]> | null> {
-  const sections = await sanityFetch<Array<{ anchor?: string; images?: SanityImage[] }>>(
-    resultGalleriesQuery,
-    { tags: ["sanity", "sanity:page", "sanity:page:/before-after"] },
-  );
+/**
+ * One before/after board as the site needs it: the photos, the two names
+ * it goes by, and the treatment page it belongs to if it has one.
+ *
+ * `treatmentSlug` is the field that used to live in code. Reading it from
+ * the gallery means adding a board in Studio is the whole job — the jump
+ * bar and the treatment page both follow from it.
+ */
+export type SanityResultGallery = {
+  images: string[];
+  title: string;
+  /** Short form for the jump bar; falls back to the heading. */
+  navLabel: string;
+  /** The treatment page that embeds this board, where one is chosen. */
+  treatmentSlug: string | null;
+};
+
+/**
+ * Keyed by anchor, in the order the sections sit on the page — which is
+ * the order the jump bar shows them in, and the order an editor sees and
+ * can drag.
+ */
+export async function getSanityResultGalleries(): Promise<Map<
+  string,
+  SanityResultGallery
+> | null> {
+  const sections = await sanityFetch<
+    Array<{
+      anchor?: string;
+      title?: string;
+      navLabel?: string;
+      treatmentSlug?: string | null;
+      images?: SanityImage[];
+    }>
+  >(resultGalleriesQuery, {
+    tags: ["sanity", "sanity:page", "sanity:page:/before-after"],
+  });
   if (!sections?.length) return null;
 
-  const galleries = new Map<string, string[]>();
+  const galleries = new Map<string, SanityResultGallery>();
   for (const section of sections) {
     if (!section.anchor) continue;
     const urls = (section.images ?? [])
       .map((image) => sanityImageUrl(image))
       .filter((url): url is string => Boolean(url));
-    if (urls.length) galleries.set(section.anchor, urls);
+    // A board with no usable photo is not a board. Skipping it keeps an
+    // empty pill out of the jump bar and an empty section off a treatment
+    // page, which is what the old code-side list achieved by omission.
+    if (!urls.length) continue;
+    const title = section.title?.trim() || section.anchor;
+    galleries.set(section.anchor, {
+      images: urls,
+      title,
+      navLabel: section.navLabel?.trim() || title,
+      treatmentSlug: section.treatmentSlug ?? null,
+    });
   }
   return galleries.size ? galleries : null;
 }

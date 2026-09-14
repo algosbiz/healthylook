@@ -11,7 +11,7 @@ import TransferOfferDetails from "./TransferOfferDetails";
 import { sanityImageUrl } from "@/sanity/lib/image";
 import { getSanityResultGalleries } from "@/sanity/lib/content";
 import { TREATMENT_CATEGORIES } from "@/data/treatments";
-import { resultGroups } from "@/data/results";
+import { getResultGroups } from "@/lib/site-content";
 import type {
   CategoryNavSection,
   CtaSection,
@@ -190,9 +190,14 @@ export function FeatureGridBlock({ section }: { section: FeatureGridSection }) {
   );
 }
 
-export function GalleryBlock({ section }: { section: GallerySection }) {
+export async function GalleryBlock({ section }: { section: GallerySection }) {
   const dark = section.tone === "brown";
-  const isResultGallery = resultGroups.some((group) => group.slug === section.anchor);
+  // A before/after board, rather than an ordinary image gallery: framed
+  // white cards, wider gutters, and generated alt text naming the
+  // treatment. The list comes from the CMS now, so a board added in Studio
+  // is styled as one without a code change.
+  const groups = await getResultGroups();
+  const isResultGallery = groups.some((group) => group.slug === section.anchor);
   const seenImageAssets = new Set<string>();
   const images = section.images.filter((image) => {
     const assetRef = image.asset._ref;
@@ -477,6 +482,7 @@ export async function ResultsNavBlock({ section }: { section: ResultsNavSection 
   // near-duplicates there. Sanity is what the page actually renders, so
   // it is the only thing the count reads from.
   const sanityGalleries = await getSanityResultGalleries();
+  const groups = await getResultGroups();
   return (
     <nav
       id={section.anchor}
@@ -500,7 +506,7 @@ export async function ResultsNavBlock({ section }: { section: ResultsNavSection 
               without runway to scroll into, it sits on top of part of the
               first/last pill instead of framing clear space beside it. */}
           <div className="w-10 shrink-0 snap-start" aria-hidden="true" />
-          {resultGroups.map((group) => (
+          {groups.map((group) => (
             <a
               key={group.slug}
               href={`#${group.slug}`}
@@ -508,7 +514,7 @@ export async function ResultsNavBlock({ section }: { section: ResultsNavSection 
             >
               {group.label}
               <span className="ml-2 text-muted">
-                {sanityGalleries?.get(group.slug)?.length ?? 0}
+                {sanityGalleries?.get(group.slug)?.images.length ?? 0}
               </span>
             </a>
           ))}
