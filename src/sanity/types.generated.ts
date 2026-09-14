@@ -81,6 +81,17 @@ export type SiteSettings = {
     faqTitle?: string;
     resultsTitle?: string;
     relatedEyebrow?: string;
+    pricingTitle?: string;
+  };
+  headingLevels?: {
+    glance?: "h2" | "h3" | "h4";
+    pricing?: "h2" | "h3" | "h4";
+    journey?: "h2" | "h3" | "h4";
+    results?: "h2" | "h3" | "h4";
+    safety?: "h2" | "h3" | "h4";
+    doctor?: "h2" | "h3" | "h4";
+    faq?: "h2" | "h3" | "h4";
+    related?: "h2" | "h3" | "h4";
   };
   defaultSeo?: Seo;
 };
@@ -207,6 +218,8 @@ export type Treatment = {
   slug?: Slug;
   path?: string;
   category?: "facial-enhancement" | "skin-treatments" | "body-treatments" | "hair-booster";
+  aboutHeading?: string;
+  aboutHeadingLevel?: "h2" | "h3" | "h4";
   shortDescription?: string;
   intro?: string;
   image?: ImageWithAlt;
@@ -227,6 +240,7 @@ export type Treatment = {
     _key: string;
   } & PriceGroup>;
   popularAreasTitle?: string;
+  popularAreasHeadingLevel?: "h2" | "h3" | "h4";
   popularAreas?: Array<string>;
   journey?: Array<{
     _key: string;
@@ -504,16 +518,42 @@ export type HeroSection = {
 export type TreatmentSection = {
   _type: "treatmentSection";
   title?: string;
+  headingLevel?: "h2" | "h3" | "h4";
+  anchor?: string;
   blocks?: Array<{
     _key: string;
   } & TreatmentContentBlock>;
   points?: Array<string>;
+  image?: ImageWithAlt;
 };
 
 export type TreatmentContentBlock = {
   _type: "treatmentContentBlock";
   heading?: string;
+  headingLevel?: "h2" | "h3" | "h4";
+  body?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal";
+    listItem?: "bullet" | "number";
+    markDefs?: Array<{
+      href?: string;
+      blank?: boolean;
+      _type: "textLink";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  } | {
+    _key: string;
+  } & ImageWithAlt>;
   paragraphs?: Array<string>;
+  image?: ImageWithAlt;
 };
 
 export type PriceGroup = {
@@ -1078,6 +1118,8 @@ export type AllTreatmentsQueryResult = Array<{
   slug: string | null;
   path?: string;
   category?: "body-treatments" | "facial-enhancement" | "hair-booster" | "skin-treatments";
+  aboutHeading?: string;
+  aboutHeadingLevel?: "h2" | "h3" | "h4";
   shortDescription?: string;
   intro?: string;
   image: {
@@ -1110,6 +1152,7 @@ export type AllTreatmentsQueryResult = Array<{
     _key: string;
   } & PriceGroup>;
   popularAreasTitle?: string;
+  popularAreasHeadingLevel?: "h2" | "h3" | "h4";
   popularAreas?: Array<string>;
   journey?: Array<{
     _key: string;
@@ -1383,6 +1426,17 @@ export type SiteSettingsQueryResult = {
     faqTitle?: string;
     resultsTitle?: string;
     relatedEyebrow?: string;
+    pricingTitle?: string;
+  };
+  headingLevels?: {
+    glance?: "h2" | "h3" | "h4";
+    pricing?: "h2" | "h3" | "h4";
+    journey?: "h2" | "h3" | "h4";
+    results?: "h2" | "h3" | "h4";
+    safety?: "h2" | "h3" | "h4";
+    doctor?: "h2" | "h3" | "h4";
+    faq?: "h2" | "h3" | "h4";
+    related?: "h2" | "h3" | "h4";
   };
   defaultSeo: {
     title: string | null;
@@ -1432,6 +1486,8 @@ export type SiteSettingsQueryResult = {
   slug?: Slug;
   path?: string;
   category?: "body-treatments" | "facial-enhancement" | "hair-booster" | "skin-treatments";
+  aboutHeading?: string;
+  aboutHeadingLevel?: "h2" | "h3" | "h4";
   shortDescription?: string;
   intro?: string;
   image?: ImageWithAlt;
@@ -1452,6 +1508,7 @@ export type SiteSettingsQueryResult = {
     _key: string;
   } & PriceGroup>;
   popularAreasTitle?: string;
+  popularAreasHeadingLevel?: "h2" | "h3" | "h4";
   popularAreas?: Array<string>;
   journey?: Array<{
     _key: string;
@@ -1542,6 +1599,17 @@ export type AllTestimonialsQueryResult = Array<{
   order: number | null;
   treatmentSlugs: Array<string | null> | null;
 }>;
+// Variable: sitemapEntriesQuery
+// Query: *[    (_type == "page" && defined(path) && count(sections) > 0) ||    (_type == "post" && defined(slug.current)) ||    (_type == "treatment" && defined(slug.current))  ]{    "path": select(      _type == "post" => "/" + slug.current,      _type == "treatment" => select(        defined(path) && path != "" => path,        "/ubud-bali/" + slug.current      ),      path    ),    _updatedAt,    "noIndex": seo.noIndex == true  }
+export type SitemapEntriesQueryResult = Array<{
+  path: string | null;
+  _updatedAt: string;
+  noIndex: boolean | false;
+} | {
+  path: string | null;
+  _updatedAt: string;
+  noIndex: boolean | false;
+}>;
 
 // Query TypeMap
 import "@sanity/client";
@@ -1559,5 +1627,6 @@ declare module "@sanity/client" {
     "\n  *[_type == \"partner\"] | order(order asc, name asc){\n    _id,\n    _type,\n    name,\n    order,\n    logo {\n  _type,\n  asset,\n  alt,\n  caption,\n  crop,\n  hotspot\n}\n  }\n": AllPartnersQueryResult;
     "\n  *[_type == \"doctor\"] | order(order asc, name asc){\n    _id,\n    _type,\n    name,\n    shortName,\n    title,\n    bio,\n    registrationNumber,\n    registryUrl,\n    order,\n    photo {\n  _type,\n  asset,\n  alt,\n  caption,\n  crop,\n  hotspot\n}\n  }\n": AllDoctorsQueryResult;
     "\n  *[_type == \"testimonial\"] | order(order asc, name asc){\n    _id,\n    _type,\n    name,\n    quote,\n    source,\n    featured,\n    order,\n    \"treatmentSlugs\": treatments[]->slug.current\n  }\n": AllTestimonialsQueryResult;
+    "\n  *[\n    (_type == \"page\" && defined(path) && count(sections) > 0) ||\n    (_type == \"post\" && defined(slug.current)) ||\n    (_type == \"treatment\" && defined(slug.current))\n  ]{\n    \"path\": select(\n      _type == \"post\" => \"/\" + slug.current,\n      _type == \"treatment\" => select(\n        defined(path) && path != \"\" => path,\n        \"/ubud-bali/\" + slug.current\n      ),\n      path\n    ),\n    _updatedAt,\n    \"noIndex\": seo.noIndex == true\n  }\n": SitemapEntriesQueryResult;
   }
 }

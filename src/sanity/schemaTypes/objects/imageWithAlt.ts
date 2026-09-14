@@ -12,7 +12,11 @@ export const imageWithAlt = defineType({
       type: "string",
       description:
         "Describe the image for people using screen readers. Leave decorative images out instead of using an empty description.",
-      validation: (Rule) => Rule.required().min(3).max(180),
+      /* A warning, not an error, for the same reason as the treatment
+       * fields: it should nag, not block a publish. It still matters — an
+       * image with no description is invisible to search and to anyone
+       * using a screen reader — which is why it nags at all. */
+      validation: (Rule) => Rule.required().min(3).max(180).warning("Search engines and screen readers have nothing to go on without this."),
     }),
     defineField({
       name: "caption",

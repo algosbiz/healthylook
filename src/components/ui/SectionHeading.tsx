@@ -17,7 +17,8 @@ type SectionHeadingProps = {
   align?: "center" | "left";
   /** `dark` recolors the whole block for use on the ink contrast bands. */
   tone?: Tone;
-  as?: "h1" | "h2" | "h3";
+  /** Semantic level only — the title keeps its display size either way. */
+  as?: "h1" | "h2" | "h3" | "h4";
   className?: string;
 };
 

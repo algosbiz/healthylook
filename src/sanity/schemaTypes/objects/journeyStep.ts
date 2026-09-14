@@ -19,7 +19,7 @@ export const journeyStep = defineType({
       title: "Step",
       type: "string",
       description: 'The clinic\'s own step name — "Consultation", "Numbing cream", "Treatment".',
-      validation: (Rule) => Rule.required().max(120),
+      validation: (Rule) => Rule.required().max(120).warning("Both halves of a step are printed; one on its own reads as a mistake."),
     }),
     defineField({
       name: "duration",
@@ -27,7 +27,7 @@ export const journeyStep = defineType({
       type: "string",
       description:
         'How long this step takes, written the way the rest of the site writes durations — "10 minutes", "~30 minutes", "30–45 minutes, depending on the treatment area".',
-      validation: (Rule) => Rule.required().max(120),
+      validation: (Rule) => Rule.required().max(120).warning("Both halves of a step are printed; one on its own reads as a mistake."),
     }),
   ],
   preview: {

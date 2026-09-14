@@ -1,4 +1,5 @@
 import { defineArrayMember, defineField, defineType } from "sanity";
+import { headingLevelField } from "../objects/headingLevel";
 
 /**
  * Everything the site says that is not tied to one page or one treatment.
@@ -232,6 +233,36 @@ export const siteSettings = defineType({
         defineField({ name: "faqTitle", title: "FAQ — heading", type: "string" }),
         defineField({ name: "resultsTitle", title: "Before & after band — heading", type: "string" }),
         defineField({ name: "relatedEyebrow", title: "Related treatments — eyebrow", type: "string" }),
+        defineField({ name: "pricingTitle", title: "Prices — heading", type: "string" }),
+      ],
+    }),
+
+    /* ── HEADING LEVELS FOR THE SHARED SECTIONS ────────────────────
+     * The headings above are the same on all 31 treatment pages, so their
+     * level is a site-wide structural decision and belongs here with their
+     * wording. The headings that differ per treatment — the one over the
+     * description, the Popular areas list, and every long-form section and
+     * prose block — carry their own level field on the treatment itself,
+     * because whether a section is top-level or a sub-part depends on what
+     * that page actually says.
+     */
+    defineField({
+      name: "headingLevels",
+      title: "Heading levels",
+      type: "object",
+      group: "treatmentPage",
+      options: { collapsible: true, collapsed: true },
+      description:
+        "Applies to every treatment page. All default to H2, which is correct unless a section is genuinely a sub-part of the one above it. · ID: Berlaku untuk semua halaman treatment. Semuanya default H2, dan itu sudah benar kecuali sebuah section memang bagian dari section di atasnya.",
+      fields: [
+        headingLevelField({ name: "glance", title: "At a glance", initialValue: "h2", applies: "The level of the At a glance box heading.", appliesId: "Level untuk heading kotak At a glance." }),
+        headingLevelField({ name: "pricing", title: "Prices", initialValue: "h2", applies: "The level of the Prices heading.", appliesId: "Level untuk heading Prices." }),
+        headingLevelField({ name: "journey", title: "Treatment journey", initialValue: "h2", applies: "The level of the Treatment journey heading.", appliesId: "Level untuk heading Treatment journey." }),
+        headingLevelField({ name: "results", title: "Before & after", initialValue: "h2", applies: "The level of the Before & after band heading.", appliesId: "Level untuk heading band Before & after." }),
+        headingLevelField({ name: "safety", title: "How we treat you", initialValue: "h2", applies: "The level of the safety commitments heading.", appliesId: "Level untuk heading komitmen keamanan." }),
+        headingLevelField({ name: "doctor", title: "Who performs this", initialValue: "h2", applies: "The level of the doctors section heading.", appliesId: "Level untuk heading section dokter." }),
+        headingLevelField({ name: "faq", title: "FAQ", initialValue: "h2", applies: "The level of the FAQ heading.", appliesId: "Level untuk heading FAQ." }),
+        headingLevelField({ name: "related", title: "Related treatments", initialValue: "h2", applies: "The level of the Related treatments heading.", appliesId: "Level untuk heading Related treatments." }),
       ],
     }),
 

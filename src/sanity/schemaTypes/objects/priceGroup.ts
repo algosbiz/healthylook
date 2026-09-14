@@ -19,7 +19,7 @@ export const priceGroup = defineType({
       description:
         "One row per price. A single row is perfectly fine. · ID: Satu baris untuk satu harga. Satu baris saja sudah sah.",
       of: [defineArrayMember({ type: "priceRow" })],
-      validation: (Rule) => Rule.required().min(1),
+      validation: (Rule) => Rule.required().min(1).warning("A price group with no rows renders as a heading over nothing."),
     }),
     defineField({
       name: "note",

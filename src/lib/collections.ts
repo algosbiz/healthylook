@@ -176,6 +176,23 @@ export const COLLECTIONS: Collection[] = [
         column: true,
         required: true,
       },
+      {
+        name: "aboutHeading",
+        label: "About — heading",
+        type: "text",
+        help: "The small gold line above the description. Write the phrase this page should rank on; leave empty for the site-wide wording.",
+      },
+      {
+        name: "aboutHeadingLevel",
+        label: "About — heading level",
+        type: "select",
+        options: [
+          { value: "h2", label: "H2" },
+          { value: "h3", label: "H3" },
+          { value: "h4", label: "H4" },
+        ],
+        help: "H2 unless this heading belongs under another one. Semantic only — it does not change how the line looks.",
+      },
       { name: "shortDescription", label: "Short description", type: "textarea", rows: 3 },
       { name: "intro", label: "Intro paragraph", type: "textarea", rows: 6 },
       { name: "image", label: "Hero image", type: "image" },
@@ -221,6 +238,17 @@ export const COLLECTIONS: Collection[] = [
       },
 
       { name: "popularAreasTitle", label: "Popular areas heading", type: "text" },
+      {
+        name: "popularAreasHeadingLevel",
+        label: "Popular areas — heading level",
+        type: "select",
+        options: [
+          { value: "h2", label: "H2" },
+          { value: "h3", label: "H3" },
+          { value: "h4", label: "H4" },
+        ],
+        help: "H3 by default: the list sits inside the description section.",
+      },
       { name: "popularAreas", label: "Popular areas", type: "stringList" },
     ],
   },
@@ -249,7 +277,8 @@ export const COLLECTIONS: Collection[] = [
         name: "sections",
         label: "Sections",
         type: "json",
-        help: 'A list of sections: [{"title":"…","blocks":[{"heading":"…","paragraphs":["…"]}],"points":["…"]}]. Use blocks for prose and heading/description pairs; use points only for short claim bullets.',
+        help:
+          'A list of sections: [{"title":"…","blocks":[{"heading":"…","paragraphs":["…"]}],"points":["…"]}]. Every key is optional. Use blocks for prose and heading/description pairs; use points only for short claim bullets. "anchor":"why-choose-us" makes a section linkable as /ubud-bali/<slug>#why-choose-us. "headingLevel":"h3" sets a heading\x27s level (sections default to h2, block headings to h3). "image":{"src":"/images/…","alt":"…","caption":"…"} adds a photo, on a block or on the section.',
       },
     ],
   },

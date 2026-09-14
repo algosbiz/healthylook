@@ -1,4 +1,5 @@
-import { defineArrayMember, defineField, defineType } from "sanity";
+import { defineArrayMember, defineType } from "sanity";
+import { textLinkAnnotation } from "./textLink";
 
 export const portableText = defineType({
   name: "portableText",
@@ -22,31 +23,10 @@ export const portableText = defineType({
           { title: "Strong", value: "strong" },
           { title: "Emphasis", value: "em" },
         ],
-        annotations: [
-          defineField({
-            name: "textLink",
-            title: "Link",
-            type: "object",
-            fields: [
-              defineField({
-                name: "href",
-                title: "Destination",
-                type: "url",
-                validation: (Rule) =>
-                  Rule.required().uri({
-                    allowRelative: true,
-                    scheme: ["http", "https", "mailto", "tel"],
-                  }),
-              }),
-              defineField({
-                name: "blank",
-                title: "Open in a new tab",
-                type: "boolean",
-                initialValue: false,
-              }),
-            ],
-          }),
-        ],
+        // Shared with the treatment page's prose so a link behaves the
+        // same wherever it is written — including an in-page `#anchor`,
+        // which the old url-typed field rejected. See textLink.ts.
+        annotations: [textLinkAnnotation],
       },
     }),
     defineArrayMember({ type: "imageWithAlt" }),

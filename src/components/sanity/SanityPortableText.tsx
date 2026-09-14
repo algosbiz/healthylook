@@ -88,20 +88,34 @@ export default function SanityPortableText({
   value,
   tone = "light",
   smallPrint = false,
+  className = "",
+  spacing = "space-y-6",
 }: {
   value?: PortableTextBlock[];
   tone?: "light" | "dark";
+  /**
+   * Gap between blocks. A prop rather than something `className` can
+   * override, because `space-y-*` utilities have equal specificity — a
+   * second one passed in wins or loses on stylesheet order, which is not
+   * something a call site should have to reason about. The treatment page
+   * passes space-y-4 to match the gap its plain paragraphs had, so moving
+   * copy into rich text changes nothing on screen.
+   */
+  spacing?: string;
+  /** Extra classes on the wrapper — the treatment page uses it to hold
+   *  its prose to the same measure as the paragraphs it replaced. */
+  className?: string;
   /** Downsizes an italic-only exclusion note within a richer offer card. */
   smallPrint?: boolean;
 }) {
   if (!value?.length) return null;
   return (
     <div
-      className={`space-y-6 font-sans text-body leading-body [&_h2:not(:first-child)]:pt-8 [&_h3:not(:first-child)]:pt-5 ${
+      className={`${spacing} font-sans text-body leading-body [&_h2:not(:first-child)]:pt-8 [&_h3:not(:first-child)]:pt-5 ${
         smallPrint ? "[&_p:has(>em:only-child)]:text-caption [&_p:has(>em:only-child)]:leading-body" : ""
       } ${
         tone === "dark" ? "text-white/70" : "text-text-secondary"
-      }`}
+      } ${className}`}
     >
       <PortableText value={value} components={components} />
     </div>

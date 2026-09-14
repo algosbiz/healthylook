@@ -10,6 +10,7 @@ import { getSiteCopy, getTreatments, type SiteCopy } from "@/lib/site-content";
 import { SITE_URL } from "@/lib/constants";
 import StickyCTA from "@/components/ui/StickyCTA";
 import WhatsAppFloatingButton from "@/components/ui/WhatsAppFloatingButton";
+import HashScroll from "@/components/ui/HashScroll";
 import SanityRuntime from "@/components/sanity/SanityRuntime";
 // next/font/google downloads and self-hosts the font at build time (no
 // runtime request to Google Fonts, and no layout-shift flash of a fallback
@@ -198,6 +199,10 @@ export default async function RootLayout({
           // injection surface here.
           dangerouslySetInnerHTML={{ __html: JSON.stringify(buildStructuredData(copy)) }}
         />
+
+        {/* Renders nothing. Makes /page#section work when that URL is
+            opened directly rather than clicked — see HashScroll. */}
+        <HashScroll />
 
         {/* Skip link — first thing in the tab order, visually hidden until
             focused. Required for keyboard users given how many nav links

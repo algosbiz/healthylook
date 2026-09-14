@@ -1,3 +1,4 @@
+import type { HeadingLevel } from "@/lib/headings";
 import type { SOCIAL_LINKS } from "@/lib/constants";
 import type {
   CLINIC_HIGHLIGHTS,
@@ -58,8 +59,24 @@ export type SiteCopy = {
   };
   glanceUnpublished: string;
   bookTreatmentLabel: string;
+  /**
+   * The heading level of each section that is the same on every treatment
+   * page. Per-treatment headings carry their own level on the treatment
+   * itself — see siteSettings.ts for why the two live apart.
+   */
+  headingLevels: {
+    glance: HeadingLevel;
+    pricing: HeadingLevel;
+    journey: HeadingLevel;
+    results: HeadingLevel;
+    safety: HeadingLevel;
+    doctor: HeadingLevel;
+    faq: HeadingLevel;
+    related: HeadingLevel;
+  };
   sectionHeadings: {
     aboutEyebrow: string;
+    pricingTitle: string;
     journeyEyebrow: string;
     journeyTitle: string;
     safetyEyebrow: string;

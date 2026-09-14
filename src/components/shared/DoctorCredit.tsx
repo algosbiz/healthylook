@@ -27,17 +27,20 @@ export default async function DoctorCredit({
   eyebrow = "Who performs this",
   title = "Treated by a licensed doctor",
   description = "Every consultation, treatment plan, and injection at Healthy Look Aesthetic is handled by a licensed doctor, never a therapist.",
+  as = "h2",
 }: {
   eyebrow?: string;
   title?: string;
   description?: string;
+  /** Semantic heading level, set per page — see src/lib/headings.ts. */
+  as?: "h2" | "h3" | "h4";
 }) {
   const doctors = await getDoctors();
 
   return (
     <section className="bg-paper py-section">
       <Container>
-        <SectionHeading eyebrow={eyebrow} title={title} description={description} />
+        <SectionHeading as={as} eyebrow={eyebrow} title={title} description={description} />
 
         <div className="mx-auto mt-16 grid max-w-4xl gap-x-10 gap-y-12 sm:grid-cols-2">
           {doctors.map((doctor, index) => (

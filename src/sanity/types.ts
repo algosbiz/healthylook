@@ -1,7 +1,6 @@
 import type { PortableTextBlock } from "@portabletext/types";
 import type { Treatment } from "@/data/treatments";
 import type { PricingSection } from "@/data/pricing";
-import type { TreatmentSection } from "@/data/treatmentSections";
 import type { Doctor } from "@/data/doctors";
 
 export type SanityKeyed = {
@@ -255,6 +254,23 @@ export type SiteSettings = {
   defaultSeo?: SeoFields;
 };
 
+export type SanityTreatmentSection = {
+  _key: string;
+  title?: string;
+  headingLevel?: string;
+  anchor?: string;
+  points?: string[];
+  blocks?: Array<{
+    _key: string;
+    heading?: string;
+    headingLevel?: string;
+    body?: PortableTextBlock[];
+    paragraphs?: string[];
+    image?: SanityImage;
+  }>;
+  image?: SanityImage;
+};
+
 export type SanityTreatmentDocument = Omit<Treatment, "image" | "priceGroups"> & {
   _id: string;
   _type: "treatment";
@@ -271,7 +287,12 @@ export type SanityTreatmentDocument = Omit<Treatment, "image" | "priceGroups"> &
       description?: string;
     }>;
   }>;
-  sections?: TreatmentSection[];
+  /**
+   * The document shape, not the page shape: images here are still Sanity
+   * references. getSanityTreatments resolves each to a URL so the page and
+   * the fallback CMS hand TreatmentDetail the same `TreatmentSection`.
+   */
+  sections?: SanityTreatmentSection[];
   faqs?: Array<{
     _key: string;
     question: string;
@@ -350,8 +371,19 @@ export type SanitySiteSettings = {
   };
   glanceUnpublished?: string;
   bookTreatmentLabel?: string;
+  headingLevels?: {
+    glance?: string;
+    pricing?: string;
+    journey?: string;
+    results?: string;
+    safety?: string;
+    doctor?: string;
+    faq?: string;
+    related?: string;
+  };
   sectionHeadings?: {
     aboutEyebrow?: string;
+    pricingTitle?: string;
     journeyEyebrow?: string;
     journeyTitle?: string;
     safetyEyebrow?: string;

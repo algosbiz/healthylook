@@ -15,6 +15,8 @@ import Partners from "@/components/home/Partners";
 import { CheckIcon, ArrowUpRightIcon, WhatsAppIcon, ClockIcon } from "@/components/ui/icons";
 import { formatIDR } from "@/lib/format";
 import { treatmentHref, TREATMENT_CATEGORIES, type Treatment } from "@/data/treatments";
+import type { SectionImage } from "@/data/treatmentSections";
+import SanityPortableText from "@/components/sanity/SanityPortableText";
 import {
   getTreatments,
   getTreatmentFaqs,
@@ -52,6 +54,40 @@ import { whatsappHrefFor } from "@/lib/constants";
  */
 // Default only — an editor can change it in Site settings → Treatment page
 // labels. See `glanceUnpublished` there.
+
+/**
+ * A photograph inside a long-form section, from either the prose block it
+ * belongs to or the section as a whole.
+ *
+ * Renders nothing when there is no image, which is what lets every image
+ * field on a treatment section stay optional without a guard around each
+ * call site — and what lets a block be a photograph with no paragraphs,
+ * or paragraphs with no photograph, without the markup branching.
+ */
+function SectionFigure({
+  image,
+  className = "",
+}: {
+  image?: SectionImage;
+  className?: string;
+}) {
+  if (!image?.src) return null;
+  return (
+    <figure className={className}>
+      <Img
+        src={image.src}
+        alt={image.alt}
+        aspect="wide"
+        sizes="(max-width: 1024px) 100vw, 640px"
+      />
+      {image.caption && (
+        <figcaption className="mt-3 font-sans text-caption leading-relaxed text-muted">
+          {image.caption}
+        </figcaption>
+      )}
+    </figure>
+  );
+}
 
 // Async because its content now comes through the database layer. Still a
 // server component, so this costs the page nothing at runtime: the awaits
@@ -113,6 +149,21 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
   //
   // All three now read from one field, so a page can never again claim a
   // doctor for a treatment the clinic staffs with a nurse.
+  /* ── HEADING LEVELS ───────────────────────────────────────
+   * React renders a lowercase string variable as an HTML tag and a
+   * capitalised one as a component, so every level chosen in the CMS is
+   * aliased to a capitalised name before it reaches the JSX below.
+   *
+   * The two per-treatment ones sit here; the shared sections read
+   * `copy.headingLevels` inline. Every level is purely semantic — each
+   * heading keeps its own size classes, so changing H2 to H3 changes the
+   * outline a search engine reads and nothing on screen. */
+  const AboutHeading = treatment.aboutHeadingLevel ?? "h2";
+  const PopularAreasHeading = treatment.popularAreasHeadingLevel ?? "h3";
+  const GlanceHeading = copy.headingLevels.glance;
+  const PricingHeading = copy.headingLevels.pricing;
+  const ResultsHeading = copy.headingLevels.results;
+
   const performedBy = treatment.performedBy ?? "Licensed doctor";
   const isDoctorPerformed = /doctor/i.test(performedBy);
   // Hero badge. Short adjective form to match the line it sits on
@@ -194,22 +245,27 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
         )}
       </PageHero>
 
-      <section className="bg-paper py-section">
+      <section id="about" className="scroll-mt-24 bg-paper py-section">
         <Container>
           <div className="grid gap-14 lg:grid-cols-12 lg:gap-20">
             <div className="lg:col-span-7">
+              {/* Was a <span>: styled like a heading, invisible to search
+                  as one. Same gold rule and same type, now an actual
+                  heading whose wording each treatment can set for itself. */}
               <Reveal>
-                <span className="eyebrow flex items-center gap-3 text-primary-strong">
+                <AboutHeading className="eyebrow flex items-center gap-3 text-primary-strong">
                   <span className="h-px w-8 bg-primary/40" aria-hidden="true" />
-                  {sectionHeadings.aboutEyebrow}
-                </span>
+                  {treatment.aboutHeading ?? sectionHeadings.aboutEyebrow}
+                </AboutHeading>
               </Reveal>
 
-              <Reveal delay={90}>
-                <p className="mt-9 measure font-sans text-lead text-text">
-                  {treatment.shortDescription}
-                </p>
-              </Reveal>
+              {treatment.shortDescription && (
+                <Reveal delay={90}>
+                  <p className="mt-9 measure font-sans text-lead text-text">
+                    {treatment.shortDescription}
+                  </p>
+                </Reveal>
+              )}
 
               {treatment.intro && (
                 <Reveal delay={140}>
@@ -259,9 +315,9 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
                         areas treated with botox") — and a generic label
                         for the treatments where it publishes the list
                         without a heading. */}
-                    <h2 className="eyebrow text-primary-strong">
+                    <PopularAreasHeading className="eyebrow text-primary-strong">
                       {treatment.popularAreasTitle ?? "Commonly treated areas"}
-                    </h2>
+                    </PopularAreasHeading>
                     <ul className="mt-7 grid gap-x-10 gap-y-3.5 sm:grid-cols-2">
                       {treatment.popularAreas.map((area) => (
                         <li
@@ -285,12 +341,26 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
                   "Microwaves vs Cryolipolysis in Bali"). */}
               {sections.length > 0 && (
                 <div className="mt-16 flex flex-col gap-12">
-                  {sections.map((section, index) => (
-                    <Reveal key={section.title} delay={Math.min(index, 4) * 60}>
-                      <div className="border-t border-hairline pt-8">
-                        <h2 className="font-sans text-h4 leading-tight text-ink">
-                          {section.title}
-                        </h2>
+                  {sections.map((section, index) => {
+                    // Per section and per block, so one page can open on an
+                    // H2 and put a comparison under it on an H3. Aliased to
+                    // capitals for the same reason as the headings above.
+                    const SectionHeadingTag = section.headingLevel ?? "h2";
+                    return (
+                    <Reveal key={section.anchor ?? section.title ?? index} delay={Math.min(index, 4) * 60}>
+                      <div
+                        id={section.anchor}
+                        className="scroll-mt-24 border-t border-hairline pt-8"
+                      >
+                        {/* A section without a heading is allowed — see the
+                            note in treatmentSection.ts on why nothing here
+                            is required. An empty <h2> would be worse than
+                            no heading: search engines read it as one. */}
+                        {section.title && (
+                          <SectionHeadingTag className="font-sans text-h4 leading-tight text-ink">
+                            {section.title}
+                          </SectionHeadingTag>
+                        )}
 
                         {/* ── CLIENT REVISION 30 — "Why section is not
                             tidy": PROSE FIRST, THEN THE BULLETS ─────────
@@ -314,27 +384,53 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
                             two formats were rewritten as uniform blocks. */}
                         {section.blocks && (
                           <div className="mt-6 flex flex-col gap-7">
-                            {section.blocks.map((block, blockIndex) => (
+                            {section.blocks.map((block, blockIndex) => {
+                              const BlockHeadingTag = block.headingLevel ?? "h3";
+                              return (
                               <div key={block.heading ?? blockIndex}>
                                 {block.heading && (
-                                  <h3 className="font-sans text-copy-lg font-medium leading-snug text-ink">
+                                  <BlockHeadingTag className="font-sans text-copy-lg font-medium leading-snug text-ink">
                                     {block.heading}
-                                  </h3>
+                                  </BlockHeadingTag>
                                 )}
-                                <div
-                                  className={`flex flex-col gap-4 ${block.heading ? "mt-3" : ""}`}
-                                >
-                                  {block.paragraphs.map((paragraph) => (
-                                    <p
-                                      key={paragraph.slice(0, 40)}
-                                      className="measure font-sans text-body leading-body text-text-secondary"
-                                    >
-                                      {paragraph}
-                                    </p>
-                                  ))}
-                                </div>
+                                {/* Rich text where the CMS holds it, the
+                                    original plain paragraphs otherwise.
+                                    Both, and this block would print the
+                                    same copy twice on any treatment part
+                                    way through being moved over. */}
+                                {block.body?.length ? (
+                                  <SanityPortableText
+                                    value={block.body}
+                                    // The gap the plain paragraphs had. See the
+                                    // prop’s own note in SanityPortableText.
+                                    spacing="space-y-4"
+                                    className={`[&_p]:measure [&_figure]:measure [&_ul]:measure [&_ol]:measure ${
+                                      block.heading ? "mt-3" : ""
+                                    }`}
+                                  />
+                                ) : block.paragraphs && block.paragraphs.length > 0 ? (
+                                  <div
+                                    className={`flex flex-col gap-4 ${block.heading ? "mt-3" : ""}`}
+                                  >
+                                    {block.paragraphs.map((paragraph) => (
+                                      <p
+                                        key={paragraph.slice(0, 40)}
+                                        className="measure font-sans text-body leading-body text-text-secondary"
+                                      >
+                                        {paragraph}
+                                      </p>
+                                    ))}
+                                  </div>
+                                ) : null}
+                                {/* Full column width rather than inset: the
+                                    text column is already the measure, and a
+                                    narrower image inside it reads as a
+                                    mistake. 16/9 keeps a row of sections
+                                    the same rhythm whatever is uploaded. */}
+                                <SectionFigure image={block.image} className="mt-6" />
                               </div>
-                            ))}
+                              );
+                            })}
                           </div>
                         )}
 
@@ -351,18 +447,21 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
                             ))}
                           </ul>
                         )}
+
+                        <SectionFigure image={section.image} className="mt-8" />
                       </div>
                     </Reveal>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
 
               {treatment.priceGroups && (
                 <Reveal delay={220}>
-                  <div className="mt-16">
-                    <h2 className="font-script text-h3 text-primary">
-                      Pricing
-                    </h2>
+                  <div id="pricing" className="mt-16 scroll-mt-24">
+                    <PricingHeading className="font-script text-h3 text-primary">
+                      {sectionHeadings.pricingTitle}
+                    </PricingHeading>
                     <div className="mt-8">
                       <PriceTable groups={treatment.priceGroups} />
                     </div>
@@ -376,11 +475,13 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
               )}
             </div>
 
-            <aside className="lg:col-span-5">
+            <aside id="at-a-glance" className="scroll-mt-24 lg:col-span-5">
               <div className="lg:sticky lg:top-32">
                 <Reveal>
                   <div className="border border-hairline bg-background p-8">
-                    <h2 className="eyebrow text-primary-strong">{copy.glanceTitle}</h2>
+                    <GlanceHeading className="eyebrow text-primary-strong">
+                      {copy.glanceTitle}
+                    </GlanceHeading>
                     <dl className="mt-6">
                       {treatment.startingPrice != null && (
                         <div className="flex items-baseline justify-between gap-5 border-b border-hairline py-3.5">
@@ -473,9 +574,10 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
           Medi Facial aren't in the sheet, so this section simply doesn't
           render for those two rather than guessing a timeline for them. */}
       {journey && journey.length > 0 && (
-        <section className="bg-wash py-section">
+        <section id="journey" className="scroll-mt-24 bg-wash py-section">
           <Container>
             <SectionHeading
+              as={copy.headingLevels.journey}
               align="left"
               eyebrow={sectionHeadings.journeyEyebrow}
               title={sectionHeadings.journeyTitle}
@@ -524,13 +626,13 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
           Positioned right after Treatment Journey per the client's own
           request (via Irene, WhatsApp): people should see proof of results
           right after learning what the visit itself involves. */}
-      <section className="bg-section py-16">
+      <section id="results" className="scroll-mt-24 bg-section py-16">
         <Container>
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <div>
-              <h2 className="font-script text-h2 leading-heading text-primary">
+              <ResultsHeading className="font-script text-h2 leading-heading text-primary">
                 {sectionHeadings.resultsTitle}
-              </h2>
+              </ResultsHeading>
               <p className="mt-3 measure font-sans text-sm leading-relaxed text-text-secondary">
                 {resultGroup
                   ? `Real ${treatment.name} results from our Ubud clinic. Individual results vary. Your doctor will discuss what is realistic for you.`
@@ -569,7 +671,7 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
 
       {/* Clinic safety commitments — the clinic's own published protocols,
           shown on every treatment page because they apply to every one. */}
-      <section className="bg-ink-brown py-section text-white">
+      <section id="safety" className="scroll-mt-24 bg-ink-brown py-section text-white">
         <Container>
           {/* ── CLIENT REVISION, CORRECTED — "TREATMENT JOURNEY" REVERTS TO
               "WHY HERE" ──────────────────────────────────────────────
@@ -586,6 +688,7 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
               journey — it's the clinic's evidence for "How we treat
               you". */}
           <SectionHeading
+            as={copy.headingLevels.safety}
             tone="dark"
             eyebrow={sectionHeadings.safetyEyebrow}
             title={sectionHeadings.safetyTitle}
@@ -622,18 +725,26 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
           pictures. Those pages still name the performer in the hero badge
           and in the At-a-glance box. */}
       {isDoctorPerformed && (
-        <DoctorCredit
-          description={`Every ${treatment.name.toLowerCase()} consultation, treatment plan, and injection at Healthy Look Aesthetic is handled by a licensed doctor, never a therapist.`}
-        />
+        <div id="doctor" className="scroll-mt-24">
+          <DoctorCredit
+            as={copy.headingLevels.doctor}
+            description={
+              treatment.name
+                ? `Every ${treatment.name.toLowerCase()} consultation, treatment plan, and injection at Healthy Look Aesthetic is handled by a licensed doctor, never a therapist.`
+                : undefined
+            }
+          />
+        </div>
       )}
 
       {faqs.length > 0 && (
-        <section className="bg-wash py-section">
+        <section id="faq" className="scroll-mt-24 bg-wash py-section">
           <Container>
             <div className="grid gap-12 lg:grid-cols-12 lg:gap-20">
               <div className="lg:col-span-4">
                 <div className="lg:sticky lg:top-32">
                   <SectionHeading
+                    as={copy.headingLevels.faq}
                     align="left"
                     eyebrow={sectionHeadings.faqEyebrow}
                     // The live site's own heading is the plain "FAQ" on
@@ -662,9 +773,10 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
       )}
 
       {related.length > 0 && (
-        <section className="bg-background py-section">
+        <section id="related" className="scroll-mt-24 bg-background py-section">
           <Container>
             <SectionHeading
+              as={copy.headingLevels.related}
               align="left"
               eyebrow={sectionHeadings.relatedEyebrow}
               title={category?.label ?? "Related treatments"}

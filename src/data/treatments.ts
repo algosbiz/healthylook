@@ -17,6 +17,8 @@
 // facial/medi). Keeping the real paths means the redesign doesn't break
 // any existing inbound link or search ranking — the brief's SEO rule.
 
+import type { HeadingLevel } from "@/lib/headings";
+
 export type TreatmentCategoryId =
   | "facial-enhancement"
   | "skin-treatments"
@@ -270,6 +272,15 @@ export type Treatment = {
    * they fall back to the detail page's generic label.
    */
   popularAreasTitle?: string;
+  /**
+   * The heading over the description, and its level. Both are written per
+   * treatment because the phrase above a description is where a page says
+   * what it is about — "About XERF skin tightening in Ubud" earns more
+   * than the generic label it replaces. Unset falls back to Site settings.
+   */
+  aboutHeading?: string;
+  aboutHeadingLevel?: HeadingLevel;
+  popularAreasHeadingLevel?: HeadingLevel;
 };
 
 export const treatments: Treatment[] = [

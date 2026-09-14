@@ -65,6 +65,7 @@ import {
   CLINIC_SAFETY_STATEMENT,
   INTERNATIONAL_PATIENT_POINTS,
 } from "@/data/clinic";
+import { headingLevel } from "@/lib/headings";
 import * as C from "@/lib/constants";
 import { sanityImageUrl } from "@/sanity/lib/image";
 
@@ -376,6 +377,7 @@ function pickList<T>(value: T[] | undefined, fallback: T[]): T[] {
 export async function getSiteCopy(): Promise<SiteCopy> {
   const settings = await getSanitySiteSettings();
   const headings = settings?.sectionHeadings;
+  const levels = settings?.headingLevels;
   const labels = settings?.glanceLabels;
 
   return {
@@ -428,8 +430,19 @@ export async function getSiteCopy(): Promise<SiteCopy> {
     },
     glanceUnpublished: pick(settings?.glanceUnpublished, "Varies — ask your doctor"),
     bookTreatmentLabel: pick(settings?.bookTreatmentLabel, "Book this treatment"),
+    headingLevels: {
+      glance: headingLevel(levels?.glance, "h2"),
+      pricing: headingLevel(levels?.pricing, "h2"),
+      journey: headingLevel(levels?.journey, "h2"),
+      results: headingLevel(levels?.results, "h2"),
+      safety: headingLevel(levels?.safety, "h2"),
+      doctor: headingLevel(levels?.doctor, "h2"),
+      faq: headingLevel(levels?.faq, "h2"),
+      related: headingLevel(levels?.related, "h2"),
+    },
     sectionHeadings: {
       aboutEyebrow: pick(headings?.aboutEyebrow, "About this treatment"),
+      pricingTitle: pick(headings?.pricingTitle, "Pricing"),
       journeyEyebrow: pick(headings?.journeyEyebrow, "Treatment Journey"),
       journeyTitle: pick(headings?.journeyTitle, "What to expect, step by step"),
       safetyEyebrow: pick(headings?.safetyEyebrow, "Why Here"),

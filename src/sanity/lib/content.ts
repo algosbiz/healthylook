@@ -8,8 +8,11 @@ import type {
   SanityPost,
   SanityTestimonialDocument,
   SanityTreatmentDocument,
+  SanityTreatmentSection,
 } from "@/sanity/types";
 import type { Treatment } from "@/data/treatments";
+import type { SectionImage, TreatmentSection } from "@/data/treatmentSections";
+import { headingLevel } from "@/lib/headings";
 import type { JourneyStep } from "@/data/treatmentJourney";
 import type { PricingSection } from "@/data/pricing";
 import type { Doctor } from "@/data/doctors";
@@ -81,7 +84,7 @@ export async function getSanityPostSlugs(): Promise<string[]> {
 }
 
 export type SanityTreatmentExtras = {
-  sections: NonNullable<SanityTreatmentDocument["sections"]>;
+  sections: TreatmentSection[];
   faqs: Array<{ question: string; answer: string }>;
   /** Empty means the treatment renders no journey section — see journeyStep. */
   journey: JourneyStep[];
@@ -90,6 +93,39 @@ export type SanityTreatmentExtras = {
   mostPopular?: boolean;
   seo?: SanityTreatmentDocument["seo"];
 };
+
+/**
+ * A section image as the page wants it: a URL, not a Sanity reference.
+ *
+ * Resolved here rather than in the component because the same
+ * `TreatmentSection` type is also filled from the fallback CMS, which stores
+ * a plain path — TreatmentDetail should render a section without knowing
+ * which of the two it came from.
+ */
+function sectionImage(image: SanityImage | undefined): SectionImage | undefined {
+  const src = sanityImageUrl(image);
+  if (!src) return undefined;
+  return { src, alt: image?.alt ?? "", caption: image?.caption };
+}
+
+function toTreatmentSections(
+  sections: SanityTreatmentSection[] | undefined,
+): TreatmentSection[] {
+  return (sections ?? []).map((section) => ({
+    title: section.title,
+    headingLevel: headingLevel(section.headingLevel, "h2"),
+    anchor: section.anchor,
+    points: section.points,
+    blocks: section.blocks?.map((block) => ({
+      heading: block.heading,
+      headingLevel: headingLevel(block.headingLevel, "h3"),
+      body: block.body,
+      paragraphs: block.paragraphs,
+      image: sectionImage(block.image),
+    })),
+    image: sectionImage(section.image),
+  }));
+}
 
 function portableTextToPlainText(blocks: PortableTextBlock[]): string {
   if (!Array.isArray(blocks)) return "";
@@ -114,7 +150,7 @@ export async function getSanityTreatments(): Promise<
   const extras = new Map<string, SanityTreatmentExtras>();
   const treatments = documents.map((document): Treatment => {
     extras.set(document.slug, {
-      sections: document.sections ?? [],
+      sections: toTreatmentSections(document.sections),
       faqs: (document.faqs ?? []).map((item) => ({
         question: item.question,
         answer: portableTextToPlainText(item.answer),
@@ -132,10 +168,15 @@ export async function getSanityTreatments(): Promise<
     return {
       slug: document.slug,
       path: document.path,
-      name: document.name,
+      // Name and description are warnings in Studio rather than hard
+      // requirements now, so either can come back empty. Empty string, not
+      // undefined: every consumer types them as strings, and one undefined
+      // here surfaces as a crash three components away rather than as a
+      // blank line.
+      name: document.name ?? "",
       h1: document.h1,
       category: document.category,
-      shortDescription: document.shortDescription,
+      shortDescription: document.shortDescription ?? "",
       treatmentTime: document.treatmentTime,
       treatmentTimeShort: document.treatmentTimeShort,
       anaesthesia: document.anaesthesia,
@@ -160,6 +201,9 @@ export async function getSanityTreatments(): Promise<
       intro: document.intro,
       popularAreas: document.popularAreas,
       popularAreasTitle: document.popularAreasTitle,
+      aboutHeading: document.aboutHeading,
+      aboutHeadingLevel: headingLevel(document.aboutHeadingLevel, "h2"),
+      popularAreasHeadingLevel: headingLevel(document.popularAreasHeadingLevel, "h3"),
     };
   });
 

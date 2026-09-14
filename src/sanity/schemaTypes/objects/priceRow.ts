@@ -11,7 +11,7 @@ export const priceRow = defineType({
       type: "string",
       description:
         "Word it exactly as the clinic quotes it — “Full Face”, “Neck”, “Sculptra 1 vial”. This is what the patient reads on the price list. · ID: Tulis persis seperti yang klinik sebutkan — “Full Face”, “Neck”, “Sculptra 1 vial”. Ini yang dibaca pasien di daftar harga.",
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) => Rule.required().warning("A row with no label reads as a blank line on the price list."),
     }),
     defineField({
       name: "price",

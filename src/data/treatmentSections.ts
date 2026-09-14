@@ -21,12 +21,60 @@
 //
 // 29 sections, ~2604 words, keyed by treatment slug.
 
-export type SectionBlock = { heading?: string; paragraphs: string[] };
+import type { PortableTextBlock } from "@portabletext/types";
+import type { HeadingLevel } from "@/lib/headings";
+
+/**
+ * A photograph inside a long-form section, already resolved to a URL by
+ * the time it reaches the page — the CMS holds a Sanity image reference,
+ * the fallback CMS holds a path, and the renderer should not have to know
+ * which it got. See getSanityTreatments for the conversion.
+ */
+export type SectionImage = {
+  src: string;
+  alt: string;
+  caption?: string;
+};
+
+/**
+ * Every part of a block is optional. A block is sometimes only a
+ * photograph and sometimes only a paragraph, and a section saved
+ * half-written should still render what it has rather than being refused
+ * on save — see the note in treatmentSection.ts.
+ */
+export type SectionBlock = {
+  heading?: string;
+  headingLevel?: HeadingLevel;
+  /**
+   * Rich text — what the CMS writes now. Carries the formatting a plain
+   * string cannot: bold, lists, inline images, and links, including a
+   * `#anchor` into the same page.
+   */
+  body?: PortableTextBlock[];
+  /**
+   * The plain-text paragraphs this file itself is written in, and what
+   * the 29 seeded treatments still hold. Rendered only when `body` is
+   * empty — see TreatmentDetail.
+   */
+  paragraphs?: string[];
+  image?: SectionImage;
+};
 
 export type TreatmentSection = {
-  title: string;
+  title?: string;
+  headingLevel?: HeadingLevel;
+  /**
+   * Optional id for a deep link into this one section —
+   * /ubud-bali/botox#why-choose-us. Set per section in Sanity; the page’s
+   * fixed sections (#about, #pricing, #journey, #faq…) carry ids of their
+   * own and need nothing here. Absent on every seeded section below,
+   * which is why the page renders `id={section.anchor}` as undefined and
+   * React drops the attribute entirely.
+   */
+  anchor?: string;
   points?: string[];
   blocks?: SectionBlock[];
+  image?: SectionImage;
 };
 
 export const treatmentSections: Record<string, TreatmentSection[]> = {
