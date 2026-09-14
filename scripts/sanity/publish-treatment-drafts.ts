@@ -99,47 +99,60 @@ type TreatmentDoc = {
 };
 
 /**
- * Asks the live site whether it understands the new shape.
+ * Asks the live site whether the new code is deployed.
  *
- * The published documents still hold `paragraphs`, so a treatment page in
- * production is currently rendering copy the old way whatever code is
- * deployed — which means the page itself cannot tell us what the code
- * does. What can: the site's own build reads `body` only if it was built
- * from the new code. So this fetches a page and looks for copy that exists
- * ONLY in the draft, i.e. text the old code could not possibly print.
+ * ── WHY NOT PROBE FOR THE COPY ITSELF ─────────────────────────────────
+ * The obvious check is to look for a treatment's prose on the page. It is
+ * useless: the migration copied the text verbatim, so the same words sit
+ * in the published `paragraphs` and in the draft `body`, and the probe
+ * passes under either build. It answers "is there text on the page",
+ * which was never in doubt.
  *
- * It is a smoke test, not a proof. A page that looks right after deploying
- * is still worth one human glance before this runs.
+ * What separates the two builds is markup the old code cannot emit at all.
+ * The section anchors shipped in the same change as `body` support, and
+ * TreatmentDetail renders them unconditionally — an old build has no
+ * `id="at-a-glance"` on a treatment page whatever the CMS holds. So they
+ * stand in for the deploy.
+ *
+ * A smoke test, not a proof: it says the deploy landed, not that every
+ * page is right. One human glance at a treatment page is worth more.
  */
 async function checkProduction(siteUrl: string) {
-  const draft = await client.fetch<TreatmentDoc | null>(
-    `*[_id == "drafts.treatment.botox"][0]{_id,slug,sections}`,
-  );
-  const firstRich = (draft?.sections ?? [])
-    .flatMap((section) => section.blocks ?? [])
-    .flatMap((block) => (block.body ?? []) as Array<{ children?: Array<{ text?: string }> }>)
-    .map((node) => (node.children ?? []).map((child) => child.text ?? "").join("").trim())
-    .find((text) => text.length > 40);
-
-  if (!firstRich) {
-    console.log("No rich-text copy found in the botox draft — nothing to probe with.");
-    return;
-  }
+  const MARKERS = ['id="at-a-glance"', 'id="journey"', 'id="related"', 'id="safety"'];
 
   const url = `${siteUrl.replace(/\/$/, "")}/ubud-bali/botox`;
   console.log(`Probing ${url}`);
-  const response = await fetch(url);
+
+  let response: Response;
+  try {
+    response = await fetch(url);
+  } catch (error) {
+    console.log(`  Could not reach the site: ${error instanceof Error ? error.message : error}`);
+    console.log("  Cannot tell whether the deploy landed. Do not publish yet.");
+    return;
+  }
+
   const html = await response.text();
-  const needle = firstRich.slice(0, 60);
-  const present = html.includes(needle);
+  const found = MARKERS.filter((marker) => html.includes(marker));
 
   console.log(`  HTTP ${response.status}`);
-  console.log(
-    present
-      ? "  The page is serving this copy. Whichever field it came from, the text is there."
-      : "  WARNING: this copy is NOT on the page. Publishing now may empty the long-form sections.",
-  );
-  console.log(`  Looked for: "${needle}…"`);
+  console.log(`  anchors found: ${found.length}/${MARKERS.length}  ${found.join(" ") || "(none)"}`);
+
+  if (found.length === MARKERS.length) {
+    console.log("\n  The new code is live. Publishing is safe.");
+  } else if (found.length > 0) {
+    console.log(
+      "\n  Only some markers are present. That is the shape of neither build —" +
+        "\n  check a treatment page by hand before publishing.",
+    );
+  } else {
+    console.log(
+      "\n  The new code is NOT live — this is still the old build.\n" +
+        "  Publishing now would empty the long-form sections on every treatment\n" +
+        "  page. Wait for the deploy to finish, or purge the CDN cache if it has\n" +
+        "  (npm run cache:purge), then run this again.",
+    );
+  }
 }
 
 async function main() {
