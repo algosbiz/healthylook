@@ -8,11 +8,36 @@ import {
   sanityDataset,
 } from "@/sanity/env";
 
+/**
+ * ── WHY THE CDN IS OFF, INCLUDING IN PRODUCTION ──────────────────────
+ * This was `useCdn: process.env.NODE_ENV === "production"`, which reads as
+ * the obvious optimisation and was the opposite of one here.
+ *
+ * The dataset is private and this client is deliberately token-free — Live
+ * Content’s internals use it, and a token on it would leak. An
+ * unauthenticated read of a private dataset through apicdn does not fail;
+ * it succeeds with nothing. Measured against the site’s own treatments
+ * query: 0 documents through apicdn without a token, 32 through the API
+ * with one.
+ *
+ * So in production every fetch went out twice — once to a CDN that could
+ * only ever answer empty, then again through the authenticated client that
+ * sanityFetch falls back to on an empty result. The site ran entirely on
+ * that fallback. It worked, which is why it went unnoticed, and it left no
+ * way to tell a genuinely empty result from an unreadable one.
+ *
+ * Turning the CDN off removes the call that cannot succeed. It is not a
+ * performance loss: that call was never returning data to cache.
+ *
+ * If the dataset is ever made public, this is worth revisiting — but then
+ * the fallback below should go at the same time, or the double fetch comes
+ * back in a subtler form.
+ */
 export const client = createClient({
   projectId: resolvedSanityProjectId,
   dataset: sanityDataset,
   apiVersion: sanityApiVersion,
-  useCdn: process.env.NODE_ENV === "production",
+  useCdn: false,
   perspective: "published",
 });
 
