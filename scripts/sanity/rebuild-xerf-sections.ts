@@ -19,6 +19,21 @@
  * differs, it prints the difference and stops. `--force` overrides, and
  * should only be used once a human has read what it printed.
  *
+ * ── AND IT REFUSES TO DESTROY LINKS ────────────────────────────────────
+ * That text check is not enough on its own, and finding out cost seven
+ * links. Portable Text keeps a link in `markDefs` and a key on the span it
+ * covers; src/data keeps plain strings, which have neither. So a rebuild
+ * writes `markDefs: []` every time and drops every link in the document —
+ * while the text comparison, which compares only text, reports that there
+ * is nothing to lose. It said exactly that, and then two journal citations
+ * and four internal treatment links went.
+ *
+ * Links now get a refusal of their own, before the text check. They cannot
+ * be carried through automatically — a rebuild's source has nowhere to
+ * hold them — so the honest options are to stop, or to be told to drop
+ * them. Restore them afterwards with restore-xerf-links.ts, which holds
+ * the seven that were lost, read back out of Sanity's document history.
+ *
  * ── DRAFT ONLY ─────────────────────────────────────────────────────────
  * Same rule as every script in this folder. XERF is published and live, so
  * this writes drafts.treatment.xerf and stops; nothing on the site changes
@@ -203,7 +218,12 @@ function plainFromPortable(body: unknown): string {
 type LiveSection = {
   title?: string;
   points?: string[];
-  blocks?: Array<{ _type?: string; heading?: string; body?: unknown; paragraphs?: string[] }>;
+  blocks?: Array<{
+    _type?: string;
+    heading?: string;
+    body?: unknown;
+    paragraphs?: string[];
+  }>;
 };
 
 function liveText(section: LiveSection): string {
@@ -262,6 +282,45 @@ async function main() {
     const a = codeText(section);
     const b = liveText(live);
     if (a !== b) conflicts.push(`  "${section.title}"\n${firstDifference(a, b)}`);
+  }
+
+  /* ── LINKS ARE INVISIBLE TO THE TEXT COMPARISON ────────────────────
+   * The check above compares plain text, and a link changes no text at
+   * all. So the first run of this script reported "no Studio edits to
+   * lose" and then destroyed seven links — two journal citations and four
+   * internal links to other treatments — because src/data holds plain
+   * strings, which carry no markDefs, and a rebuild writes what src/data
+   * has. A check that only looks at what it was designed to look at is
+   * worse than no check, because it is believed.
+   *
+   * Links therefore get their own refusal. There is no way to carry them
+   * through a rebuild automatically: they live in Portable Text and the
+   * source of a rebuild is plain text. So the only honest options are to
+   * stop, or to be told explicitly to drop them.
+   */
+  const liveLinks: string[] = [];
+  for (const section of current.sections ?? []) {
+    for (const block of section.blocks ?? []) {
+      for (const node of (block.body ?? []) as Array<{ markDefs?: Array<{ href?: string }> }>) {
+        for (const md of node.markDefs ?? []) {
+          if (md?.href) liveLinks.push(`  [${section.title}] ${md.href}`);
+        }
+      }
+    }
+  }
+  if (liveLinks.length) {
+    console.log(
+      `${liveLinks.length} link(s) in Studio would be destroyed by a rebuild — src/data holds\n` +
+        `plain text, which cannot carry them:\n\n` +
+        liveLinks.join("\n") +
+        `\n\nRe-apply them afterwards with scripts/sanity/restore-xerf-links.ts, or pass\n` +
+        `--force if you genuinely want them gone.`,
+    );
+    if (!force) {
+      process.exitCode = 1;
+      return;
+    }
+    console.log("\n--force given: the links above will be dropped.\n");
   }
 
   if (conflicts.length) {
