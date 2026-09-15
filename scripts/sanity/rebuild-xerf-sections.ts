@@ -173,6 +173,11 @@ async function buildSection(section: TreatmentSection, index: number) {
     ...(section.title ? { title: section.title } : {}),
     ...(section.anchor ? { anchor: section.anchor } : {}),
     ...(section.headingLevel ? { headingLevel: section.headingLevel } : {}),
+    // Only written when they differ from the default, so a section that
+    // has not opted in carries no field at all and Studio shows it on the
+    // initialValue rather than on a stored "prose"/"plain".
+    ...(section.display && section.display !== "prose" ? { display: section.display } : {}),
+    ...(section.tone && section.tone !== "plain" ? { tone: section.tone } : {}),
     ...(blocks.length ? { blocks } : {}),
     ...(section.points?.length ? { points: section.points } : {}),
     ...(section.image ? { image: await uploadImage(section.image) } : {}),

@@ -115,9 +115,43 @@ export type SectionBlock = {
   image?: SectionImage;
 };
 
+/**
+ * How a section arranges its blocks.
+ *
+ * ── WHY THIS EXISTS ────────────────────────────────────────────────────
+ * The clinic's note on the XERF page was that it "seems like a newspaper".
+ * Measured, it is: 21,000px tall, and 44 paragraphs stacked in one 650px
+ * column with nothing to break them. The worst of it is the list-shaped
+ * sections — "Can XERF Be Combined with Other Treatments?" is eight
+ * heading-and-paragraph pairs in a row, which is a table of contents
+ * written out as prose.
+ *
+ * `cards` lays those out as a grid instead: same words, scannable, and the
+ * page gets a change of texture every few screens.
+ *
+ * ── AND WHY IT IS PER SECTION RATHER THAN A REDESIGN ───────────────────
+ * One component renders all 32 treatment pages, so anything done to the
+ * template happens to every one of them. Defaulting to `prose` means the
+ * other 31 pages render exactly as they do today and XERF opts in section
+ * by section — the same shape as `headingLevel` and `uncropped`.
+ */
+export type SectionDisplay = "prose" | "cards";
+
+/**
+ * The surface a section sits on. `wash` tints it, which is how a page this
+ * long gets a landmark — something the eye can use to tell "I have been
+ * here" from "this is new". Default `plain` leaves it on the page colour,
+ * i.e. what every treatment page does now.
+ */
+export type SectionTone = "plain" | "wash";
+
 export type TreatmentSection = {
   title?: string;
   headingLevel?: HeadingLevel;
+  /** See SectionDisplay. Defaults to `prose`. */
+  display?: SectionDisplay;
+  /** See SectionTone. Defaults to `plain`. */
+  tone?: SectionTone;
   /**
    * Optional id for a deep link into this one section —
    * /ubud-bali/botox#why-choose-us. Set per section in Sanity; the page’s
@@ -426,6 +460,9 @@ export const treatmentSections: Record<string, TreatmentSection[]> = {
     },
     {
       title: "Safety Features Behind XERF",
+      // Four named features, two sentences each: a list wearing prose
+      // clothing. As cards the reader sees all four at once.
+      display: "cards",
       blocks: [
         {
           heading: "Wave Fit™ Pulse Technology",
@@ -671,6 +708,11 @@ export const treatmentSections: Record<string, TreatmentSection[]> = {
     },
     {
       title: "Can XERF Be Combined with Other Treatments?",
+      // The worst stretch on the page: an opening line followed by EIGHT
+      // heading-and-paragraph pairs, which is a table of contents written
+      // out longhand. The opening line stays prose above the grid — see
+      // how `cards` splits headed from unheaded blocks.
+      display: "cards",
       blocks: [
         {
           paragraphs: [
@@ -746,6 +788,11 @@ export const treatmentSections: Record<string, TreatmentSection[]> = {
       // Worth raising with them: "Needle-free, minimal discomfort" would
       // say the same thing without the page contradicting itself.
       title: "Highlights",
+      // The one tinted panel on this page. It is the most visual section —
+      // seven short claims and a row of icons — so it is the one that
+      // gains most from being lifted off the page colour, and a single
+      // landmark stays a landmark.
+      tone: "wash",
       points: [
         "No needles",
         "No pain",
@@ -763,6 +810,8 @@ export const treatmentSections: Record<string, TreatmentSection[]> = {
     },
     {
       title: "Why Choose Healthy Look Aesthetic for XERF Treatment?",
+      // Five reasons, one line each. Cards, for the same reason.
+      display: "cards",
       blocks: [
         {
           heading: "Doctor-Led Treatment",

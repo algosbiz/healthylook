@@ -262,6 +262,10 @@ export type SanityTreatmentSection = {
   title?: string;
   headingLevel?: string;
   anchor?: string;
+  /** Layout and surface, both per section and both optional — see
+   *  treatmentSection.ts for why they are not a template-wide redesign. */
+  display?: string;
+  tone?: string;
   points?: string[];
   // Prose blocks and tables share one array, so `_type` is what tells them
   // apart — Sanity stamps it on every array member and it is the only

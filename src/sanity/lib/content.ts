@@ -143,6 +143,11 @@ function toTreatmentSections(
     title: section.title,
     headingLevel: headingLevel(section.headingLevel, "h2"),
     anchor: section.anchor,
+    // Anything other than the two known values falls back to the default
+    // rather than reaching the renderer, so a stray string in the document
+    // cannot produce a section with no layout at all.
+    display: section.display === "cards" ? "cards" : "prose",
+    tone: section.tone === "wash" ? "wash" : "plain",
     points: section.points,
     // Prose and tables share one array so the clinic can order them
     // freely; `_type` is what Sanity stamps on each member and the only

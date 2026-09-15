@@ -218,6 +218,44 @@ export const treatmentSection = defineType({
           "Use lowercase words separated by hyphens.",
         ),
     }),
+    /* ── PER SECTION, OFF BY DEFAULT ───────────────────────────────────
+     * The clinic's note on the XERF page was that it reads "like a
+     * newspaper" — 44 paragraphs stacked in one column. These two are the
+     * answer, and they are per section rather than a redesign because one
+     * component renders all 32 treatment pages: anything done to the
+     * template happens to every one of them. Left alone, a section renders
+     * exactly as it does today.
+     */
+    defineField({
+      name: "display",
+      title: "Layout",
+      type: "string",
+      options: {
+        list: [
+          { title: "Stacked paragraphs", value: "prose" },
+          { title: "Grid of cards", value: "cards" },
+        ],
+        layout: "radio",
+      },
+      initialValue: "prose",
+      description:
+        "Choose cards for a section that is really a list — four safety features, eight treatment combinations. Each text block with a subheading becomes a card; a block without one stays as an opening paragraph above them. · ID: Pilih cards untuk section yang isinya sebenarnya daftar — empat fitur keamanan, delapan kombinasi treatment. Tiap blok teks yang punya subheading jadi satu kartu; blok tanpa subheading tetap jadi paragraf pembuka di atasnya.",
+    }),
+    defineField({
+      name: "tone",
+      title: "Background",
+      type: "string",
+      options: {
+        list: [
+          { title: "Page colour", value: "plain" },
+          { title: "Tinted panel", value: "wash" },
+        ],
+        layout: "radio",
+      },
+      initialValue: "plain",
+      description:
+        "A tinted panel gives a long page a landmark. Use it sparingly — two or three on a page, or it stops standing out. · ID: Panel berwarna jadi penanda di halaman yang panjang. Pakai secukupnya — dua atau tiga saja per halaman, kalau kebanyakan malah tidak menonjol lagi.",
+    }),
     defineField({
       name: "blocks",
       title: "Prose and tables",

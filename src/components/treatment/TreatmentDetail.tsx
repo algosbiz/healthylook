@@ -17,6 +17,7 @@ import { formatIDR } from "@/lib/format";
 import { treatmentHref, TREATMENT_CATEGORIES, type Treatment } from "@/data/treatments";
 import {
   isSectionTable,
+  type SectionBlock,
   type SectionImage,
   type SectionTable,
 } from "@/data/treatmentSections";
@@ -94,6 +95,59 @@ function SectionFigure({
         </figcaption>
       )}
     </figure>
+  );
+}
+
+/**
+ * One prose block: its subheading, its body, and its figure.
+ *
+ * Pulled out of the section markup because a section can now lay its blocks
+ * out two ways — stacked, or as a grid of cards — and the block itself is
+ * identical in both. The only difference is the box around it, which is
+ * what `className` carries.
+ */
+function SectionProseBlock({
+  block,
+  className = "",
+}: {
+  block: SectionBlock;
+  className?: string;
+}) {
+  const BlockHeadingTag = block.headingLevel ?? "h3";
+  return (
+    <div className={className}>
+      {block.heading && (
+        <BlockHeadingTag className="font-sans text-copy-lg font-medium leading-snug text-ink">
+          {block.heading}
+        </BlockHeadingTag>
+      )}
+      {/* Rich text where the CMS holds it, the original plain paragraphs
+          otherwise. Both, and this block would print the same copy twice on
+          any treatment part way through being moved over. */}
+      {block.body?.length ? (
+        <SanityPortableText
+          value={block.body}
+          spacing="space-y-4"
+          className={`[&_p]:measure [&_figure]:measure [&_ul]:measure [&_ol]:measure ${
+            block.heading ? "mt-3" : ""
+          }`}
+        />
+      ) : block.paragraphs && block.paragraphs.length > 0 ? (
+        <div className={`flex flex-col gap-4 ${block.heading ? "mt-3" : ""}`}>
+          {block.paragraphs.map((paragraph) => (
+            <p
+              key={paragraph.slice(0, 40)}
+              className="measure font-sans text-body leading-body text-text-secondary"
+            >
+              {paragraph}
+            </p>
+          ))}
+        </div>
+      ) : null}
+      {/* Full column width rather than inset: the text column is already
+          the measure, and a narrower image inside it reads as a mistake. */}
+      <SectionFigure image={block.image} className="mt-6" />
+    </div>
   );
 }
 
@@ -434,17 +488,37 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
                   several hundred words each, including comparisons like
                   "Microwaves vs Cryolipolysis in Bali"). */}
               {sections.length > 0 && (
-                <div className="mt-16 flex flex-col gap-12">
+                // gap-16 rather than gap-12: the hairline rule that used to
+                // open each section is gone, so the space between them is
+                // now the only thing marking the boundary and has to do the
+                // work on its own.
+                <div className="mt-16 flex flex-col gap-16">
                   {sections.map((section, index) => {
                     // Per section and per block, so one page can open on an
                     // H2 and put a comparison under it on an H3. Aliased to
                     // capitals for the same reason as the headings above.
                     const SectionHeadingTag = section.headingLevel ?? "h2";
+                    const asCards = section.display === "cards";
+                    const washed = section.tone === "wash";
                     return (
                     <Reveal key={section.anchor ?? section.title ?? index} delay={Math.min(index, 4) * 60}>
+                      {/* ── NO RULE BETWEEN SECTIONS ────────────────────
+                          Each section used to open on a hairline rule. On a
+                          page of three or four sections that reads as
+                          structure; on this one it is thirteen horizontal
+                          lines down a single column, which is what made the
+                          clinic call it a newspaper. The heading and the
+                          space around it already say "new section", so the
+                          rule was saying it a second time in the most
+                          newspaper-like way available.
+                          The space it occupied is kept — see `gap-16` on the
+                          wrapper — so sections are further apart now, not
+                          closer together.
+                          A washed section needs no rule either: its own
+                          tint is the boundary. */}
                       <div
                         id={section.anchor}
-                        className="scroll-mt-24 border-t border-hairline pt-8"
+                        className={`scroll-mt-24 ${washed ? "bg-wash px-7 py-9 sm:px-9" : ""}`}
                       >
                         {/* A section without a heading is allowed — see the
                             note in treatmentSection.ts on why nothing here
@@ -477,68 +551,75 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
                             wants bullets first — the five that mixed the
                             two formats were rewritten as uniform blocks. */}
                         {section.blocks && (
-                          <div className="mt-6 flex flex-col gap-7">
-                            {section.blocks.map((block, blockIndex) => {
-                              // Tables share the array with prose so the
-                              // clinic can put one between two paragraphs;
-                              // they carry no heading of their own, which
-                              // is why they return before the block markup
-                              // rather than being folded into it.
-                              if (isSectionTable(block)) {
-                                return (
+                          asCards ? (
+                            /* ── CARDS ────────────────────────────────
+                               Blocks that have a subheading become the
+                               grid; blocks without one stay above it as
+                               ordinary prose, because a section written as
+                               "one sentence of setup, then the list" would
+                               otherwise turn its setup into a card with no
+                               title. Tables never become cards — a table
+                               needs the full column width it can get.
+
+                               Two columns at `sm` and up. The prose column
+                               is 650px on a desktop, so a card is ~305px:
+                               wide enough for the two or three sentences
+                               these blocks actually hold, and narrow enough
+                               that two of them read as a pair rather than
+                               as two more paragraphs. */
+                            <>
+                              {section.blocks.filter(
+                                (block) => !isSectionTable(block) && !block.heading,
+                              ).length > 0 && (
+                                <div className="mt-6 flex flex-col gap-7">
+                                  {section.blocks
+                                    .filter((block) => !isSectionTable(block) && !block.heading)
+                                    .map((block, blockIndex) => (
+                                      <SectionProseBlock
+                                        key={blockIndex}
+                                        block={block as SectionBlock}
+                                      />
+                                    ))}
+                                </div>
+                              )}
+                              <div className="mt-7 grid gap-4 sm:grid-cols-2">
+                                {section.blocks
+                                  .filter((block) => !isSectionTable(block) && block.heading)
+                                  .map((block, blockIndex) => (
+                                    <SectionProseBlock
+                                      key={(block as SectionBlock).heading ?? blockIndex}
+                                      block={block as SectionBlock}
+                                      className="h-full border border-hairline bg-background p-6 [&_p]:max-w-none"
+                                    />
+                                  ))}
+                              </div>
+                              {section.blocks.filter(isSectionTable).map((table, tableIndex) => (
+                                <SectionTableFigure
+                                  key={table.caption ?? tableIndex}
+                                  table={table}
+                                  className="mt-8"
+                                />
+                              ))}
+                            </>
+                          ) : (
+                            <div className="mt-6 flex flex-col gap-7">
+                              {section.blocks.map((block, blockIndex) =>
+                                /* Tables share the array with prose so the
+                                   clinic can put one between two paragraphs. */
+                                isSectionTable(block) ? (
                                   <SectionTableFigure
                                     key={block.caption ?? blockIndex}
                                     table={block}
                                   />
-                                );
-                              }
-                              const BlockHeadingTag = block.headingLevel ?? "h3";
-                              return (
-                              <div key={block.heading ?? blockIndex}>
-                                {block.heading && (
-                                  <BlockHeadingTag className="font-sans text-copy-lg font-medium leading-snug text-ink">
-                                    {block.heading}
-                                  </BlockHeadingTag>
-                                )}
-                                {/* Rich text where the CMS holds it, the
-                                    original plain paragraphs otherwise.
-                                    Both, and this block would print the
-                                    same copy twice on any treatment part
-                                    way through being moved over. */}
-                                {block.body?.length ? (
-                                  <SanityPortableText
-                                    value={block.body}
-                                    // The gap the plain paragraphs had. See the
-                                    // prop’s own note in SanityPortableText.
-                                    spacing="space-y-4"
-                                    className={`[&_p]:measure [&_figure]:measure [&_ul]:measure [&_ol]:measure ${
-                                      block.heading ? "mt-3" : ""
-                                    }`}
+                                ) : (
+                                  <SectionProseBlock
+                                    key={block.heading ?? blockIndex}
+                                    block={block}
                                   />
-                                ) : block.paragraphs && block.paragraphs.length > 0 ? (
-                                  <div
-                                    className={`flex flex-col gap-4 ${block.heading ? "mt-3" : ""}`}
-                                  >
-                                    {block.paragraphs.map((paragraph) => (
-                                      <p
-                                        key={paragraph.slice(0, 40)}
-                                        className="measure font-sans text-body leading-body text-text-secondary"
-                                      >
-                                        {paragraph}
-                                      </p>
-                                    ))}
-                                  </div>
-                                ) : null}
-                                {/* Full column width rather than inset: the
-                                    text column is already the measure, and a
-                                    narrower image inside it reads as a
-                                    mistake. 16/9 keeps a row of sections
-                                    the same rhythm whatever is uploaded. */}
-                                <SectionFigure image={block.image} className="mt-6" />
-                              </div>
-                              );
-                            })}
-                          </div>
+                                ),
+                              )}
+                            </div>
+                          )
                         )}
 
                         {section.points && (
