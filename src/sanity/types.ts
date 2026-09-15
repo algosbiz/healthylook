@@ -289,7 +289,12 @@ export type SanityTreatmentSection = {
   image?: SanityImage;
 };
 
-export type SanityTreatmentDocument = Omit<Treatment, "image" | "priceGroups"> & {
+export type SanityTreatmentDocument = Omit<
+  Treatment,
+  "image" | "priceGroups" | "resultsNote"
+> & {
+  /** Raw block; mapped to the page type in content.ts. */
+  resultsNote?: SanityTreatmentSection["blocks"] extends Array<infer B> ? B : never;
   _id: string;
   _type: "treatment";
   image?: SanityImage;

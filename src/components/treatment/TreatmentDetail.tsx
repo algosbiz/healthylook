@@ -228,6 +228,11 @@ const SECTION_TONES = {
  * and keeps the scrolling INSIDE the figure — the page body must never
  * scroll horizontally.
  *
+ * Columns carry a hairline rule between them, asked for directly by the
+ * clinic. It is the same hairline every other rule on the site uses, and
+ * it can only ever appear inside a <table> — so no page that does not have
+ * one looks any different.
+ *
  * The first column is sticky so the attribute being compared stays on
  * screen while the devices scroll past it. Without that, a reader three
  * columns deep no longer knows whether they are looking at comfort level
@@ -343,7 +348,7 @@ function SectionTableFigure({
                 <th
                   key={column || index}
                   scope="col"
-                  className={`border-b border-hairline px-4 py-3.5 align-bottom ${headingClass} first:pl-0 last:pr-0 ${
+                  className={`border-b border-r border-hairline px-4 py-3.5 align-bottom ${headingClass} first:pl-0 last:border-r-0 last:pr-0 ${
                     index === 0 && labelFirst ? `sticky left-0 z-10 ${tone.surface}` : ""
                   }`}
                 >
@@ -368,7 +373,7 @@ function SectionTableFigure({
                     <Cell
                       key={columnIndex}
                       {...(isLabel ? { scope: "row" as const } : {})}
-                      className={`border-b border-hairline px-4 py-3.5 align-top font-sans text-copy leading-body first:pl-0 last:pr-0 ${
+                      className={`border-b border-r border-hairline px-4 py-3.5 align-top font-sans text-copy leading-body first:pl-0 last:border-r-0 last:pr-0 ${
                         isLabel
                           ? `sticky left-0 z-10 font-medium ${tone.surface} ${tone.heading}`
                           : tone.point
@@ -1130,6 +1135,28 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
                 : "View before & after"}
             </Button>
           </div>
+
+          {/* ── THE ONE BLOCK THAT LIVES DOWN HERE ────────────────────────
+              The clinic asked to move "Tested and Loved by Our Head Doctor"
+              beside the results, and nothing in Studio could do it: the
+              long-form sections all render in one run further up, and this
+              band's own copy is built in this file from the treatment's
+              name. `resultsNote` is the field that makes it possible.
+
+              Above the photographs rather than below, because it is context
+              for them — who did this work — and context after the evidence
+              is a caption nobody reads.
+
+              Absent on every other treatment, and absent renders nothing,
+              so no page that does not use it changes. */}
+          {treatment.resultsNote && (
+            <Reveal delay={60}>
+              <SectionProseBlock
+                block={treatment.resultsNote}
+                className="mt-8 max-w-2xl border-t border-primary/20 pt-6"
+              />
+            </Reveal>
+          )}
 
           {resultGroup && (
             <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3">

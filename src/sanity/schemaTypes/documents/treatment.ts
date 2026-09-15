@@ -177,6 +177,32 @@ export const treatment = defineType({
     }),
     defineField({ name: "sections", title: "Long-form sections", type: "array", group: "content", of: [defineArrayMember({ type: "treatmentSection" })] }),
     defineField({ name: "faqs", title: "FAQs", type: "array", group: "content", of: [defineArrayMember({ type: "faqItem" })] }),
+    /* ── THE ONE PLACE OUTSIDE THE LONG-FORM RUN ───────────────────────
+     * The clinic asked to move "Tested and Loved by Our Head Doctor" down
+     * beside the before/after gallery, and there was no way to do it: the
+     * long-form sections all render in one place, above Pricing and the
+     * Journey, so dragging that block to the very end of the list still
+     * left it two sections short. The band's own copy is built in the
+     * component from the treatment's name, and its heading lives in Site
+     * settings, shared by all 32 pages — neither is a place for one
+     * treatment's sentence.
+     *
+     * A `treatmentContentBlock` rather than a plain string, so it is the
+     * same editor as every other block on the page — a subheading, rich
+     * text that can carry a link, an optional image — and a block can be
+     * cut from a section and pasted here unchanged.
+     *
+     * Empty on every other treatment, and empty renders nothing, so no
+     * page that does not use it changes at all.
+     */
+    defineField({
+      name: "resultsNote",
+      title: "Note in the before & after band",
+      type: "treatmentContentBlock",
+      group: "content",
+      description:
+        "Optional. Appears under the heading of the before & after section, above the photographs. Use it for something that belongs next to the results rather than in the article above — a line about who performs the treatment, or what the photographs do and do not show. · ID: Opsional. Tampil di bawah judul bagian before & after, di atas foto-fotonya. Dipakai untuk hal yang lebih cocok berdampingan dengan hasil daripada di artikel atas — misalnya siapa yang mengerjakan treatment-nya, atau apa yang foto itu tunjukkan dan tidak tunjukkan.",
+    }),
     defineField({ name: "seo", title: "Search and social", type: "seo", group: "seo" }),
   ],
   preview: {

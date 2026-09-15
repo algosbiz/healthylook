@@ -1,3 +1,5 @@
+import type { SectionBlock } from "@/data/treatmentSections";
+
 // Treatment catalogue for the whole site: this one file drives the header's
 // mega-menu, the homepage's category tabs, the treatments index, and the
 // treatment detail route.
@@ -271,6 +273,15 @@ export type Treatment = {
    * other treatments with `popularAreas` present theirs without one, so
    * they fall back to the detail page's generic label.
    */
+  /**
+   * A prose block shown inside the before/after band, under its heading.
+   *
+   * The long-form sections all render in one run above Pricing and the
+   * Journey, so there was no way to place a line beside the results — the
+   * clinic asked for exactly that. Optional, and absent on every treatment
+   * but the one that asked, so no other page changes.
+   */
+  resultsNote?: SectionBlock;
   popularAreasTitle?: string;
   /**
    * The heading over the description, and its level. Both are written per

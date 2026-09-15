@@ -158,6 +158,24 @@ function sectionImage(image: SanityImage | undefined): SectionImage | undefined 
   };
 }
 
+/** One prose block, as the page wants it. Shared by the long-form sections
+ *  and by the before/after note, which is the same editor. */
+function toProseBlock(
+  block: NonNullable<SanityTreatmentSection["blocks"]>[number] | undefined,
+) {
+  if (!block) return undefined;
+  const hasContent =
+    block.heading || block.body?.length || block.paragraphs?.length || block.image;
+  if (!hasContent) return undefined;
+  return {
+    heading: block.heading,
+    headingLevel: headingLevel(block.headingLevel, "h3"),
+    body: block.body,
+    paragraphs: block.paragraphs,
+    image: sectionImage(block.image),
+  };
+}
+
 function toTreatmentSections(
   sections: SanityTreatmentSection[] | undefined,
 ): TreatmentSection[] {
@@ -289,6 +307,8 @@ export async function getSanityTreatments(): Promise<
       intro: document.intro,
       popularAreas: document.popularAreas,
       popularAreasTitle: document.popularAreasTitle,
+      // Empty renders nothing, so a treatment without one is unchanged.
+      resultsNote: toProseBlock(document.resultsNote),
       aboutHeading: document.aboutHeading,
       aboutHeadingLevel: headingLevel(document.aboutHeadingLevel, "h2"),
       popularAreasHeadingLevel: headingLevel(document.popularAreasHeadingLevel, "h3"),

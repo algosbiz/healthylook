@@ -424,6 +424,11 @@ export const treatmentSections: Record<string, TreatmentSection[]> = {
     },
     {
       title: "The Science Behind RF Skin Tightening",
+      // The clinic asked for a background here too. `wash` rather than a
+      // third strong colour: brown and cream are already spoken for further
+      // down, and a page where every other section shouts has no landmarks
+      // left. It is the site's own subtlest tint, not a new one.
+      tone: "wash",
       blocks: [
         {
           paragraphs: [
