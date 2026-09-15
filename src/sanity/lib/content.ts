@@ -22,7 +22,17 @@ import type {
  * because they are string unions, which do not exist at runtime — so the
  * only thing keeping these honest is that they sit directly above the
  * mapper that uses them. */
-const SECTION_DISPLAYS: SectionDisplay[] = ["prose", "cards", "icons"];
+const SECTION_DISPLAYS: SectionDisplay[] = [
+  "prose",
+  "cards",
+  "iconRow",
+  "iconGrid",
+  "iconCards",
+];
+
+/* "icons" was the single icon layout before it became three. Any document
+ * still holding it gets the two-column one, which is what it drew. */
+const LEGACY_DISPLAYS: Record<string, SectionDisplay> = { icons: "iconGrid" };
 const SECTION_TONES: SectionTone[] = ["plain", "wash", "blush", "brown"];
 import { headingLevel } from "@/lib/headings";
 import type { JourneyStep } from "@/data/treatmentJourney";
@@ -167,7 +177,7 @@ function toTreatmentSections(
     // rendered as though the editor had chosen nothing.
     display: SECTION_DISPLAYS.includes(section.display as SectionDisplay)
       ? (section.display as SectionDisplay)
-      : "prose",
+      : (LEGACY_DISPLAYS[section.display ?? ""] ?? "prose"),
     tone: SECTION_TONES.includes(section.tone as SectionTone)
       ? (section.tone as SectionTone)
       : "plain",

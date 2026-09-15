@@ -234,12 +234,15 @@ export const treatmentSection = defineType({
         list: [
           { title: "Stacked paragraphs", value: "prose" },
           { title: "Grid of cards", value: "cards" },
+          { title: "Icon beside text — one per row", value: "iconRow" },
+          { title: "Icon beside text — two columns", value: "iconGrid" },
+          { title: "Icon above text — three columns", value: "iconCards" },
         ],
         layout: "radio",
       },
       initialValue: "prose",
       description:
-        "Choose cards for a section that is really a list — four safety features, eight treatment combinations. Each text block with a subheading becomes a card; a block without one stays as an opening paragraph above them. · ID: Pilih cards untuk section yang isinya sebenarnya daftar — empat fitur keamanan, delapan kombinasi treatment. Tiap blok teks yang punya subheading jadi satu kartu; blok tanpa subheading tetap jadi paragraf pembuka di atasnya.",
+        "Cards for a section that is really a list of explanations — four safety features, eight treatment combinations: each block with a subheading becomes a card, and a block without one stays as an opening paragraph above them. The three icon layouts are for blocks that are a picture and a short line rather than prose; they differ only in where the icon sits and how many fit across. · ID: Pilih Cards untuk section yang isinya sebenarnya daftar penjelasan — empat fitur keamanan, delapan kombinasi treatment: tiap blok bersubheading jadi satu kartu, blok tanpa subheading tetap jadi paragraf pembuka. Tiga pilihan Icon dipakai kalau tiap bloknya berupa gambar dan satu baris teks, bukan paragraf; bedanya hanya di posisi ikon dan berapa yang muat sebaris.",
     }),
     defineField({
       name: "tone",
@@ -249,6 +252,8 @@ export const treatmentSection = defineType({
         list: [
           { title: "Page colour", value: "plain" },
           { title: "Tinted panel", value: "wash" },
+          { title: "Cream panel", value: "blush" },
+          { title: "Dark brown panel", value: "brown" },
         ],
         layout: "radio",
       },

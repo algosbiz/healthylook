@@ -68,6 +68,17 @@ export default function Img({
    * in its own proportions should pass this.
    */
   ratio,
+  /**
+   * The colour behind the image while it loads, and behind any part of it
+   * that is transparent.
+   *
+   * `bg-wash` is right for a photograph — a neutral holding colour in the
+   * shape the photo will fill. It is wrong for a transparent PNG on a
+   * tinted panel: the icons in a treatment's Highlights list are line art
+   * with no background of their own, so the default painted a small grey
+   * square behind each one on the cream surface they sit on.
+   */
+  background = "bg-wash",
 }: {
   src: string;
   alt: string;
@@ -80,6 +91,7 @@ export default function Img({
   quality?: number;
   scrim?: boolean;
   ratio?: number;
+  background?: string;
 }) {
   // Sanity URLs render through <SanityImage>, which builds their srcset
   // from cdn.sanity.io; local and Blob images stay on Vercel's optimizer.
@@ -90,7 +102,7 @@ export default function Img({
       // A given `ratio` replaces the preset class rather than sitting
       // alongside it: two aspect-ratio declarations on one element is a
       // coin toss decided by stylesheet order, not by which was intended.
-      className={`relative isolate overflow-hidden bg-wash ${ratio ? "w-full" : aspects[aspect]} ${rounded} ${className}`}
+      className={`relative isolate overflow-hidden ${background} ${ratio ? "w-full" : aspects[aspect]} ${rounded} ${className}`}
       style={ratio ? { aspectRatio: String(ratio) } : undefined}
     >
       <Picture

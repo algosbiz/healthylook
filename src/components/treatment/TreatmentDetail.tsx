@@ -16,6 +16,7 @@ import { CheckIcon, ArrowUpRightIcon, WhatsAppIcon, ClockIcon } from "@/componen
 import { formatIDR } from "@/lib/format";
 import { treatmentHref, TREATMENT_CATEGORIES, type Treatment } from "@/data/treatments";
 import {
+  isIconDisplay,
   isSectionTable,
   type SectionBlock,
   type SectionImage,
@@ -206,6 +207,44 @@ const SECTION_TONES = {
     card: "border-white/15 bg-white/5",
     point: "text-white/75",
     icon: "text-gold-soft",
+  },
+} as const;
+
+/**
+ * Where the icon sits, and how many fit across.
+ *
+ * ── WHY THREE, AND WHY THE CLINIC PICKS ────────────────────────────────
+ * Their note, on the Highlights list: "ini kebesaran… bisa dibuat sebelahan
+ * aja gk? … atau kasih aku 3 opsi beda untuk peletakan itu, krn kedepannya
+ * pasti ada yg seperti itu juga". So it is a choice in Studio rather than a
+ * decision taken once here — more of these lists are coming and they will
+ * not all want the same shape.
+ *
+ * The difference is not decoration. Beside the text, an icon is a marker on
+ * a list and the eye reads down the words; above it, the icon is the thing
+ * being read and the text is its caption. `iconCards` therefore gets a
+ * bigger icon and centres, while the two beside-text layouts keep it small
+ * enough to stay out of the way — the clinic's own instruction was "mungkin
+ * 25x25", and 28px is the nearest step on this scale.
+ */
+const ICON_LAYOUTS = {
+  iconRow: {
+    list: "gap-y-4",
+    item: "flex items-center gap-3.5",
+    icon: "w-7",
+    sizes: "28px",
+  },
+  iconGrid: {
+    list: "gap-x-8 gap-y-4 sm:grid-cols-2",
+    item: "flex items-center gap-3.5",
+    icon: "w-7",
+    sizes: "28px",
+  },
+  iconCards: {
+    list: "gap-x-6 gap-y-8 text-center sm:grid-cols-3",
+    item: "flex flex-col items-center gap-3",
+    icon: "w-14",
+    sizes: "56px",
   },
 } as const;
 
@@ -593,7 +632,9 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
                     // capitals for the same reason as the headings above.
                     const SectionHeadingTag = section.headingLevel ?? "h2";
                     const asCards = section.display === "cards";
-                    const asIcons = section.display === "icons";
+                    const iconLayout = isIconDisplay(section.display)
+                      ? section.display
+                      : null;
                     /* One place decides what a tinted section looks like,
                        so a dark one cannot end up with ink-coloured
                        headings on it. `plain` carries no padding at all —
@@ -650,7 +691,7 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
                             wants bullets first — the five that mixed the
                             two formats were rewritten as uniform blocks. */}
                         {section.blocks && (
-                          asIcons ? (
+                          iconLayout ? (
                             /* ── ONE PICTURE, ONE EXPLANATION ─────────
                                The clinic's note, on the Highlights
                                section: "this should be explained one
@@ -670,15 +711,16 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
                                art, and blown up to the measure they would
                                read as illustrations rather than as marks
                                against a list. */
-                            <ul className="mt-7 grid gap-x-8 gap-y-7 sm:grid-cols-2">
+                            <ul className={`mt-7 grid ${ICON_LAYOUTS[iconLayout].list}`}>
                               {section.blocks
                                 .filter((block) => !isSectionTable(block))
                                 .map((block, blockIndex) => {
                                   const item = block as SectionBlock;
+                                  const layout = ICON_LAYOUTS[iconLayout];
                                   return (
                                     <li
                                       key={item.heading ?? blockIndex}
-                                      className="flex items-center gap-4"
+                                      className={layout.item}
                                     >
                                       {item.image?.src && (
                                         <Img
@@ -686,8 +728,12 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
                                           alt={item.image.alt}
                                           aspect="square"
                                           rounded="rounded-none"
-                                          sizes="56px"
-                                          className="w-14 shrink-0 bg-transparent"
+                                          sizes={layout.sizes}
+                                          // Transparent line art: no holding
+                                          // colour, or each icon wears a small
+                                          // square of it on a tinted panel.
+                                          background="bg-transparent"
+                                          className={`shrink-0 ${layout.icon}`}
                                         />
                                       )}
                                       {item.heading && (

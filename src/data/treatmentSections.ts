@@ -129,13 +129,36 @@ export type SectionBlock = {
  * `cards` lays those out as a grid instead: same words, scannable, and the
  * page gets a change of texture every few screens.
  *
+ * The three `icon*` values are for a section whose blocks are a picture and
+ * a short claim rather than prose — the clinic's Highlights list. They
+ * differ only in where the icon sits and how many fit across, because that
+ * is the choice that actually changes how such a list reads: beside the
+ * text it is a list, above the text it is a row of features. The clinic
+ * asked for the options directly, since more of these are coming.
+ *
  * ── AND WHY IT IS PER SECTION RATHER THAN A REDESIGN ───────────────────
  * One component renders all 32 treatment pages, so anything done to the
  * template happens to every one of them. Defaulting to `prose` means the
  * other 31 pages render exactly as they do today and XERF opts in section
  * by section — the same shape as `headingLevel` and `uncropped`.
  */
-export type SectionDisplay = "prose" | "cards" | "icons";
+/** The three icon layouts. Separate from SectionDisplay so the renderer can
+ *  narrow to them and index its layout table without a cast. */
+export type IconDisplay =
+  /** Small icon, text beside it, one per row — the full width of the column. */
+  | "iconRow"
+  /** Small icon, text beside it, two across. */
+  | "iconGrid"
+  /** Larger icon above the text, centred, three across. */
+  | "iconCards";
+
+export type SectionDisplay = "prose" | "cards" | IconDisplay;
+
+export const ICON_DISPLAYS: IconDisplay[] = ["iconRow", "iconGrid", "iconCards"];
+
+export function isIconDisplay(value: SectionDisplay | undefined): value is IconDisplay {
+  return !!value && (ICON_DISPLAYS as string[]).includes(value);
+}
 
 /**
  * The surface a section sits on — how a page this long gets a landmark,
@@ -754,7 +777,7 @@ export const treatmentSections: Record<string, TreatmentSection[]> = {
       // transparency rather than sliced at guessed offsets, and kept
       // transparent so they sit on whatever surface the section has.
       title: "Highlights",
-      display: "icons",
+      display: "iconRow",
       tone: "blush",
       blocks: [
         {
