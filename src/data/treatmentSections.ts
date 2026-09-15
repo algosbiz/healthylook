@@ -34,6 +34,61 @@ export type SectionImage = {
   src: string;
   alt: string;
   caption?: string;
+  /**
+   * The image's own width ÷ height, so the figure takes the picture's shape
+   * instead of cropping it into the default 16:9.
+   *
+   * Only worth setting where the proportions carry meaning — a diagram, a
+   * comparison chart, a row of icons. A photograph is better off cropped to
+   * the shared rhythm. For Sanity images this is derived automatically from
+   * the asset id, which encodes the dimensions; in this file it is written
+   * out, because a local path carries nothing to derive it from.
+   */
+  ratio?: number;
+};
+
+/**
+ * A real table inside a treatment section.
+ *
+ * ── WHY A TABLE TYPE AND NOT MORE PROSE ───────────────────────────────
+ * Two of the clinic's XERF tables were first flattened into paragraphs,
+ * because there was nowhere to put a table. Both lost something real in
+ * the process: "HIFU vs Thermage vs XERF" is six attributes compared
+ * across three devices, and the whole point of it is reading ACROSS a row
+ * — technology, target layer, comfort, timeline, cost — which prose can
+ * only present one device at a time. The can/cannot list is a pairing, and
+ * a pair read as two separate paragraphs is not the same claim.
+ *
+ * Kept deliberately plain: a header row and body rows of strings. No
+ * merged cells, no per-cell formatting, no column widths. Anything richer
+ * belongs in prose, and every extra capability here is one more thing that
+ * has to survive a narrow screen.
+ */
+export type SectionTable = {
+  /** Distinguishes a table from a prose block inside `blocks`. */
+  kind: "table";
+  caption?: string;
+  /** The header row. Its length sets the column count. */
+  columns: string[];
+  /** Body rows. A row shorter than `columns` renders empty trailing cells. */
+  rows: string[][];
+  /**
+   * Whether the first cell of each row NAMES that row rather than being a
+   * value like the others. True for a comparison — "Comfort level" labels
+   * the row that XERF, Thermage and HIFU are compared on — and the reason
+   * that cell is a row header, is emphasised, and stays pinned while the
+   * rest scrolls sideways.
+   *
+   * False where the columns are peers. The clinic's can/cannot table looks
+   * like a table but is two independent lists printed side by side: its
+   * first row pairs "Tightens and defines facial contours" with "Does not
+   * add volume", which are not related to each other at all. Marking that
+   * first cell as the row's header would assert a relationship the content
+   * does not have, to a screen reader most of all.
+   *
+   * Defaults to true, which is the commoner shape.
+   */
+  labelFirstColumn?: boolean;
 };
 
 /**
@@ -73,9 +128,22 @@ export type TreatmentSection = {
    */
   anchor?: string;
   points?: string[];
-  blocks?: SectionBlock[];
+  /**
+   * Prose blocks and tables, interleaved in the order they should read.
+   * One array rather than two fields, so a section can put a paragraph
+   * above a table and another one below it — which is exactly how the
+   * clinic writes its comparisons.
+   */
+  blocks?: (SectionBlock | SectionTable)[];
   image?: SectionImage;
 };
+
+/** Narrow a `blocks` entry. Tables carry `kind`; prose blocks never do. */
+export function isSectionTable(
+  block: SectionBlock | SectionTable,
+): block is SectionTable {
+  return (block as SectionTable).kind === "table";
+}
 
 export const treatmentSections: Record<string, TreatmentSection[]> = {
   "botox": [
@@ -256,11 +324,30 @@ export const treatmentSections: Record<string, TreatmentSection[]> = {
   // where they occur (the comparison table and the can/cannot table, both
   // of which are tables in the document and have no table renderer here).
   //
-  // The document's own "What is XERF?" paragraph is NOT repeated here — it
-  // is this treatment's `intro` in treatments.ts, which the detail page
-  // renders higher up as the lead. Same de-duplication rule as botox,
-  // lip-filler, botox/korean and facial.
+  // ── SECOND PASS: THE TABLES AND THE ARTWORK ────────────────────────
+  // The first pass flattened both of the document's tables into prose and
+  // left all three of its infographics out, because a treatment section
+  // had nowhere to put either. It has both now — `blocks` takes tables
+  // alongside prose, and a figure can render at its own proportions rather
+  // than being cropped square. Everything the document carries is on the
+  // page: the opening (now this treatment's `intro`), the definition,
+  // every section, both tables, all three diagrams, the highlight list,
+  // and the 13 FAQs.
   "xerf": [
+    {
+      // The definition. It was this treatment's `intro` on the first pass,
+      // which put it above the clinic's own opening lines; those lead now
+      // and this follows, which is the document's order. See the note on
+      // `intro` in treatments.ts.
+      title: "What is XERF?",
+      blocks: [
+        {
+          paragraphs: [
+            "XERF is the world's first and only dual-frequency monopolar RF technology, combining 6.78 MHz and 2 MHz to deliver targeted thermal energy at three different skin depths, supporting collagen remodeling and gradual skin tightening. Designed with comfort in mind, XERF offers a more comfortable treatment experience with less pain, while delivering controlled thermal energy to the skin. Known as a beauty secret among Hollywood and Korean celebrities, XERF offers an advanced approach to skin tightening without surgery or needle.",
+          ],
+        },
+      ],
+    },
     {
       title: "Who is XERF Treatment For?",
       blocks: [
@@ -285,6 +372,20 @@ export const treatmentSections: Record<string, TreatmentSection[]> = {
           paragraphs: [
             "Conventional monopolar RF typically operates at a single 6.78 MHz frequency, primarily targeting more superficial tissue layers. XERF also uses 6.78 MHz, but combines it with a lower 2 MHz frequency, allowing energy to reach different tissue depths. This is important because facial ageing is a multi-layer process: collagen and elastin gradually decrease in the skin, fat compartments can lose volume or shift, muscles and connective tissues become less supportive, and the SMAS gradually loses elasticity. Together, these changes contribute to skin laxity, folds, sagging, and loss of facial definition. The SMAS is the connective tissue layer that surgeons tighten during a surgical facelift. By combining 6.78 MHz and 2 MHz frequencies, XERF is designed to address superficial, mid, and deeper tissue layers, supporting both skin quality and deeper tissue tightening for a more comprehensive approach to facial ageing.",
           ],
+          // The manufacturer's diagram of exactly this paragraph — the same
+          // three technologies, drawn against the skin layers each one
+          // reaches. Placed on the block rather than the section so it sits
+          // directly under the argument it illustrates, not at the foot of
+          // the section below the collagen paragraphs.
+          //
+          // The clinic's own crop, which stops above the manufacturer's
+          // "CONFIDENTIAL" footer — that footer is on the version inside
+          // the source document and should not be republished.
+          image: {
+            src: "/images/treatments/xerf-rf-comparison.jpg",
+            alt: "Diagram comparing bipolar RF, single monopolar RF at 6.78 MHz, and XERF's dual monopolar 6.78 MHz plus 2 MHz, showing how deep each reaches through the epidermis, dermis, subcutaneous fat and SMAS layer.",
+            ratio: 2.089,
+          },
         },
       ],
     },
@@ -308,6 +409,20 @@ export const treatmentSections: Record<string, TreatmentSection[]> = {
           ],
         },
       ],
+      // This section's paragraph is three lines long and the diagram is the
+      // rest of the answer: it names each of the three depths, its
+      // frequency, and which areas it suits. Set at section level because
+      // there is only one block and the figure closes the section.
+      //
+      // Cropped from the source document's own artboard at 1325×695 rather
+      // than the 572×281 copy that came with the images — the depth
+      // captions are small type, and at the smaller size they went soft at
+      // the width this column renders.
+      image: {
+        src: "/images/treatments/xerf-multi-layer-targeting.jpg",
+        alt: "XERF multi-layer targeting diagram: shallow at 6.78 MHz for the forehead and brow, middle at 6.78 MHz for upper cheeks and neck, and deep at 6.78 MHz plus 2 MHz for the lower face, under the chin and jowl.",
+        ratio: 1.906,
+      },
     },
     {
       title: "Safety Features Behind XERF",
@@ -339,14 +454,19 @@ export const treatmentSections: Record<string, TreatmentSection[]> = {
       ],
     },
     {
-      // ── THE CAN / CANNOT TABLE, AS PROSE ────────────────────────────
+      // ── THE CAN / CANNOT TABLE, NOW ACTUALLY A TABLE ────────────────
       // The document sets this out twice: once as prose under "What XERF
       // Can Do" / "What XERF Cannot Do", and again as a two-column table
-      // of ticks and crosses. There is no table renderer on a treatment
-      // page, and the two say the same thing, so the prose version is what
-      // is kept — with the four items that appear ONLY in the table (acne,
-      // rosacea, acne scars, jawline definition) folded into it, so nothing
-      // the clinic published is lost.
+      // of ticks and crosses. Both are here now — the prose makes the
+      // argument, the table is the scannable summary, which is how the
+      // document itself uses them.
+      //
+      // The ✓ and ✗ glyphs are not carried into the cells. They repeat
+      // what the two column headings already say, and a screen reader
+      // announces them as "check mark" before every single item.
+      //
+      // `labelFirstColumn: false` because the two columns are peers, not a
+      // label and its values — see that field's note.
       title: "Our Honest Approach to XERF",
       blocks: [
         {
@@ -355,18 +475,56 @@ export const treatmentSections: Record<string, TreatmentSection[]> = {
           ],
         },
         {
-          heading: "What XERF can do",
+          // The question mark is not a typo and not the document's: someone
+          // rewrote both of these headings in Studio after the page went
+          // live, and their wording is the newer decision. Brought back into
+          // this file so the two stop disagreeing — see the same reasoning
+          // on the XERF entry in seo.ts.
+          heading: "What XERF can do?",
           paragraphs: [
             "XERF works primarily by stimulating collagen remodeling and improving tissue firmness. This makes it effective for tightening and defining facial contours, enhancing jawline definition, smoothing fine lines and wrinkles, and softening the appearance of smile lines and marionette lines. It also lifts the brow, improves the appearance of hooded eyes, tightens and rejuvenates the neck, and improves skin laxity and crepey skin. Selected body areas, such as the postpartum belly, can be treated as well.",
           ],
         },
         {
-          heading: "What XERF cannot do",
+          heading: "What XERF cannot do?",
           paragraphs: [
             "XERF is not a replacement for surgery. It cannot provide the same degree of lifting as a surgical facelift or neck lift, so patients with severe skin sagging, significant jowling, or substantial excess skin may see more dramatic results from a surgical approach instead.",
             "XERF is also not designed to add volume, and it does not replace treatments such as dermal fillers or collagen stimulators. This is one reason it matters to choose a provider experienced in both energy-based treatments and advanced injectables. A skilled doctor can assess whether you would benefit most from XERF, injectables, or a combination of the two, rather than defaulting to a single technology for every concern.",
             "XERF is not primarily a treatment for pigmentation or skin brightening, and it does not treat acne, rosacea, or the appearance of acne scars. Patients with active skin inflammation, unstable pigmentation, or a tendency toward post-inflammatory pigmentation need careful assessment before any energy-based treatment.",
             "Our goal is not simply to offer XERF. It is to recommend the right treatment for your anatomy, skin condition, and aesthetic goals, even when that means telling you another treatment may be more appropriate.",
+          ],
+        },
+        {
+          kind: "table",
+          labelFirstColumn: false,
+          columns: ["XERF can help with", "XERF cannot do"],
+          rows: [
+            [
+              "Tightens and defines facial contours",
+              "Does not add volume (not a replacement for dermal fillers)",
+            ],
+            [
+              "Enhances jawline definition",
+              "Cannot provide the same degree of lifting as a surgical facelift or neck lift",
+            ],
+            [
+              "Smooths fine lines and wrinkles",
+              "Not for severe skin sagging, significant jowling, or substantial skin excess",
+            ],
+            [
+              "Softens the appearance of smile lines and marionette lines",
+              "Does not treat pigmentation or brighten the skin",
+            ],
+            ["Lifts the brow and improves the appearance of hooded eyes", "Does not treat acne"],
+            ["Tightens and rejuvenates the neck", "Does not treat rosacea"],
+            [
+              "Improves skin laxity and crepey skin",
+              "Does not improve the appearance of acne scars",
+            ],
+            // The document's left column runs one item longer than its
+            // right. The empty cell is the document's own shape, not a
+            // dropped row.
+            ["Can be used on selected body areas (e.g. postpartum belly)", ""],
           ],
         },
       ],
@@ -389,14 +547,19 @@ export const treatmentSections: Record<string, TreatmentSection[]> = {
       ],
     },
     {
-      // ── THE COMPARISON TABLE, AS PROSE ──────────────────────────────
-      // Six rows × three devices in the document. Rewritten as one block
-      // per device rather than dropped, because the comparison is the
-      // question patients actually arrive with — and because HIFU is a
-      // treatment this clinic also sells, so the honest version of this
-      // table is one it publishes rather than hides. Every value below is
-      // the document's own cell content; nothing is added and no device is
-      // ranked beyond what the clinic itself wrote.
+      // ── THE COMPARISON TABLE, RESTORED AS A TABLE ───────────────────
+      // Six attributes across three devices. The first pass rewrote it as
+      // one paragraph per device, which kept every value but lost the
+      // thing the table is FOR: reading across a row to see how the three
+      // differ on one attribute at a time. Both are here now — the per
+      // device paragraphs still read as prose for anyone scrolling, and
+      // the table underneath answers "which is more comfortable" in one
+      // glance instead of three.
+      //
+      // Every cell is the document's own wording. Nothing is added, and no
+      // device is ranked beyond what the clinic itself wrote — HIFU is a
+      // treatment this clinic also sells, which is why the honest version
+      // of this table is one it publishes rather than hides.
       title: "HIFU vs Thermage vs XERF: Quick Comparison",
       blocks: [
         {
@@ -420,6 +583,53 @@ export const treatmentSections: Record<string, TreatmentSection[]> = {
           heading: "HIFU — focused ultrasound",
           paragraphs: [
             "Focused ultrasound (MFU-V), targeting the superficial dermis, deep dermis, and SMAS layer. Its main focus is lifting and contouring. Comfort is a tingling and warm sensation. Results are immediate, with the peak result after 6 weeks. Cost consideration: moderate — more affordable.",
+          ],
+        },
+        {
+          kind: "table",
+          columns: [
+            "Features",
+            "XERF (dual-frequency RF)",
+            "Thermage (single-frequency RF)",
+            "HIFU (focused ultrasound)",
+          ],
+          rows: [
+            [
+              "Technology",
+              "Dual-frequency RF (6.78 MHz + 2 MHz)",
+              "Single-frequency RF (6.78 MHz)",
+              "Focused ultrasound (MFU-V)",
+            ],
+            [
+              "Targets",
+              "Epidermis, dermis, fat, and SMAS",
+              "Deep dermis and collagen",
+              "Superficial dermis, deep dermis, SMAS layer",
+            ],
+            [
+              "Main focus",
+              "Skin tightening, lifting and collagen remodelling",
+              "Skin tightening and collagen remodeling",
+              "Lifting and contouring",
+            ],
+            [
+              "Comfort level",
+              "Warm sensation with integrated cooling",
+              "Heating sensation with vibration and cooling",
+              "Tingling and warm sensation",
+            ],
+            [
+              "Results timeline",
+              "Some improvement early, with continued improvement up to 3–6 months",
+              "Results visible from 4 weeks, continue up to 6 months",
+              "Immediate result with peak result after 6 weeks",
+            ],
+            [
+              "Cost consideration",
+              "Mid to high",
+              "High. Premium pricing for single-session treatment.",
+              "Moderate. More affordable.",
+            ],
           ],
         },
       ],
@@ -516,6 +726,40 @@ export const treatmentSections: Record<string, TreatmentSection[]> = {
           ],
         },
       ],
+    },
+    {
+      // ── THE DOCUMENT'S "HIGHLIGHT" LIST ─────────────────────────────
+      // Seven claims the clinic prints under that heading, with a row of
+      // drawn icons above them. The first pass put the list on the
+      // homepage card and nowhere else, so a reader who arrived on the
+      // treatment page itself — which is most of them — never saw it.
+      //
+      // Wording is the clinic's own, sentence-cased to match every other
+      // list on the site. The icons are their artwork, flattened onto the
+      // section's own paper tone so the transparent background does not
+      // show as a grey band.
+      //
+      // ⚠ "No pain" is the clinic's phrase and is kept as they wrote it,
+      // but it sits on the same page as their own FAQ answer — "most
+      // patients describe XERF as warmth rather than pain" — and their
+      // procedure copy, "you will only feel warmth with mild discomfort".
+      // Worth raising with them: "Needle-free, minimal discomfort" would
+      // say the same thing without the page contradicting itself.
+      title: "Highlights",
+      points: [
+        "No needles",
+        "No pain",
+        "No downtime",
+        "No fat loss",
+        "Result after just one session",
+        "Personalized treatment",
+        "Natural-looking lift",
+      ],
+      image: {
+        src: "/images/treatments/xerf-highlights.png",
+        alt: "Seven icons: no needles, glowing skin, no downtime, no fat loss, fast results, targeted lifting, and natural-looking results.",
+        ratio: 4.957,
+      },
     },
     {
       title: "Why Choose Healthy Look Aesthetic for XERF Treatment?",

@@ -514,8 +514,20 @@ export const treatments: Treatment[] = [
         rows: [{ label: "Per session", price: 9800000 }],
       },
     ],
+    // ── THE DOCUMENT'S OWN OPENING ──────────────────────────────────────
+    // This used to hold the "What is XERF?" definition, and the two
+    // paragraphs the clinic actually opens with were missing from the page
+    // entirely. They are the lead-in, and they only work BEFORE the
+    // definition — a page that defines the technology and then asks "are
+    // you looking for a non-invasive way…?" reads backwards.
+    //
+    // So the opening sits here, where the page prints it directly under
+    // the short description, and the definition moved down into its own
+    // "What is XERF?" section — which is the order the document has.
+    // The clinic's two paragraphs are run together as one, because `intro`
+    // renders as a single <p>; no wording changed.
     intro:
-      "XERF is the world's first and only dual-frequency monopolar RF technology, combining 6.78 MHz and 2 MHz to deliver targeted thermal energy at three different skin depths, supporting collagen remodeling and gradual skin tightening. Designed with comfort in mind, XERF offers a more comfortable treatment experience with less pain, while delivering controlled thermal energy to the skin. Known as a beauty secret among Hollywood and Korean celebrities, XERF offers an advanced approach to skin tightening without surgery or needle.",
+      "Are you looking for a non-invasive way to achieve firmer, tighter, and more youthful-looking skin? If you have already searched for skin tightening, chances are you have seen XERF mentioned everywhere, from celebrity Instagram stories to clinic treatment menus. Our XERF treatment is now available in Bali, so you no longer need to travel overseas again to try one of the most talked-about non-surgical facelift alternatives.",
     popularAreasTitle: "What areas can be treated with our XERF",
     popularAreas: [
       "Forehead",

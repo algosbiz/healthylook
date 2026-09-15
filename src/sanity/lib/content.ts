@@ -102,10 +102,38 @@ export type SanityTreatmentExtras = {
  * a plain path — TreatmentDetail should render a section without knowing
  * which of the two it came from.
  */
+/**
+ * The image's own proportions, read out of the Sanity asset id.
+ *
+ * Every asset id carries its dimensions — `image-<hash>-1287x616-jpg` — so
+ * the ratio is already in the document and needs no extra field in the
+ * projection and no second request for asset metadata. Returns undefined
+ * for anything that does not match, which simply leaves the figure on its
+ * default crop.
+ */
+function imageRatio(image: SanityImage | undefined): number | undefined {
+  const ref = image?.asset?._ref;
+  const match = typeof ref === "string" ? /-(\d+)x(\d+)-[a-z]+$/.exec(ref) : null;
+  if (!match) return undefined;
+  const width = Number(match[1]);
+  const height = Number(match[2]);
+  if (!width || !height) return undefined;
+  return Number((width / height).toFixed(4));
+}
+
 function sectionImage(image: SanityImage | undefined): SectionImage | undefined {
   const src = sanityImageUrl(image);
   if (!src) return undefined;
-  return { src, alt: image?.alt ?? "", caption: image?.caption };
+  return {
+    src,
+    alt: image?.alt ?? "",
+    caption: image?.caption,
+    // Only when the editor has asked for it. Deriving a ratio for every
+    // image would reshape eight already-published treatment photographs to
+    // solve a problem only the diagrams have — see `uncropped` in
+    // imageWithAlt.ts.
+    ratio: image?.uncropped ? imageRatio(image) : undefined,
+  };
 }
 
 function toTreatmentSections(
@@ -116,13 +144,25 @@ function toTreatmentSections(
     headingLevel: headingLevel(section.headingLevel, "h2"),
     anchor: section.anchor,
     points: section.points,
-    blocks: section.blocks?.map((block) => ({
-      heading: block.heading,
-      headingLevel: headingLevel(block.headingLevel, "h3"),
-      body: block.body,
-      paragraphs: block.paragraphs,
-      image: sectionImage(block.image),
-    })),
+    // Prose and tables share one array so the clinic can order them
+    // freely; `_type` is what Sanity stamps on each member and the only
+    // thing that tells the two apart once interleaved.
+    blocks: section.blocks?.map((block) =>
+      block._type === "treatmentTable"
+        ? {
+            kind: "table" as const,
+            caption: block.caption,
+            columns: block.columns ?? [],
+            rows: (block.rows ?? []).map((row) => row.cells ?? []),
+          }
+        : {
+            heading: block.heading,
+            headingLevel: headingLevel(block.headingLevel, "h3"),
+            body: block.body,
+            paragraphs: block.paragraphs,
+            image: sectionImage(block.image),
+          },
+    ),
     image: sectionImage(section.image),
   }));
 }

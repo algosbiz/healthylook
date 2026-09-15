@@ -5,6 +5,7 @@ const imageProjection = `{
   asset,
   alt,
   caption,
+  uncropped,
   crop,
   hotspot
 }`;

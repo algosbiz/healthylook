@@ -105,6 +105,85 @@ export const treatmentContentBlock = defineType({
   },
 });
 
+/**
+ * A comparison table inside a treatment section.
+ *
+ * ── WHY IT LIVES IN `blocks` ALONGSIDE PROSE ───────────────────────────
+ * The clinic writes a comparison as a sentence of setup, then the table,
+ * then sometimes a qualifier underneath. A separate `tables` field would
+ * fix the order at "all prose, then all tables" and lose that. Sharing the
+ * array lets the editor drag a table into the exact place it is read.
+ *
+ * ── KEPT PLAIN ON PURPOSE ──────────────────────────────────────────────
+ * A header row and rows of plain-text cells. No merged cells, no per-cell
+ * styling, no column widths. Every one of those is a thing that has to
+ * survive a 320px screen, and the page already has to scroll this
+ * sideways to keep a four-column comparison readable at all.
+ */
+export const treatmentTableRow = defineType({
+  name: "treatmentTableRow",
+  title: "Row",
+  type: "object",
+  fields: [
+    defineField({
+      name: "cells",
+      title: "Cells",
+      type: "array",
+      of: [defineArrayMember({ type: "string" })],
+      description:
+        "One entry per column, left to right. The first is the row's label. · ID: Satu isian untuk tiap kolom, dari kiri ke kanan. Yang pertama jadi label barisnya.",
+      validation: (Rule) => Rule.required().min(1),
+    }),
+  ],
+  preview: {
+    select: { cells: "cells" },
+    prepare: ({ cells }) => ({
+      title: Array.isArray(cells) && cells[0] ? String(cells[0]) : "Row",
+      subtitle: Array.isArray(cells) ? cells.slice(1).filter(Boolean).join("  ·  ") : "",
+    }),
+  },
+});
+
+export const treatmentTable = defineType({
+  name: "treatmentTable",
+  title: "Comparison table",
+  type: "object",
+  fields: [
+    defineField({
+      name: "columns",
+      title: "Column headings",
+      type: "array",
+      of: [defineArrayMember({ type: "string" })],
+      description:
+        "Left to right. The first column heading is usually what is being compared, e.g. \"Feature\", and can be left blank. · ID: Dari kiri ke kanan. Judul kolom pertama biasanya berisi apa yang dibandingkan, misalnya \"Feature\", dan boleh dikosongkan.",
+      validation: (Rule) => Rule.required().min(2),
+    }),
+    defineField({
+      name: "rows",
+      title: "Rows",
+      type: "array",
+      of: [defineArrayMember({ type: "treatmentTableRow" })],
+      validation: (Rule) => Rule.required().min(1),
+    }),
+    defineField({
+      name: "caption",
+      title: "Caption",
+      type: "string",
+      description:
+        "Optional line under the table. · ID: Baris keterangan opsional di bawah tabel.",
+    }),
+  ],
+  preview: {
+    select: { columns: "columns", rows: "rows", caption: "caption" },
+    prepare: ({ columns, rows, caption }) => ({
+      title: caption || (Array.isArray(columns) ? columns.filter(Boolean).join(" · ") : "Table"),
+      subtitle: `${Array.isArray(rows) ? rows.length : 0} rows × ${
+        Array.isArray(columns) ? columns.length : 0
+      } columns`,
+    }),
+  },
+});
+
 export const treatmentSection = defineType({
   name: "treatmentSection",
   title: "Treatment content section",
@@ -141,9 +220,14 @@ export const treatmentSection = defineType({
     }),
     defineField({
       name: "blocks",
-      title: "Prose",
+      title: "Prose and tables",
       type: "array",
-      of: [defineArrayMember({ type: "treatmentContentBlock" })],
+      of: [
+        defineArrayMember({ type: "treatmentContentBlock" }),
+        defineArrayMember({ type: "treatmentTable" }),
+      ],
+      description:
+        "Add text blocks and comparison tables, and drag them into the order they should read. · ID: Tambahkan blok teks dan tabel perbandingan, lalu seret ke urutan yang diinginkan.",
     }),
     defineField({
       name: "points",

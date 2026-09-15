@@ -50,6 +50,24 @@ export default function Img({
   quality = 82,
   /** Dark scrim for images that sit under overlaid text. */
   scrim = false,
+  /**
+   * The image's own width ÷ height. Set it and the box takes that shape
+   * instead of one of the fixed `aspect` presets, so `object-cover` has
+   * nothing to crop.
+   *
+   * ── WHY THIS EXISTS ───────────────────────────────────────────────
+   * Every preset here crops, which is right for photographs: a portrait of
+   * a treatment room can lose its edges and still be the same picture. It
+   * is wrong for a diagram. The XERF page carries three infographics whose
+   * content IS text — an RF comparison at 2.09:1, a layer diagram at
+   * 1.91:1, and a row of benefit icons at 4.96:1. Dropped into the 16:9
+   * box section figures used to force, the icon strip showed about a third
+   * of itself and the other two lost their outer columns.
+   *
+   * Photographs should keep using `aspect`; anything whose meaning lives
+   * in its own proportions should pass this.
+   */
+  ratio,
 }: {
   src: string;
   alt: string;
@@ -61,6 +79,7 @@ export default function Img({
   priority?: boolean;
   quality?: number;
   scrim?: boolean;
+  ratio?: number;
 }) {
   // Sanity URLs render through <SanityImage>, which builds their srcset
   // from cdn.sanity.io; local and Blob images stay on Vercel's optimizer.
@@ -68,7 +87,11 @@ export default function Img({
 
   return (
     <div
-      className={`relative isolate overflow-hidden bg-wash ${aspects[aspect]} ${rounded} ${className}`}
+      // A given `ratio` replaces the preset class rather than sitting
+      // alongside it: two aspect-ratio declarations on one element is a
+      // coin toss decided by stylesheet order, not by which was intended.
+      className={`relative isolate overflow-hidden bg-wash ${ratio ? "w-full" : aspects[aspect]} ${rounded} ${className}`}
+      style={ratio ? { aspectRatio: String(ratio) } : undefined}
     >
       <Picture
         unoptimized={!isSanityHostedImage(src)}

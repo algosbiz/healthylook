@@ -17,6 +17,9 @@ export type SanityImage = {
   };
   alt: string;
   caption?: string;
+  /** "Show the whole image" — renders at the asset's own proportions
+   *  instead of being cropped to the figure's default shape. */
+  uncropped?: boolean;
   hotspot?: { x: number; y: number; height: number; width: number };
   crop?: { top: number; bottom: number; left: number; right: number };
 };
@@ -260,13 +263,20 @@ export type SanityTreatmentSection = {
   headingLevel?: string;
   anchor?: string;
   points?: string[];
+  // Prose blocks and tables share one array, so `_type` is what tells them
+  // apart — Sanity stamps it on every array member and it is the only
+  // reliable discriminator once the two are interleaved.
   blocks?: Array<{
     _key: string;
+    _type?: string;
     heading?: string;
     headingLevel?: string;
     body?: PortableTextBlock[];
     paragraphs?: string[];
     image?: SanityImage;
+    caption?: string;
+    columns?: string[];
+    rows?: Array<{ _key: string; cells?: string[] }>;
   }>;
   image?: SanityImage;
 };

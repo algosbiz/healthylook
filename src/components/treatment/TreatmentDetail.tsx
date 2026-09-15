@@ -15,7 +15,11 @@ import Partners from "@/components/home/Partners";
 import { CheckIcon, ArrowUpRightIcon, WhatsAppIcon, ClockIcon } from "@/components/ui/icons";
 import { formatIDR } from "@/lib/format";
 import { treatmentHref, TREATMENT_CATEGORIES, type Treatment } from "@/data/treatments";
-import type { SectionImage } from "@/data/treatmentSections";
+import {
+  isSectionTable,
+  type SectionImage,
+  type SectionTable,
+} from "@/data/treatmentSections";
 import SanityPortableText from "@/components/sanity/SanityPortableText";
 import {
   getTreatments,
@@ -74,15 +78,105 @@ function SectionFigure({
   if (!image?.src) return null;
   return (
     <figure className={className}>
+      {/* `ratio` where the image has one, 16:9 otherwise. A photograph is
+          better cropped to the shared rhythm; a diagram cropped to it stops
+          being readable — see the prop's note in Img.tsx. */}
       <Img
         src={image.src}
         alt={image.alt}
         aspect="wide"
+        ratio={image.ratio}
         sizes="(max-width: 1024px) 100vw, 640px"
       />
       {image.caption && (
         <figcaption className="mt-3 font-sans text-caption leading-relaxed text-muted">
           {image.caption}
+        </figcaption>
+      )}
+    </figure>
+  );
+}
+
+/**
+ * A comparison table inside a treatment section.
+ *
+ * ── THE SCROLLER IS THE WHOLE DESIGN PROBLEM ───────────────────────────
+ * The clinic's own comparison is four columns of prose cells, and there is
+ * no width at which that fits a 320px phone. The two honest options are to
+ * reflow each row into a stacked card, or to let the table keep its shape
+ * and scroll sideways inside its own box. This does the second: a stacked
+ * version silently destroys the one thing a comparison table is for, which
+ * is reading across a row. `overflow-x-auto` keeps the comparison intact
+ * and keeps the scrolling INSIDE the figure — the page body must never
+ * scroll horizontally.
+ *
+ * The first column is sticky so the attribute being compared stays on
+ * screen while the devices scroll past it. Without that, a reader three
+ * columns deep no longer knows whether they are looking at comfort level
+ * or cost.
+ */
+function SectionTableFigure({
+  table,
+  className = "",
+}: {
+  table: SectionTable;
+  className?: string;
+}) {
+  if (!table.columns.length || !table.rows.length) return null;
+  const labelFirst = table.labelFirstColumn ?? true;
+  return (
+    <figure className={className}>
+      <div className="overflow-x-auto border-t border-hairline">
+        <table className="w-full min-w-[34rem] border-collapse text-left">
+          <thead>
+            <tr>
+              {table.columns.map((column, index) => (
+                <th
+                  key={column || index}
+                  scope="col"
+                  className={`border-b border-hairline px-4 py-3.5 align-bottom font-sans text-caption uppercase leading-snug tracking-caps text-primary-strong first:pl-0 last:pr-0 ${
+                    index === 0 && labelFirst ? "sticky left-0 z-10 bg-paper" : ""
+                  }`}
+                >
+                  {column}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {table.rows.map((row, rowIndex) => (
+              <tr key={row[0] || rowIndex}>
+                {table.columns.map((_, columnIndex) => {
+                  const cell = row[columnIndex] ?? "";
+                  // A row-labelling first cell becomes a row header, which
+                  // is what lets a screen reader announce "Comfort level"
+                  // before reading the value the reader has landed on.
+                  // Where the columns are peers it stays an ordinary cell —
+                  // see `labelFirstColumn`.
+                  const isLabel = columnIndex === 0 && labelFirst;
+                  const Cell = isLabel ? "th" : "td";
+                  return (
+                    <Cell
+                      key={columnIndex}
+                      {...(isLabel ? { scope: "row" as const } : {})}
+                      className={`border-b border-hairline px-4 py-3.5 align-top font-sans text-copy leading-body first:pl-0 last:pr-0 ${
+                        isLabel
+                          ? "sticky left-0 z-10 bg-paper font-medium text-ink"
+                          : "text-text-secondary"
+                      }`}
+                    >
+                      {cell}
+                    </Cell>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {table.caption && (
+        <figcaption className="mt-3 font-sans text-caption leading-relaxed text-muted">
+          {table.caption}
         </figcaption>
       )}
     </figure>
@@ -385,6 +479,19 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
                         {section.blocks && (
                           <div className="mt-6 flex flex-col gap-7">
                             {section.blocks.map((block, blockIndex) => {
+                              // Tables share the array with prose so the
+                              // clinic can put one between two paragraphs;
+                              // they carry no heading of their own, which
+                              // is why they return before the block markup
+                              // rather than being folded into it.
+                              if (isSectionTable(block)) {
+                                return (
+                                  <SectionTableFigure
+                                    key={block.caption ?? blockIndex}
+                                    table={block}
+                                  />
+                                );
+                              }
                               const BlockHeadingTag = block.headingLevel ?? "h3";
                               return (
                               <div key={block.heading ?? blockIndex}>

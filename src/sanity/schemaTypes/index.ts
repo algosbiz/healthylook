@@ -17,7 +17,12 @@ import { portableText } from "./objects/portableText";
 import { seo } from "./objects/seo";
 import { priceRow } from "./objects/priceRow";
 import { priceGroup } from "./objects/priceGroup";
-import { treatmentContentBlock, treatmentSection } from "./objects/treatmentSection";
+import {
+  treatmentContentBlock,
+  treatmentSection,
+  treatmentTable,
+  treatmentTableRow,
+} from "./objects/treatmentSection";
 import { categoryNavSection } from "./objects/sections/categoryNavSection";
 import { ctaSection } from "./objects/sections/ctaSection";
 import { collectionSection } from "./objects/sections/collectionSection";
@@ -49,6 +54,8 @@ export const schemaTypes = [
   priceGroup,
   treatmentContentBlock,
   treatmentSection,
+  treatmentTable,
+  treatmentTableRow,
 
   // Controlled page-builder sections
   heroSection,
