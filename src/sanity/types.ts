@@ -91,6 +91,8 @@ export type FeatureGridSection = SectionBase<"featureGridSection"> & {
   description?: string;
   items: FeatureItem[];
   columns?: 2 | 3 | 4;
+  /** "cards" (default) or one of the three icon layouts — see IconList. */
+  layout?: string;
   tone?: SectionTone;
 };
 

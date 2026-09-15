@@ -9,6 +9,7 @@ import SectionShell from "./SectionShell";
 import ScrollNavButton from "./ScrollNavButton";
 import TransferOfferDetails from "./TransferOfferDetails";
 import { sanityImageUrl } from "@/sanity/lib/image";
+import IconList, { isIconListLayout } from "@/components/shared/IconList";
 import { getSanityResultGalleries } from "@/sanity/lib/content";
 import { TREATMENT_CATEGORIES } from "@/data/treatments";
 import { getResultGroups } from "@/lib/site-content";
@@ -128,6 +129,26 @@ export function FeatureGridBlock({ section }: { section: FeatureGridSection }) {
         }
         tone={dark ? "dark" : "light"}
       />
+      {/* ── THE SAME ICON LIST AS A TREATMENT SECTION ────────────────
+          The clinic asked for this shape on a treatment page and then for
+          it to be available on every other page too. It renders through
+          the shared component rather than a copy, so the two cannot drift
+          into looking slightly different from each other. */}
+      {isIconListLayout(section.layout) ? (
+        <IconList
+          className="mt-14"
+          layout={section.layout}
+          labelClass={dark ? "text-white/80" : "text-text-secondary"}
+          items={section.items.map((item) => {
+            const src = sanityImageUrl(item.image);
+            return {
+              key: item._key,
+              label: item.title,
+              image: src && item.image ? { src, alt: item.image.alt } : undefined,
+            };
+          })}
+        />
+      ) : (
       <div className={`mt-14 grid gap-px bg-hairline ${gridColumns[section.columns || 3]}`}>
         {section.items.map((item, index) => {
           const src = sanityImageUrl(item.image);
@@ -186,6 +207,7 @@ export function FeatureGridBlock({ section }: { section: FeatureGridSection }) {
           );
         })}
       </div>
+      )}
     </SectionShell>
   );
 }

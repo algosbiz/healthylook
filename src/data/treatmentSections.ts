@@ -777,7 +777,7 @@ export const treatmentSections: Record<string, TreatmentSection[]> = {
       // transparency rather than sliced at guessed offsets, and kept
       // transparent so they sit on whatever surface the section has.
       title: "Highlights",
-      display: "iconRow",
+      display: "iconGrid",
       tone: "blush",
       blocks: [
         {
