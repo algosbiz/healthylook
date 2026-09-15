@@ -191,6 +191,13 @@ function toTreatmentSections(
             kind: "table" as const,
             caption: block.caption,
             columns: block.columns ?? [],
+            // Was missing, and the table quietly rendered as a comparison
+            // whatever it actually was — the can/cannot pairing included,
+            // which on a phone printed two unrelated items as a matched
+            // pair. Same shape of mistake as the display/tone whitelist
+            // below: a field added to the page's type and its renderer but
+            // never to the path that fills them from the CMS.
+            labelFirstColumn: block.labelFirstColumn ?? true,
             rows: (block.rows ?? []).map((row) => row.cells ?? []),
           }
         : {

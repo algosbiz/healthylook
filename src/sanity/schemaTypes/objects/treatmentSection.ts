@@ -165,6 +165,30 @@ export const treatmentTable = defineType({
       of: [defineArrayMember({ type: "treatmentTableRow" })],
       validation: (Rule) => Rule.required().min(1),
     }),
+    /* ── WHAT THE FIRST COLUMN IS ──────────────────────────────────────
+     * Not decoration: it decides the markup and, on a phone, the whole
+     * shape of the thing.
+     *
+     * On a real comparison the first cell NAMES the row — "Comfort level"
+     * — so it becomes a row header, stays pinned while the rest scrolls,
+     * and on a phone the table reflows into one block per row with every
+     * option listed under the attribute being read.
+     *
+     * Where the columns are peers it must be off. The can/cannot table
+     * looks tabular but is two independent lists side by side: its first
+     * row pairs "Tightens and defines facial contours" with "Does not add
+     * volume", which have nothing to do with each other. Left on, a screen
+     * reader announces the first as the heading for the second, and the
+     * phone layout prints them as if they were a matched pair.
+     */
+    defineField({
+      name: "labelFirstColumn",
+      title: "First column names each row",
+      type: "boolean",
+      initialValue: true,
+      description:
+        "On for a comparison, where the first column is what is being compared (Technology, Comfort level…). Turn OFF when the columns are simply two lists side by side, like a can-do / cannot-do pairing. · ID: Nyalakan untuk tabel perbandingan, yaitu kalau kolom pertama berisi hal yang dibandingkan (Technology, Comfort level…). MATIKAN kalau kolomnya cuma dua daftar yang disandingkan, misalnya bisa / tidak bisa.",
+    }),
     defineField({
       name: "caption",
       title: "Caption",

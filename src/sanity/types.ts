@@ -282,6 +282,8 @@ export type SanityTreatmentSection = {
     image?: SanityImage;
     caption?: string;
     columns?: string[];
+    /** Whether the first cell of each row names it — see treatmentSection.ts. */
+    labelFirstColumn?: boolean;
     rows?: Array<{ _key: string; cells?: string[] }>;
   }>;
   image?: SanityImage;

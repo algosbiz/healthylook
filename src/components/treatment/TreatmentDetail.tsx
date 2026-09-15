@@ -177,6 +177,7 @@ function SectionProseBlock({
 const SECTION_TONES = {
   plain: {
     shell: "",
+    surface: "bg-paper",
     heading: "text-ink",
     prose: "",
     card: "border-hairline bg-background",
@@ -185,6 +186,7 @@ const SECTION_TONES = {
   },
   wash: {
     shell: "bg-wash px-7 py-9 sm:px-9",
+    surface: "bg-wash",
     heading: "text-ink",
     prose: "",
     card: "border-hairline bg-background",
@@ -193,6 +195,7 @@ const SECTION_TONES = {
   },
   blush: {
     shell: "bg-blush px-7 py-9 sm:px-9",
+    surface: "bg-blush",
     heading: "text-ink",
     prose: "",
     card: "border-hairline bg-background",
@@ -201,6 +204,7 @@ const SECTION_TONES = {
   },
   brown: {
     shell: "bg-ink-brown px-7 py-9 text-white sm:px-9",
+    surface: "bg-ink-brown",
     heading: "text-white",
     // Portable Text and plain paragraphs both render <p>, so one selector
     // covers the pair rather than each branch carrying its own colour.
@@ -231,16 +235,107 @@ const SECTION_TONES = {
  */
 function SectionTableFigure({
   table,
+  tone,
   className = "",
 }: {
   table: SectionTable;
+  tone: (typeof SECTION_TONES)[keyof typeof SECTION_TONES];
   className?: string;
 }) {
   if (!table.columns.length || !table.rows.length) return null;
   const labelFirst = table.labelFirstColumn ?? true;
+  const headingClass = `font-sans text-caption uppercase leading-snug tracking-caps ${
+    tone === SECTION_TONES.brown ? "text-gold-soft" : "text-primary-strong"
+  }`;
   return (
     <figure className={className}>
-      <div className="overflow-x-auto border-t border-hairline">
+      {/* ── PHONE: STOP BEING A TABLE ────────────────────────────────────
+          A four-column comparison cannot be made to fit 360px, and the
+          clinic had already objected once to content running off the right
+          edge, so below `sm` the honest answer is to reflow rather than to
+          be a table the reader has to drag sideways.
+
+          Which shape it takes is read from `labelFirstColumn` — the flag
+          that already records what kind of table this is. No new setting,
+          and nothing for an editor to choose wrongly:
+
+          • label + values, a real comparison → one block per ROW, so all
+            three devices stay together under the attribute being read.
+            One block per DEVICE would look tidier and destroy the point:
+            answering "which is more comfortable" would mean scrolling
+            between three separate cards.
+
+          • peer columns, the can/cannot pairing → one list per COLUMN.
+            Nothing is lost, because nothing in that table relates across a
+            row — "Enhances jawline definition" has no connection to the
+            "cannot" item printed beside it. */}
+      <div className="sm:hidden">
+        {labelFirst ? (
+          <dl className="flex flex-col gap-6 border-t border-hairline pt-5">
+            {table.rows.map((row, rowIndex) => (
+              <div key={row[0] || rowIndex}>
+                <dt className={headingClass}>{row[0]}</dt>
+                <dd className="mt-2.5 flex flex-col gap-2.5">
+                  {table.columns.slice(1).map((column, columnIndex) => {
+                    const cell = row[columnIndex + 1];
+                    if (!cell) return null;
+                    return (
+                      <div key={column || columnIndex}>
+                        {/* The column name gets its own line rather than a
+                            fixed-width gutter: these read "Thermage
+                            (single-frequency RF)", which no sensible gutter
+                            width survives. */}
+                        <span
+                          className={`block font-sans text-label opacity-70 ${tone.point}`}
+                        >
+                          {column}
+                        </span>
+                        <span className={`font-sans text-copy leading-snug ${tone.point}`}>
+                          {cell}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        ) : (
+          <div className="flex flex-col gap-7 border-t border-hairline pt-5">
+            {table.columns.map((column, columnIndex) => {
+              const cells = table.rows
+                .map((row) => row[columnIndex])
+                .filter((cell): cell is string => Boolean(cell));
+              if (!cells.length) return null;
+              return (
+                <div key={column || columnIndex}>
+                  <h4 className={headingClass}>{column}</h4>
+                  <ul className="mt-3 flex flex-col gap-2">
+                    {cells.map((cell) => (
+                      <li
+                        key={cell}
+                        className={`flex gap-2.5 font-sans text-copy leading-snug ${tone.point}`}
+                      >
+                        <span
+                          aria-hidden="true"
+                          className={`mt-2 h-1 w-1 shrink-0 rounded-full bg-current ${tone.icon}`}
+                        />
+                        {cell}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* ── `sm` AND UP: THE REAL TABLE ──────────────────────────────────
+          Still scrolls inside its own box rather than reflowing, because at
+          this width reading across a row is both possible and the whole
+          point of the thing. */}
+      <div className="hidden overflow-x-auto border-t border-hairline sm:block">
         <table className="w-full min-w-[34rem] border-collapse text-left">
           <thead>
             <tr>
@@ -248,8 +343,8 @@ function SectionTableFigure({
                 <th
                   key={column || index}
                   scope="col"
-                  className={`border-b border-hairline px-4 py-3.5 align-bottom font-sans text-caption uppercase leading-snug tracking-caps text-primary-strong first:pl-0 last:pr-0 ${
-                    index === 0 && labelFirst ? "sticky left-0 z-10 bg-paper" : ""
+                  className={`border-b border-hairline px-4 py-3.5 align-bottom ${headingClass} first:pl-0 last:pr-0 ${
+                    index === 0 && labelFirst ? `sticky left-0 z-10 ${tone.surface}` : ""
                   }`}
                 >
                   {column}
@@ -275,8 +370,8 @@ function SectionTableFigure({
                       {...(isLabel ? { scope: "row" as const } : {})}
                       className={`border-b border-hairline px-4 py-3.5 align-top font-sans text-copy leading-body first:pl-0 last:pr-0 ${
                         isLabel
-                          ? "sticky left-0 z-10 bg-paper font-medium text-ink"
-                          : "text-text-secondary"
+                          ? `sticky left-0 z-10 font-medium ${tone.surface} ${tone.heading}`
+                          : tone.point
                       }`}
                     >
                       {cell}
@@ -741,6 +836,7 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
                                 <SectionTableFigure
                                   key={table.caption ?? tableIndex}
                                   table={table}
+                                  tone={tone}
                                   className="mt-8"
                                 />
                               ))}
@@ -754,6 +850,7 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
                                   <SectionTableFigure
                                     key={block.caption ?? blockIndex}
                                     table={block}
+                                    tone={tone}
                                   />
                                 ) : (
                                   <SectionProseBlock
