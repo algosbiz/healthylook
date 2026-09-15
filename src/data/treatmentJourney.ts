@@ -1,3 +1,5 @@
+import type { PortableTextBlock } from "@portabletext/types";
+
 // "Your Treatment Journey" — the step-by-step timeline on each treatment
 // page: what happens, in order, from arrival to the treatment itself.
 //
@@ -21,7 +23,40 @@
 export type JourneyStep = {
   /** The clinic's own step name — "Consultation", "Numbing cream", etc. */
   label: string;
-  duration: string;
+  /**
+   * How long the step takes.
+   *
+   * Optional, because not every step has a length. This was required, and
+   * the cost of that was XERF: the clinic writes a five-step procedure of
+   * which only the first three are timed, so the last two — the wellness
+   * elixir at the resort, and what to expect of the result — had nowhere
+   * to go and ended up as a separate "Our XERF Procedure" section further
+   * down the page. The clinic's own note was that they belong here. A step
+   * with no duration now simply prints no duration line, rather than a
+   * clock icon next to nothing.
+   */
+  duration?: string;
+  /**
+   * What actually happens in this step, where the clinic explains it
+   * rather than just naming it. Plain paragraphs here; the CMS holds the
+   * same copy as rich text in `body`, which can carry a link.
+   *
+   * Most treatments have none of this and render exactly as before — a
+   * label and a duration.
+   */
+  description?: string[];
+  /**
+   * The rich-text version of `description`, as the CMS stores it. Present
+   * instead of `description` on anything edited in Studio, and the reason
+   * a journey step can hold a link at all — the XERF wellness step links
+   * to the resort's own wellness page, and moving that copy here would
+   * have destroyed the link if a step could only hold plain strings.
+   *
+   * Same two-field arrangement as a prose block's `body`/`paragraphs`, and
+   * for the same reason: the seeded copy stays renderable while Studio
+   * becomes the place it is edited.
+   */
+  body?: PortableTextBlock[];
 };
 
 export const treatmentJourney: Record<string, JourneyStep[]> = {
@@ -42,21 +77,57 @@ export const treatmentJourney: Record<string, JourneyStep[]> = {
     { label: "Preparation", duration: "5 minutes" },
     { label: "Treatment", duration: "15–30 minutes" },
   ],
+  // ── THE WHOLE PROCEDURE, NOT JUST THE TIMED PART ────────────────────
   // XERF is not in the source spreadsheet — it is a new device, and these
-  // three steps are the timed ones from the clinic's own "Our Procedures"
-  // list in "XERF Treatment Bali.docx", with their durations.
+  // are the clinic's own "Our Procedures" steps from "XERF Treatment
+  // Bali.docx".
   //
-  // The document's steps 4 and 5 (the wellness elixir at Ubud Nyuh Bali
-  // Resort, and the result timeline) are deliberately NOT here: this
-  // section prints every step under a clock icon, and neither of those
-  // carries a duration the clinic published. Both are on the page in full
-  // — see the "Our XERF Procedure" section in treatmentSections.ts.
+  // This held only the first three for a while, because `duration` was
+  // required and steps 4 and 5 have none, so they lived in a separate "Our
+  // XERF Procedure" section further down the page. The clinic's own note
+  // was that they belong here, which is obviously right: a reader looking
+  // for "what happens when I come in" should not find two answers in two
+  // places. `duration` is optional now and that section is gone.
+  //
+  // Step 4's copy carries a link to the resort's wellness page in Sanity.
+  // It cannot be expressed here — this file holds plain strings — which is
+  // exactly why a step also has a rich-text `body` that the CMS fills. See
+  // scripts/sanity/move-xerf-procedure-to-journey.ts, which carries the
+  // link across.
   xerf: [
-    { label: "Consultation & facial assessment", duration: "15 minutes" },
-    { label: "XERF skin prep ritual", duration: "15–20 minutes" },
+    {
+      label: "Consultation & facial assessment",
+      duration: "15 minutes",
+      description: [
+        "We believe that good results don't only depend on the advancement of the machine, but also on ensuring that the patient is a good candidate and will achieve a good result, as no single technology will fit everyone. Our doctor will also explain the possible outcome, realistic expectations, and the treatment combination that you may benefit from.",
+      ],
+    },
+    {
+      label: "XERF skin prep ritual",
+      duration: "15–20 minutes",
+      description: [
+        "After ensuring you're an ideal candidate, your skin will be thoroughly cleansed with double cleansing. A special sheet mask will be applied not only to hydrate your skin, but also to reduce skin impedance to enhance your XERF treatment.",
+      ],
+    },
     {
       label: "XERF dual wave RF",
       duration: "30–60 minutes, depending on the number of shots",
+      description: [
+        "Our doctor will perform XERF, delivering radiofrequency energy in controlled pulses. XERF is equipped with an advanced cooling system, so you will only feel warmth with mild discomfort. Comfort varies for every patient; patients with thinner and drier skin tend to feel more. Areas closer to the bone, such as the jawline, may feel more intense.",
+      ],
+    },
+    {
+      // No duration published for either of the last two, and none invented.
+      label: "Wellness elixir at Ubud Nyuh Bali Resort",
+      description: [
+        "Before going back home, enjoy our curated wellness elixir to hydrate your body while taking in the beautiful greenery of the five-star resort.",
+      ],
+    },
+    {
+      label: "Enjoy the result",
+      description: [
+        "Some patients will notice immediate improvement, although the full result develops over the weeks and months as we wait for new collagen production. Some patients notice early improvements in skin smoothness and tightness within 2–4 weeks. The result will improve gradually as new collagen and elastin form, with the peak of the result after approximately 3 months.",
+      ],
     },
   ],
   "collagen-stimulator": [

@@ -672,41 +672,6 @@ export const treatmentSections: Record<string, TreatmentSection[]> = {
       ],
     },
     {
-      title: "Our XERF Procedure",
-      blocks: [
-        {
-          heading: "1. Consultation and facial assessment with our certified doctor",
-          paragraphs: [
-            "We believe that good results don't only depend on the advancement of the machine, but also on ensuring that the patient is a good candidate and will achieve a good result, as no single technology will fit everyone. Our doctor will also explain the possible outcome, realistic expectations, and the treatment combination that you may benefit from.",
-          ],
-        },
-        {
-          heading: "2. XERF skin prep ritual",
-          paragraphs: [
-            "After ensuring you're an ideal candidate, your skin will be thoroughly cleansed with double cleansing. A special sheet mask will be applied not only to hydrate your skin, but also to reduce skin impedance to enhance your XERF treatment.",
-          ],
-        },
-        {
-          heading: "3. XERF dual wave RF",
-          paragraphs: [
-            "Our doctor will perform XERF, delivering radiofrequency energy in controlled pulses. XERF is equipped with an advanced cooling system, so you will only feel warmth with mild discomfort. Comfort varies for every patient; patients with thinner and drier skin tend to feel more. Areas closer to the bone, such as the jawline, may feel more intense. The treatment itself will take around 30–60 minutes, depending on the number of shots.",
-          ],
-        },
-        {
-          heading: "4. Wellness elixir at Ubud Nyuh Bali Resort",
-          paragraphs: [
-            "Before going back home, enjoy our curated wellness elixir to hydrate your body while taking in the beautiful greenery of the five-star resort.",
-          ],
-        },
-        {
-          heading: "5. Enjoy the result",
-          paragraphs: [
-            "Some patients will notice immediate improvement, although the full result develops over the weeks and months as we wait for new collagen production. Some patients notice early improvements in skin smoothness and tightness within 2–4 weeks. The result will improve gradually as new collagen and elastin form, with the peak of the result after approximately 3 months.",
-          ],
-        },
-      ],
-    },
-    {
       title: "Can XERF Be Combined with Other Treatments?",
       // The worst stretch on the page: an opening line followed by EIGHT
       // heading-and-paragraph pairs, which is a table of contents written

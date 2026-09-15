@@ -266,6 +266,10 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
   const { glanceLabels, sectionHeadings } = copy;
   // Resolved here rather than inline in the JSX below: both are async now,
   // and an await cannot sit inside a prop expression.
+  // Drives the journey grid's column count — see the note there.
+  const journeyHasProse = journey.some(
+    (step) => step.body?.length || step.description?.length,
+  );
   const reviews = await getTestimonialsForTreatment(treatment.slug);
   const reviewsNameThisTreatment = await hasOwnTestimonials(treatment.slug);
   const related = (await getTreatments())
@@ -791,7 +795,17 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
               className="lg:max-w-2xl"
             />
 
-            <ol className="mt-14 grid gap-x-10 gap-y-11 sm:grid-cols-2 lg:grid-cols-4">
+            {/* Four across for a bare timeline of labels and durations,
+                which is what 28 of the 29 treatments have. Two across the
+                moment any step carries an explanation: a paragraph in a
+                quarter-width column is four words a line. Decided from the
+                data rather than per treatment, so nothing has to be
+                configured to make a journey readable. */}
+            <ol
+              className={`mt-14 grid gap-x-10 gap-y-11 sm:grid-cols-2 ${
+                journeyHasProse ? "lg:grid-cols-2" : "lg:grid-cols-4"
+              }`}
+            >
               {journey.map((step, index) => (
                 <li key={step.label}>
                   <Reveal delay={Math.min(index, 6) * 70}>
@@ -805,10 +819,37 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
                       <h3 className="mt-4 font-sans text-h4 leading-tight text-ink">
                         {step.label}
                       </h3>
-                      <p className="mt-2.5 flex items-center gap-2 font-sans text-copy text-text-secondary">
-                        <ClockIcon className="h-3.5 w-3.5 shrink-0 text-primary" />
-                        {step.duration}
-                      </p>
+                      {/* Only when there is one. A clock icon beside nothing
+                          is what kept the clinic's untimed steps — the
+                          wellness elixir, the result — off this list and in
+                          a duplicate section further down the page. */}
+                      {step.duration && (
+                        <p className="mt-2.5 flex items-center gap-2 font-sans text-copy text-text-secondary">
+                          <ClockIcon className="h-3.5 w-3.5 shrink-0 text-primary" />
+                          {step.duration}
+                        </p>
+                      )}
+                      {/* Rich text where the CMS holds it, plain paragraphs
+                          otherwise — the same pairing as a prose block, and
+                          what lets a step carry a link. */}
+                      {step.body?.length ? (
+                        <SanityPortableText
+                          value={step.body}
+                          spacing="space-y-3"
+                          className="mt-3.5 text-copy leading-body text-text-secondary"
+                        />
+                      ) : step.description?.length ? (
+                        <div className="mt-3.5 flex flex-col gap-3">
+                          {step.description.map((paragraph) => (
+                            <p
+                              key={paragraph.slice(0, 40)}
+                              className="font-sans text-copy leading-body text-text-secondary"
+                            >
+                              {paragraph}
+                            </p>
+                          ))}
+                        </div>
+                      ) : null}
                     </div>
                   </Reveal>
                 </li>

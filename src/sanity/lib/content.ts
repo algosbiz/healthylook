@@ -203,6 +203,9 @@ export async function getSanityTreatments(): Promise<
       journey: (document.journey ?? []).map((step) => ({
         label: step.label,
         duration: step.duration,
+        // Rich text, so a step can hold a link — the XERF wellness step
+        // links to the resort's own wellness page.
+        body: step.body,
       })),
       featuredOnHomepage: document.featuredOnHomepage,
       featuredOrder: document.featuredOrder,

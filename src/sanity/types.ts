@@ -313,7 +313,13 @@ export type SanityTreatmentDocument = Omit<Treatment, "image" | "priceGroups"> &
     answer: PortableTextBlock[];
   }>;
   /** Ordered — see the journeyStep schema for why the sequence is content. */
-  journey?: Array<{ _key: string; label: string; duration: string }>;
+  journey?: Array<{
+    _key: string;
+    label: string;
+    duration?: string;
+    /** Optional rich text — what happens in this step. Carries links. */
+    body?: PortableTextBlock[];
+  }>;
   featuredOnHomepage?: boolean;
   featuredOrder?: number;
   mostPopular?: boolean;
