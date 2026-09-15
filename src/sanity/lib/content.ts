@@ -11,7 +11,19 @@ import type {
   SanityTreatmentSection,
 } from "@/sanity/types";
 import type { Treatment } from "@/data/treatments";
-import type { SectionImage, TreatmentSection } from "@/data/treatmentSections";
+import type {
+  SectionDisplay,
+  SectionImage,
+  SectionTone,
+  TreatmentSection,
+} from "@/data/treatmentSections";
+
+/* The accepted values, spelled out once. Derived from the types by hand
+ * because they are string unions, which do not exist at runtime — so the
+ * only thing keeping these honest is that they sit directly above the
+ * mapper that uses them. */
+const SECTION_DISPLAYS: SectionDisplay[] = ["prose", "cards", "icons"];
+const SECTION_TONES: SectionTone[] = ["plain", "wash", "blush", "brown"];
 import { headingLevel } from "@/lib/headings";
 import type { JourneyStep } from "@/data/treatmentJourney";
 import type { PricingSection } from "@/data/pricing";
@@ -143,11 +155,22 @@ function toTreatmentSections(
     title: section.title,
     headingLevel: headingLevel(section.headingLevel, "h2"),
     anchor: section.anchor,
-    // Anything other than the two known values falls back to the default
-    // rather than reaching the renderer, so a stray string in the document
-    // cannot produce a section with no layout at all.
-    display: section.display === "cards" ? "cards" : "prose",
-    tone: section.tone === "wash" ? "wash" : "plain",
+    // Whitelisted rather than passed through, so a stray string in the
+    // document cannot reach the renderer and produce a section with no
+    // layout at all. Anything unrecognised falls back to the default.
+    //
+    // ⚠ These two lists have to grow whenever SectionDisplay or SectionTone
+    // does. They did not, the first time: "icons", "blush" and "brown"
+    // were added to the types and the renderer but not here, so Studio held
+    // them, the page asked for them, and this quietly mapped every one of
+    // them back to "prose" and "plain". Nothing errored; the section simply
+    // rendered as though the editor had chosen nothing.
+    display: SECTION_DISPLAYS.includes(section.display as SectionDisplay)
+      ? (section.display as SectionDisplay)
+      : "prose",
+    tone: SECTION_TONES.includes(section.tone as SectionTone)
+      ? (section.tone as SectionTone)
+      : "plain",
     points: section.points,
     // Prose and tables share one array so the clinic can order them
     // freely; `_type` is what Sanity stamps on each member and the only

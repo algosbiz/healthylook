@@ -44,8 +44,50 @@ export const client = createClient({
 // from Sanity Manage. The public client above must stay token-free because it
 // is also used by Live Content internals.
 const sanityReadToken = process.env.SANITY_API_READ_TOKEN?.trim() || false;
+
+/**
+ * Local draft preview — see the whole site as it WOULD look once the
+ * drafts in Studio are published, without publishing them.
+ *
+ * ── WHY IT IS NEEDED ───────────────────────────────────────────────────
+ * Sanity wins over src/data at render, and this client reads the published
+ * perspective, so work sitting in a draft is invisible on localhost. The
+ * only ways to see it were to publish it — which puts it on the live site
+ * for everyone — or to switch Sanity off entirely and read the code
+ * fallback, which is not the same content: the code has no rich text and
+ * therefore none of the links. Neither is a preview.
+ *
+ * Turn it on by adding SANITY_PREVIEW_DRAFTS=true to .env.local, and
+ * restart the dev server. Every page then renders drafts overlaid on
+ * published, exactly as publishing would leave it.
+ *
+ * ── IT CANNOT REACH THE LIVE SITE ──────────────────────────────────────
+ * Guarded twice. The flag is read from a server-only variable, so it
+ * cannot be set from the browser; and it is ignored outright when Vercel
+ * says this is the production deployment, so setting it in the wrong
+ * project's environment variables shows unpublished copy to nobody.
+ * Preview deployments are deliberately still allowed — reviewing a draft
+ * on a preview URL is the other half of what this is for.
+ */
+const previewDrafts =
+  process.env.SANITY_PREVIEW_DRAFTS === "true" &&
+  process.env.VERCEL_ENV !== "production";
+
+if (previewDrafts) {
+  console.warn(
+    "[sanity] SANITY_PREVIEW_DRAFTS is on — pages are rendering UNPUBLISHED drafts. " +
+      "Remove it from .env.local to go back to published content.",
+  );
+}
+
 const publishedClient = sanityReadToken
-  ? client.withConfig({ token: sanityReadToken, useCdn: false })
+  ? client.withConfig({
+      token: sanityReadToken,
+      useCdn: false,
+      // "drafts" returns each draft in place of its published version and
+      // leaves everything else alone, which is what publishing would do.
+      ...(previewDrafts ? { perspective: "drafts" as const } : {}),
+    })
   : client;
 
 const live = defineLive({
@@ -88,6 +130,26 @@ export async function sanityFetch<TResult>(
   options: SanityFetchOptions = {},
 ): Promise<TResult | null> {
   if (!isSanityConfigured) return null;
+
+  /* ── DRAFT PREVIEW GOES STRAIGHT PAST LIVE CONTENT ──────────────────
+   * Live Content is asked first below, and it reads through `client`,
+   * which is pinned to the published perspective — so with drafts turned
+   * on it answered with published data and the preview did nothing at all.
+   * The drafts perspective lives on `publishedClient`, which is only
+   * reached as a fallback, so preview has to skip the live path outright.
+   *
+   * No loss: Live Content exists to push published changes to open pages
+   * without a reload, which is not what a draft preview is for. `revalidate:
+   * 0` because the point is to see the draft as it is right now, not as it
+   * was up to a minute ago.
+   */
+  if (previewDrafts) {
+    try {
+      return await fetchPublished<TResult>(query, { ...options, revalidate: 0 });
+    } catch {
+      return null;
+    }
+  }
 
   try {
     const result = await live.sanityFetch({
