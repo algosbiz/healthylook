@@ -285,6 +285,22 @@ const nextConfig: NextConfig = {
         statusCode: 301,
       },
       { source: "/carboxy-therapy-in-ubud-bali", destination: "/ubud-bali/carboxy-therapy", statusCode: 301 },
+
+      /**
+       * Two more, reported after the sheet above had shipped. Both are
+       * near-misses of rows already here — /prp-in-ubud-bali against
+       * /prp-ubud-bali, /hair-removal-ubud-bali against
+       * /ipl-hair-removal-ubud-bali — which is exactly why they were
+       * missed: they look like duplicates and are not. Next matches a
+       * source literally, so a rule for one spelling does nothing for the
+       * other, and these kept answering 404 after the rest went live.
+       *
+       * The old site evidently published both spellings. If more turn up,
+       * they will look like this too: read them from a 404 report rather
+       * than guessed at from the ones already listed.
+       */
+      { source: "/prp-in-ubud-bali", destination: "/ubud-bali/prp", statusCode: 301 },
+      { source: "/hair-removal-ubud-bali", destination: "/ubud-bali/ipl-hair-removal", statusCode: 301 },
       /**
        * The sheet sends this to /ubud-bali/slimming-body-contouring, which
        * is the one destination in it that no longer exists: the client
