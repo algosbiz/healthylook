@@ -70,7 +70,13 @@ export const treatment = defineType({
       applies: "The level of the heading above the description.",
       appliesId: "Level untuk heading di atas deskripsi.",
     }),
-    defineField({ name: "shortDescription", title: "Catalogue description", type: "text", rows: 3, group: "overview", description: "The lead line on this page and the text on every card that links to it. · ID: Kalimat pembuka di halaman ini dan teks di setiap kartu yang menuju ke sini." }),
+    /* The warning is the point. Emptying this field looks like it only
+     * tidies the page it is on -- and it does, it removes a sentence the
+     * hero has already said. What is not visible from here is that the
+     * same field is the entire body of this treatment's card on the
+     * homepage, on /ubud-bali, on /pricing and in every related-treatment
+     * strip, all of which go blank. That is exactly what happened on XERF. */
+    defineField({ name: "shortDescription", title: "Catalogue description", type: "text", rows: 3, group: "overview", description: "Shown under the page title, and on every card that links to this treatment. ⚠ Emptying it leaves those cards blank. It also opens the About section on treatments that have no Introduction below. · ID: Tampil di bawah judul halaman, dan di setiap kartu yang menuju treatment ini. ⚠ Kalau dikosongkan, kartu-kartu itu jadi kosong. Teks ini juga membuka bagian About pada treatment yang tidak punya Introduction di bawah." }),
     defineField({ name: "intro", title: "Introduction", type: "text", rows: 6, group: "overview" }),
     defineField({ name: "image", title: "Hero image", type: "imageWithAlt", group: "overview" }),
     defineField({

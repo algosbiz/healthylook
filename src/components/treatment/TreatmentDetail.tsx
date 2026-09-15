@@ -407,7 +407,22 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
                 </AboutHeading>
               </Reveal>
 
-              {treatment.shortDescription && (
+              {/* ── THE SAME SENTENCE, TWICE ON ONE SCREEN ──────────────
+                  The hero already prints `shortDescription`, and this
+                  printed it again a few hundred pixels below — so every
+                  treatment page opened by saying the same thing twice. The
+                  clinic's own reaction was to delete the field on XERF,
+                  which fixed the page and silently emptied the treatment's
+                  card on the homepage, on /ubud-bali, on /pricing and in
+                  every related-treatment strip, since all of those read it.
+
+                  Hiding it here rather than deleting it keeps the card copy
+                  and removes the repeat. But only where there is an `intro`
+                  to lead with instead: 23 of the 32 treatments have none,
+                  and on those this paragraph is the entire body of the
+                  About block. Dropping it for everyone would have left 23
+                  pages with a heading and nothing under it. */}
+              {treatment.shortDescription && !treatment.intro && (
                 <Reveal delay={90}>
                   <p className="mt-9 measure font-sans text-lead text-text">
                     {treatment.shortDescription}
@@ -415,9 +430,12 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
                 </Reveal>
               )}
 
+              {/* mt-9, not mt-6: exactly one of these two ever renders now,
+                  so whichever it is opens the block and needs the heading's
+                  full clearance. */}
               {treatment.intro && (
                 <Reveal delay={140}>
-                  <p className="mt-6 measure font-sans text-body leading-body text-text-secondary">
+                  <p className="mt-9 measure font-sans text-body leading-body text-text-secondary">
                     {treatment.intro}
                   </p>
                 </Reveal>
