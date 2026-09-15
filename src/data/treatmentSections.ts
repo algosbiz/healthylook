@@ -135,15 +135,22 @@ export type SectionBlock = {
  * other 31 pages render exactly as they do today and XERF opts in section
  * by section — the same shape as `headingLevel` and `uncropped`.
  */
-export type SectionDisplay = "prose" | "cards";
+export type SectionDisplay = "prose" | "cards" | "icons";
 
 /**
- * The surface a section sits on. `wash` tints it, which is how a page this
- * long gets a landmark — something the eye can use to tell "I have been
- * here" from "this is new". Default `plain` leaves it on the page colour,
- * i.e. what every treatment page does now.
+ * The surface a section sits on — how a page this long gets a landmark,
+ * something the eye can use to tell "I have been here" from "this is new".
+ *
+ * The clinic asked for this directly: "please also use some brown or cream
+ * background in some paragraph so it's not too boring". The four values are
+ * the site's own existing tones, not a new palette — `wash` and `blush` are
+ * the two tints its page sections already use, and `brown` is the same
+ * `bg-ink-brown` its dark bands use, with the type inverted to match.
+ *
+ * Default `plain` leaves a section on the page colour, i.e. exactly what
+ * every treatment page did before any of this existed.
  */
-export type SectionTone = "plain" | "wash";
+export type SectionTone = "plain" | "wash" | "blush" | "brown";
 
 export type TreatmentSection = {
   title?: string;
@@ -460,6 +467,7 @@ export const treatmentSections: Record<string, TreatmentSection[]> = {
     },
     {
       title: "Safety Features Behind XERF",
+      tone: "brown",
       // Four named features, two sentences each: a list wearing prose
       // clothing. As cards the reader sees all four at once.
       display: "cards",
@@ -735,43 +743,77 @@ export const treatmentSections: Record<string, TreatmentSection[]> = {
       ],
     },
     {
-      // ── THE DOCUMENT'S "HIGHLIGHT" LIST ─────────────────────────────
-      // Seven claims the clinic prints under that heading, with a row of
-      // drawn icons above them. The first pass put the list on the
-      // homepage card and nowhere else, so a reader who arrived on the
-      // treatment page itself — which is most of them — never saw it.
+      // ── ONE ICON PER CLAIM ──────────────────────────────────────────
+      // The clinic's note: "this should be explained one picture one
+      // explanation… but i sent you the entire pic so you can crop it".
+      // It was their seven-icon strip above a separate list of the same
+      // seven claims, which asked the reader to count across to pair them
+      // up — and on a phone the strip and the list never shared a screen.
       //
-      // Wording is the clinic's own, sentence-cased to match every other
-      // list on the site. The icons are their artwork, flattened onto the
-      // section's own paper tone so the transparent background does not
-      // show as a grey band.
-      //
-      // ⚠ "No pain" is the clinic's phrase and is kept as they wrote it,
-      // but it sits on the same page as their own FAQ answer — "most
-      // patients describe XERF as warmth rather than pain" — and their
-      // procedure copy, "you will only feel warmth with mild discomfort".
-      // Worth raising with them: "Needle-free, minimal discomfort" would
-      // say the same thing without the page contradicting itself.
+      // The strip is cut into seven squares, detected from its own
+      // transparency rather than sliced at guessed offsets, and kept
+      // transparent so they sit on whatever surface the section has.
       title: "Highlights",
-      // The one tinted panel on this page. It is the most visual section —
-      // seven short claims and a row of icons — so it is the one that
-      // gains most from being lifted off the page colour, and a single
-      // landmark stays a landmark.
-      tone: "wash",
-      points: [
-        "No needles",
-        "No pain",
-        "No downtime",
-        "No fat loss",
-        "Result after just one session",
-        "Personalized treatment",
-        "Natural-looking lift",
+      display: "icons",
+      tone: "blush",
+      blocks: [
+        {
+          heading: "No needles",
+          image: {
+            src: "/images/treatments/xerf-highlight-icons/1.png",
+            alt: "A syringe crossed out.",
+            ratio: 1,
+          },
+        },
+        {
+          heading: "No pain",
+          image: {
+            src: "/images/treatments/xerf-highlight-icons/2.png",
+            alt: "A calm face with radiating lines.",
+            ratio: 1,
+          },
+        },
+        {
+          heading: "No downtime",
+          image: {
+            src: "/images/treatments/xerf-highlight-icons/3.png",
+            alt: "A calendar crossed out.",
+            ratio: 1,
+          },
+        },
+        {
+          heading: "No fat loss",
+          image: {
+            src: "/images/treatments/xerf-highlight-icons/4.png",
+            alt: "Fat cells crossed out.",
+            ratio: 1,
+          },
+        },
+        {
+          heading: "Result after just one session",
+          image: {
+            src: "/images/treatments/xerf-highlight-icons/5.png",
+            alt: "A clock with a spark.",
+            ratio: 1,
+          },
+        },
+        {
+          heading: "Personalized treatment",
+          image: {
+            src: "/images/treatments/xerf-highlight-icons/6.png",
+            alt: "A face in profile with a target on the jawline.",
+            ratio: 1,
+          },
+        },
+        {
+          heading: "Natural-looking lift",
+          image: {
+            src: "/images/treatments/xerf-highlight-icons/7.png",
+            alt: "Two leaves.",
+            ratio: 1,
+          },
+        },
       ],
-      image: {
-        src: "/images/treatments/xerf-highlights.png",
-        alt: "Seven icons: no needles, glowing skin, no downtime, no fat loss, fast results, targeted lifting, and natural-looking results.",
-        ratio: 4.957,
-      },
     },
     {
       title: "Why Choose Healthy Look Aesthetic for XERF Treatment?",

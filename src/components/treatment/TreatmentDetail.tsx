@@ -109,15 +109,19 @@ function SectionFigure({
 function SectionProseBlock({
   block,
   className = "",
+  headingClass = "text-ink",
+  proseClass = "",
 }: {
   block: SectionBlock;
   className?: string;
+  headingClass?: string;
+  proseClass?: string;
 }) {
   const BlockHeadingTag = block.headingLevel ?? "h3";
   return (
-    <div className={className}>
+    <div className={`${className} ${proseClass}`}>
       {block.heading && (
-        <BlockHeadingTag className="font-sans text-copy-lg font-medium leading-snug text-ink">
+        <BlockHeadingTag className={`font-sans text-copy-lg font-medium leading-snug ${headingClass}`}>
           {block.heading}
         </BlockHeadingTag>
       )}
@@ -150,6 +154,60 @@ function SectionProseBlock({
     </div>
   );
 }
+
+/**
+ * What each section surface looks like, in one place.
+ *
+ * ── WHY A TABLE AND NOT A TERNARY AT EACH SITE ─────────────────────────
+ * A tinted section changes four things at once — its own background, its
+ * heading colour, the prose colour, and the card chrome inside it — and a
+ * dark one inverts all four. Spread across the markup as conditionals,
+ * that is four chances to forget one, and forgetting the heading on the
+ * brown surface means ink-on-brown, which is unreadable rather than merely
+ * wrong.
+ *
+ * `plain` carries no padding at all: an untinted section should sit on the
+ * page exactly as it did before any of this existed, not inside an
+ * invisible box that shifts it.
+ *
+ * The four are the site's own tones, from SectionShell — not a new palette.
+ */
+const SECTION_TONES = {
+  plain: {
+    shell: "",
+    heading: "text-ink",
+    prose: "",
+    card: "border-hairline bg-background",
+    point: "text-text-secondary",
+    icon: "text-primary",
+  },
+  wash: {
+    shell: "bg-wash px-7 py-9 sm:px-9",
+    heading: "text-ink",
+    prose: "",
+    card: "border-hairline bg-background",
+    point: "text-text-secondary",
+    icon: "text-primary",
+  },
+  blush: {
+    shell: "bg-blush px-7 py-9 sm:px-9",
+    heading: "text-ink",
+    prose: "",
+    card: "border-hairline bg-background",
+    point: "text-text-secondary",
+    icon: "text-primary",
+  },
+  brown: {
+    shell: "bg-ink-brown px-7 py-9 text-white sm:px-9",
+    heading: "text-white",
+    // Portable Text and plain paragraphs both render <p>, so one selector
+    // covers the pair rather than each branch carrying its own colour.
+    prose: "[&_p]:text-white/75 [&_li]:text-white/75 [&_a]:text-gold-soft",
+    card: "border-white/15 bg-white/5",
+    point: "text-white/75",
+    icon: "text-gold-soft",
+  },
+} as const;
 
 /**
  * A comparison table inside a treatment section.
@@ -400,7 +458,21 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
       <section id="about" className="scroll-mt-24 bg-paper py-section">
         <Container>
           <div className="grid gap-14 lg:grid-cols-12 lg:gap-20">
-            <div className="lg:col-span-7">
+            {/* ── min-w-0, OR THE TABLES BREAK THE PHONE LAYOUT ────────
+                A grid item defaults to `min-width: auto`, which means it
+                refuses to shrink below its content's min-content width.
+                The comparison table sets `min-w-[34rem]` so it stays
+                readable, and that 544px became this column's minimum: on a
+                360px phone the column was 544px wide, the page was 564px
+                wide, and every paragraph in it ran off the right edge. The
+                clinic's report was "the paragraph is cropped", with the
+                About copy cut mid-sentence.
+                `overflow-x-auto` on the table could not save it, because a
+                scroll container only scrolls once it is allowed to be
+                narrower than its content — and this column never was.
+                Measured at 360px: page width 564 before, 360 after, with
+                the table scrolling inside its own box as intended. */}
+            <div className="min-w-0 lg:col-span-7">
               {/* Was a <span>: styled like a heading, invisible to search
                   as one. Same gold rule and same type, now an actual
                   heading whose wording each treatment can set for itself. */}
@@ -521,7 +593,13 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
                     // capitals for the same reason as the headings above.
                     const SectionHeadingTag = section.headingLevel ?? "h2";
                     const asCards = section.display === "cards";
-                    const washed = section.tone === "wash";
+                    const asIcons = section.display === "icons";
+                    /* One place decides what a tinted section looks like,
+                       so a dark one cannot end up with ink-coloured
+                       headings on it. `plain` carries no padding at all —
+                       an untinted section should sit on the page exactly as
+                       it always has, not inside an invisible box. */
+                    const tone = SECTION_TONES[section.tone ?? "plain"];
                     return (
                     <Reveal key={section.anchor ?? section.title ?? index} delay={Math.min(index, 4) * 60}>
                       {/* ── NO RULE BETWEEN SECTIONS ────────────────────
@@ -538,16 +616,15 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
                           closer together.
                           A washed section needs no rule either: its own
                           tint is the boundary. */}
-                      <div
-                        id={section.anchor}
-                        className={`scroll-mt-24 ${washed ? "bg-wash px-7 py-9 sm:px-9" : ""}`}
-                      >
+                      <div id={section.anchor} className={`scroll-mt-24 ${tone.shell}`}>
                         {/* A section without a heading is allowed — see the
                             note in treatmentSection.ts on why nothing here
                             is required. An empty <h2> would be worse than
                             no heading: search engines read it as one. */}
                         {section.title && (
-                          <SectionHeadingTag className="font-sans text-h4 leading-tight text-ink">
+                          <SectionHeadingTag
+                            className={`font-sans text-h4 leading-tight ${tone.heading}`}
+                          >
                             {section.title}
                           </SectionHeadingTag>
                         )}
@@ -573,7 +650,58 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
                             wants bullets first — the five that mixed the
                             two formats were rewritten as uniform blocks. */}
                         {section.blocks && (
-                          asCards ? (
+                          asIcons ? (
+                            /* ── ONE PICTURE, ONE EXPLANATION ─────────
+                               The clinic's note, on the Highlights
+                               section: "this should be explained one
+                               picture one explanation". It was a strip of
+                               seven icons above a list of seven claims, so
+                               the reader had to count across to work out
+                               which icon meant what — and on a phone the
+                               strip and the list were never on screen at
+                               the same time.
+
+                               Each block here is one icon and one claim.
+                               The icons are the clinic's own artwork, cut
+                               out of that strip.
+
+                               The image is small and fixed rather than
+                               column-width: these are 179px pieces of line
+                               art, and blown up to the measure they would
+                               read as illustrations rather than as marks
+                               against a list. */
+                            <ul className="mt-7 grid gap-x-8 gap-y-7 sm:grid-cols-2">
+                              {section.blocks
+                                .filter((block) => !isSectionTable(block))
+                                .map((block, blockIndex) => {
+                                  const item = block as SectionBlock;
+                                  return (
+                                    <li
+                                      key={item.heading ?? blockIndex}
+                                      className="flex items-center gap-4"
+                                    >
+                                      {item.image?.src && (
+                                        <Img
+                                          src={item.image.src}
+                                          alt={item.image.alt}
+                                          aspect="square"
+                                          rounded="rounded-none"
+                                          sizes="56px"
+                                          className="w-14 shrink-0 bg-transparent"
+                                        />
+                                      )}
+                                      {item.heading && (
+                                        <span
+                                          className={`font-sans text-copy leading-snug ${tone.point}`}
+                                        >
+                                          {item.heading}
+                                        </span>
+                                      )}
+                                    </li>
+                                  );
+                                })}
+                            </ul>
+                          ) : asCards ? (
                             /* ── CARDS ────────────────────────────────
                                Blocks that have a subheading become the
                                grid; blocks without one stay above it as
@@ -600,6 +728,8 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
                                       <SectionProseBlock
                                         key={blockIndex}
                                         block={block as SectionBlock}
+                                        headingClass={tone.heading}
+                                        proseClass={tone.prose}
                                       />
                                     ))}
                                 </div>
@@ -611,7 +741,9 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
                                     <SectionProseBlock
                                       key={(block as SectionBlock).heading ?? blockIndex}
                                       block={block as SectionBlock}
-                                      className="h-full border border-hairline bg-background p-6 [&_p]:max-w-none"
+                                      className={`h-full border p-6 [&_p]:max-w-none ${tone.card}`}
+                                      headingClass={tone.heading}
+                                      proseClass={tone.prose}
                                     />
                                   ))}
                               </div>
@@ -637,6 +769,8 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
                                   <SectionProseBlock
                                     key={block.heading ?? blockIndex}
                                     block={block}
+                                    headingClass={tone.heading}
+                                    proseClass={tone.prose}
                                   />
                                 ),
                               )}
@@ -649,9 +783,9 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
                             {section.points.map((point) => (
                               <li
                                 key={point}
-                                className="measure flex gap-3 font-sans text-copy leading-body text-text-secondary"
+                                className={`measure flex gap-3 font-sans text-copy leading-body ${tone.point}`}
                               >
-                                <CheckIcon className="mt-1.5 h-3.5 w-3.5 shrink-0 text-primary" />
+                                <CheckIcon className={`mt-1.5 h-3.5 w-3.5 shrink-0 ${tone.icon}`} />
                                 {point}
                               </li>
                             ))}
@@ -784,10 +918,22 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
           Medi Facial aren't in the sheet, so this section simply doesn't
           render for those two rather than guessing a timeline for them. */}
       {journey && journey.length > 0 && (
-        <section id="journey" className="scroll-mt-24 bg-wash py-section">
+        /* ── THE DARK BAND ────────────────────────────────────────────
+           The clinic sent a reference for this section — a dark panel of
+           numbered columns, each with its step, its duration and a line of
+           explanation — and said it should look like that. It is also the
+           answer to their other note, that the page is "too boring": a
+           treatment page is otherwise an unbroken run of pale surfaces
+           from the hero to the footer, and one full-width dark band in the
+           middle is the cheapest possible landmark.
+           SectionHeading already had a `dark` tone for exactly these ink
+           bands elsewhere on the site, so this is the site's own existing
+           treatment of a dark section, not a new one invented here. */
+        <section id="journey" className="scroll-mt-24 bg-ink-brown py-section">
           <Container>
             <SectionHeading
               as={copy.headingLevels.journey}
+              tone="dark"
               align="left"
               eyebrow={sectionHeadings.journeyEyebrow}
               title={sectionHeadings.journeyTitle}
@@ -809,14 +955,14 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
               {journey.map((step, index) => (
                 <li key={step.label}>
                   <Reveal delay={Math.min(index, 6) * 70}>
-                    <div className="border-t border-primary/25 pt-7">
+                    <div className="border-t border-white/20 pt-7">
                       <span
-                        className="font-script text-statement leading-none text-primary/50"
+                        className="font-script text-statement leading-none text-gold-soft/60"
                         aria-hidden="true"
                       >
                         {String(index + 1).padStart(2, "0")}
                       </span>
-                      <h3 className="mt-4 font-sans text-h4 leading-tight text-ink">
+                      <h3 className="mt-4 font-sans text-h4 leading-tight text-white">
                         {step.label}
                       </h3>
                       {/* Only when there is one. A clock icon beside nothing
@@ -824,8 +970,8 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
                           wellness elixir, the result — off this list and in
                           a duplicate section further down the page. */}
                       {step.duration && (
-                        <p className="mt-2.5 flex items-center gap-2 font-sans text-copy text-text-secondary">
-                          <ClockIcon className="h-3.5 w-3.5 shrink-0 text-primary" />
+                        <p className="mt-2.5 flex items-center gap-2 font-sans text-copy text-white/70">
+                          <ClockIcon className="h-3.5 w-3.5 shrink-0 text-gold-soft" />
                           {step.duration}
                         </p>
                       )}
@@ -836,14 +982,14 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
                         <SanityPortableText
                           value={step.body}
                           spacing="space-y-3"
-                          className="mt-3.5 text-copy leading-body text-text-secondary"
+                          className="mt-3.5 text-copy leading-body [&_a]:text-gold-soft [&_p]:text-white/70"
                         />
                       ) : step.description?.length ? (
                         <div className="mt-3.5 flex flex-col gap-3">
                           {step.description.map((paragraph) => (
                             <p
                               key={paragraph.slice(0, 40)}
-                              className="font-sans text-copy leading-body text-text-secondary"
+                              className="font-sans text-copy leading-body text-white/70"
                             >
                               {paragraph}
                             </p>
