@@ -85,8 +85,12 @@ export const curatedSection = defineType({
       type: "array",
       of: [defineArrayMember({ type: "treatmentHighlight" })],
       hidden: onlyTreatmentHighlights,
+      // Spelled out because the replace-not-merge rule is the one thing here
+      // that can surprise someone: adding a single card looks like adding,
+      // and is actually replacing. Saying so in the field itself puts the
+      // warning where it is read, not in a handover note.
       description:
-        "Add, remove and reorder the cards. Leave empty to keep the list the website ships with. · ID: Tambah, hapus, dan urutkan kartunya. Kosongkan untuk memakai daftar bawaan website.",
+        "Empty = every card the website comes with is shown. Add items and only the ones picked here are shown — this list replaces the built-in one, it does not add to it. So either leave it empty, or list every card that should appear. · ID: Kosong = semua kartu bawaan website tampil. Kalau diisi, hanya kartu yang dipilih di sini yang tampil — daftar ini mengganti daftar bawaan, bukan menambahnya. Jadi: kosongkan saja, atau tulis semua kartu yang ingin ditampilkan.",
       validation: (Rule) => Rule.max(12),
     }),
 
