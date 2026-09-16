@@ -400,6 +400,9 @@ export const treatments: Treatment[] = [
           { label: "Restylane Defyne", price: 4500000 },
           { label: "Restylane Volyme", price: 4700000 },
           { label: "Restylane Lyft", price: 4900000 },
+          { label: "Croma Filler", price: 2950000 },
+          { label: "Croma Volume", price: 3200000 },
+          { label: "Croma Volume Plus", price: 3500000 },
         ],
       },
       {
@@ -520,9 +523,22 @@ export const treatments: Treatment[] = [
     // disk (lysiwave.jpg, sylfirm.jpg), so no `imagePosition` is needed.
     image: "/images/treatments/xerf.jpg",
     startingPrice: 9800000,
+    // Synced from Sanity 2026-09-16. The clinic filled the real table in
+    // Studio: six tiers by shot count, not the single flat price this held
+    // while they were still deciding. Sanity is what the site serves; this
+    // matters only on the day Sanity cannot be reached, which is exactly
+    // the day a wrong price would be worst.
     priceGroups: [
       {
-        rows: [{ label: "Per session", price: 9800000 }],
+        title: "XERF",
+        rows: [
+          { label: "XERF 150 shots (double chin OR forehead & browlift)", price: 9800000 },
+          { label: "XERF 300 shots (Lower Face OR Neck & Double Chin)", price: 18500000 },
+          { label: "XERF 450 shots (Lower Face & Browlift)", price: 24500000 },
+          { label: "XERF 600 shots (Full Face or Neck & Decolettage)", price: 29500000 },
+          { label: "XERF 900 shots (Full Face & Neck)", price: 42500000 },
+          { label: "XERF 1050 shots (Full face, Neck, and Decolettage)", price: 49000000 },
+        ],
       },
     ],
     // ── THE DOCUMENT'S OWN OPENING ──────────────────────────────────────
@@ -1221,7 +1237,6 @@ export const treatments: Treatment[] = [
           { label: "Full Arm", price: 690000 },
           { label: "Full Back", price: 990000 },
           { label: "Full Leg", price: 990000 },
-          { label: "Full Body", price: 1990000 },
         ],
       },
     ],
@@ -1661,7 +1676,6 @@ export const treatments: Treatment[] = [
           { label: "Immune Booster", price: 1100000 },
           { label: "Jet Lag Recovery", price: 1250000 },
           { label: "Ultimate Glow", price: 1250000 },
-          { label: "Bali Belly Cure", price: 1500000 },
           { label: "Anti Aging", price: 1750000 },
           { label: "Myer's Cocktail", price: 1750000 },
         ],
