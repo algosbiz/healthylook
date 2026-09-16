@@ -10,6 +10,7 @@ import { testimonial } from "./documents/testimonial";
 import { faqItem } from "./objects/faqItem";
 import { featureItem } from "./objects/featureItem";
 import { journeyStep } from "./objects/journeyStep";
+import { treatmentHighlight } from "./objects/treatmentHighlight";
 import { clinicHighlight, internationalPoint, safetyProtocol } from "./objects/clinicItems";
 import { imageWithAlt } from "./objects/imageWithAlt";
 import { link } from "./objects/link";
@@ -47,6 +48,7 @@ export const schemaTypes = [
   faqItem,
   featureItem,
   journeyStep,
+  treatmentHighlight,
   clinicHighlight,
   safetyProtocol,
   internationalPoint,

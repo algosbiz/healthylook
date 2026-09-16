@@ -160,12 +160,33 @@ export type CuratedSectionComponent =
   (typeof CURATED_SECTION_COMPONENTS)[number];
 
 /**
+ * One card in the Treatment highlights section. `slug` is projected from the
+ * treatment reference rather than stored, so the card follows the treatment
+ * if its slug ever changes.
+ */
+export type SanityTreatmentHighlight = SanityKeyed & {
+  _type: "treatmentHighlight";
+  slug?: string;
+  facts?: string[];
+  isFeatured?: boolean;
+  badge?: string;
+};
+
+/**
  * Curated sections reuse exact existing, data-driven components. Their records
  * live in related collections while bespoke blocks cover page-specific text
  * and images. No class names or arbitrary HTML enter Sanity.
+ *
+ * Treatment highlights is the one component whose content is not a collection,
+ * so it carries its own optional fields here. All of them empty is the normal
+ * state and means "render what the component ships with".
  */
 export type CuratedSection = SectionBase<"curatedSection"> & {
   component: CuratedSectionComponent;
+  highlightsEyebrow?: string;
+  highlightsTitle?: string;
+  highlightsIntro?: string;
+  highlights?: SanityTreatmentHighlight[];
 };
 
 export type PricingPromisePoint = SanityKeyed & {

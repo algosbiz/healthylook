@@ -45,7 +45,29 @@ export default async function CuratedSection({ section }: { section: CuratedSect
       );
     }
     case "treatmentHighlights":
-      return <TreatmentHighlights />;
+      // An entry whose reference was deleted projects no slug, so it is
+      // dropped here rather than reaching the component as a card with a
+      // name it cannot resolve. Everything else is passed through as-is;
+      // empty means "use what the component ships with".
+      return (
+        <TreatmentHighlights
+          entries={(section.highlights ?? []).flatMap((entry) =>
+            entry.slug
+              ? [
+                  {
+                    slug: entry.slug,
+                    facts: entry.facts ?? [],
+                    featured: entry.isFeatured,
+                    badge: entry.badge,
+                  },
+                ]
+              : [],
+          )}
+          eyebrow={section.highlightsEyebrow}
+          title={section.highlightsTitle}
+          description={section.highlightsIntro}
+        />
+      );
     case "whyUs":
       return <WhyUs />;
     case "doctors":

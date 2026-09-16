@@ -52,10 +52,23 @@ import { getTreatments } from "@/lib/site-content";
  * Only the first flagged entry is promoted; flagging a second would just
  * leave it in the grid below, not break the layout.
  */
-const HIGHLIGHT_ENTRIES: { slug: string; facts: string[]; featured?: boolean }[] = [
+export type HighlightEntry = {
+  slug: string;
+  facts: string[];
+  featured?: boolean;
+  /** Shown beside the name on the large card only. */
+  badge?: string;
+};
+
+/**
+ * The list the website ships with, and the fallback when Sanity carries no
+ * list of its own — see the note on the component's props below.
+ */
+const HIGHLIGHT_ENTRIES: HighlightEntry[] = [
   {
     slug: "xerf",
     featured: true,
+    badge: "New",
     facts: [
       "No needles",
       "No pain",
@@ -97,9 +110,43 @@ const HIGHLIGHT_ENTRIES: { slug: string; facts: string[]; featured?: boolean }[]
   },
 ];
 
-type Highlight = { treatment: Treatment; facts: string[]; featured?: boolean };
+type Highlight = {
+  treatment: Treatment;
+  facts: string[];
+  featured?: boolean;
+  badge?: string;
+};
 
-export default async function TreatmentHighlights() {
+const DEFAULT_EYEBROW = "Signature Technology";
+const DEFAULT_TITLE = "Treatment Highlights";
+const DEFAULT_DESCRIPTION =
+  "A few of the technologies we're especially proud to offer — some exclusive to Healthy Look in Bali, all chosen for what they do for you.";
+
+/**
+ * ── EVERY PROP IS AN OVERRIDE, NOT A REQUIREMENT ────────────────────────
+ * The clinic can now choose the treatments and write the bullets in Studio
+ * (see curatedSection's `highlights`). Nothing is required there, and the
+ * normal state is that all of it is empty: called with no props at all,
+ * this renders exactly what it rendered before the fields existed.
+ *
+ * `entries` replaces the whole list rather than merging into it. A merge
+ * would mean the clinic could delete a card in Studio and watch it come
+ * back from the constant below, which is not something a person can be
+ * expected to debug from inside a CMS.
+ */
+export default async function TreatmentHighlights({
+  entries,
+  eyebrow,
+  title,
+  description,
+}: {
+  entries?: HighlightEntry[];
+  eyebrow?: string;
+  title?: string;
+  description?: string;
+} = {}) {
+  const source = entries?.length ? entries : HIGHLIGHT_ENTRIES;
+
   // Resolved in the component, not at module scope: the lookup goes
   // through the database layer now, and a module-scope await would run
   // once on first import and then hold that result forever.
@@ -107,10 +154,14 @@ export default async function TreatmentHighlights() {
   // An unresolved slug is dropped rather than rendering a broken card —
   // the same defensive pattern HOME_POPULAR_SLUGS uses elsewhere.
   const all = await getTreatments();
-  const highlights = HIGHLIGHT_ENTRIES.map((entry): Highlight | null => {
-    const treatment = all.find((t) => t.slug === entry.slug);
-    return treatment ? { treatment, facts: entry.facts, featured: entry.featured } : null;
-  }).filter((item): item is Highlight => item !== null);
+  const highlights = source
+    .map((entry): Highlight | null => {
+      const treatment = all.find((t) => t.slug === entry.slug);
+      return treatment
+        ? { treatment, facts: entry.facts, featured: entry.featured, badge: entry.badge }
+        : null;
+    })
+    .filter((item): item is Highlight => item !== null);
 
   if (highlights.length === 0) return null;
 
@@ -126,9 +177,9 @@ export default async function TreatmentHighlights() {
       <Container>
         <SectionHeading
           align="left"
-          eyebrow="Signature Technology"
-          title="Treatment Highlights"
-          description="A few of the technologies we're especially proud to offer — some exclusive to Healthy Look in Bali, all chosen for what they do for you."
+          eyebrow={eyebrow || DEFAULT_EYEBROW}
+          title={title || DEFAULT_TITLE}
+          description={description || DEFAULT_DESCRIPTION}
           className="lg:max-w-2xl"
         />
 
@@ -166,10 +217,15 @@ export default async function TreatmentHighlights() {
                   <span className="flex flex-wrap items-center gap-x-3 gap-y-2">
                     {featured.treatment.name}
                     {/* Same pill as the "Most Popular" badge on the
-                        Treatments section, so the two read as one system. */}
-                    <span className="rounded-full bg-primary/10 px-2.5 py-1 font-sans text-nano font-semibold uppercase tracking-caps text-primary-strong">
-                      New
-                    </span>
+                        Treatments section, so the two read as one system.
+                        Optional now that the featured treatment is a choice:
+                        "New" is only true of whatever is actually launching,
+                        so it travels with the entry rather than the layout. */}
+                    {featured.badge && (
+                      <span className="rounded-full bg-primary/10 px-2.5 py-1 font-sans text-nano font-semibold uppercase tracking-caps text-primary-strong">
+                        {featured.badge}
+                      </span>
+                    )}
                   </span>
                   <ArrowUpRightIcon className="mt-1.5 h-4 w-4 shrink-0 text-primary opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                 </h3>

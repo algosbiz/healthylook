@@ -24,6 +24,13 @@ const sectionProjection = `{
   items[]{
     ...,
     image ${imageProjection}
+  },
+  // Treatment highlights stores a reference per card; the renderer wants the
+  // slug, so it can look the treatment up in the merged catalogue rather than
+  // trusting a second copy of the name and photo.
+  highlights[]{
+    ...,
+    "slug": treatment->slug.current
   }
 }`;
 
