@@ -140,6 +140,11 @@ export const siteSettings = defineType({
       type: "array",
       group: "contact",
       of: [defineArrayMember({ type: "string" })],
+      // This list is what the enquiry dropdown actually renders, and it went a
+      // release without a new device on it. Saying so here is the cheapest
+      // place to catch that next time.
+      description:
+        'Offered in the enquiry form\'s treatment dropdown, in this order. "Not sure yet" is always first and is not listed here. Add a new device here when it launches, or visitors have no way to ask for it. · ID: Tampil di dropdown treatment pada form enquiry, sesuai urutan ini. "Not sure yet" selalu paling atas dan tidak perlu ditulis. Tambahkan device baru ke sini saat diluncurkan, kalau tidak pengunjung tidak punya cara memilihnya.',
     }),
 
     // ── Clinic content ────────────────────────────────────────────────
