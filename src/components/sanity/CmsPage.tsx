@@ -1,4 +1,5 @@
 import PageBuilder from "@/components/sanity/PageBuilder";
+import { PageBreadcrumbJsonLd } from "@/components/shared/BreadcrumbJsonLd";
 import { getSanityPage } from "@/sanity/lib/content";
 
 /**
@@ -13,5 +14,10 @@ export default async function CmsPage({ path }: { path: string }) {
       `Published Sanity page could not be loaded for ${path}. Check the project, dataset, and SANITY_API_READ_TOKEN.`,
     );
   }
-  return <PageBuilder sections={page.sections} />;
+  return (
+    <>
+      <PageBreadcrumbJsonLd page={page} />
+      <PageBuilder sections={page.sections} />
+    </>
+  );
 }

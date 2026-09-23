@@ -6,6 +6,7 @@ import ManagedPage from "@/components/sanity/ManagedPage";
 import { getSanityPage } from "@/sanity/lib/content";
 import { resolvePageMetadata } from "@/sanity/lib/metadata";
 import { TREATMENT_SEO } from "@/data/seo";
+import { TREATMENTS_CRUMB } from "@/lib/breadcrumbs";
 
 /**
  * /eye-rejuvenaton-treatment — the one treatment page that does not live
@@ -47,7 +48,9 @@ export default async function EyeRejuvenationPage() {
   if (!treatment) notFound();
 
   return (
-    <ManagedPage page={sanityPage}>
+    // Its URL is top-level, but it is a treatment like every other: the
+    // breadcrumb says so whichever of the two bodies renders.
+    <ManagedPage page={sanityPage} breadcrumbParent={TREATMENTS_CRUMB}>
       <TreatmentDetail treatment={treatment} />
     </ManagedPage>
   );

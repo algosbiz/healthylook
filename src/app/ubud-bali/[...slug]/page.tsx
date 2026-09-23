@@ -4,6 +4,7 @@ import TreatmentDetail from "@/components/treatment/TreatmentDetail";
 import { getTreatments, getTreatmentBySlug } from "@/lib/site-content";
 import { getTreatmentSeo } from "@/data/seo";
 import PageBuilder from "@/components/sanity/PageBuilder";
+import { PageBreadcrumbJsonLd } from "@/components/shared/BreadcrumbJsonLd";
 import { getSanityPage } from "@/sanity/lib/content";
 import { resolveTreatmentMetadata } from "@/sanity/lib/metadata";
 
@@ -74,7 +75,14 @@ export default async function TreatmentPage({
   const { slug } = await params;
   const joinedSlug = slug.join("/");
   const sanityPage = await getSanityPage(`/ubud-bali/${joinedSlug}`);
-  if (sanityPage) return <PageBuilder sections={sanityPage.sections} />;
+  if (sanityPage) {
+    return (
+      <>
+        <PageBreadcrumbJsonLd page={sanityPage} />
+        <PageBuilder sections={sanityPage.sections} />
+      </>
+    );
+  }
 
   const treatment = await getTreatmentBySlug(joinedSlug);
   // `treatment.path` means this treatment's real URL is elsewhere, so this

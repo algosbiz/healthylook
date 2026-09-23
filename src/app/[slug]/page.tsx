@@ -15,6 +15,8 @@ import {
   getSanityTopLevelPageSlugs,
 } from "@/sanity/lib/content";
 import { sanityImageUrl } from "@/sanity/lib/image";
+import BreadcrumbJsonLd, { PageBreadcrumbJsonLd } from "@/components/shared/BreadcrumbJsonLd";
+import { BLOG_CRUMB, HOME_CRUMB, toHeroCrumbs } from "@/lib/breadcrumbs";
 
 /**
  * The clinic's long-form articles, at the same top-level URLs the live site
@@ -102,22 +104,27 @@ export default async function ArticlePage({
 }) {
   const { slug } = await params;
   const sanityPage = await getSanityPage(`/${slug}`);
-  if (sanityPage) return <PageBuilder sections={sanityPage.sections} />;
+  if (sanityPage) {
+    return (
+      <>
+        <PageBreadcrumbJsonLd page={sanityPage} />
+        <PageBuilder sections={sanityPage.sections} />
+      </>
+    );
+  }
 
   const sanityPost = await getSanityPost(slug);
   if (sanityPost) {
     const image = sanityImageUrl(sanityPost.coverImage) || "/images/clinic/clinic-04.jpg";
+    const trail = [HOME_CRUMB, BLOG_CRUMB, { name: sanityPost.title, path: `/${sanityPost.slug}` }];
     return (
       <>
+        <BreadcrumbJsonLd trail={trail} />
         <PageHero
           eyebrow={sanityPost.categories?.[0]?.title || "Our Blog"}
           title={sanityPost.title}
           description={sanityPost.excerpt}
-          crumbs={[
-            { label: "Home", href: "/" },
-            { label: "Our Blog", href: "/our-blog" },
-            { label: sanityPost.title },
-          ]}
+          crumbs={toHeroCrumbs(trail)}
           image={image}
           imageAlt={sanityPost.coverImage?.alt || "Healthy Look Aesthetic clinic, Ubud"}
         />
@@ -141,18 +148,20 @@ export default async function ArticlePage({
   // "Liquid Lifting in Bali"), so the breadcrumb uses it where it exists.
   const blogPosts = await getBlogPosts();
   const listing = blogPosts.find((post) => post.articleSlug === slug);
+  const trail = [
+    HOME_CRUMB,
+    BLOG_CRUMB,
+    { name: listing?.title ?? article.title, path: `/${article.slug}` },
+  ];
 
   return (
     <>
+      <BreadcrumbJsonLd trail={trail} />
       <PageHero
         eyebrow="Our Blog"
         title={article.title}
         description={article.description}
-        crumbs={[
-          { label: "Home", href: "/" },
-          { label: "Our Blog", href: "/our-blog" },
-          { label: listing?.title ?? article.title },
-        ]}
+        crumbs={toHeroCrumbs(trail)}
         image="/images/clinic/clinic-04.jpg"
         imageAlt="Healthy Look Aesthetic clinic, Ubud"
       />

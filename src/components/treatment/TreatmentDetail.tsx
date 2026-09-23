@@ -16,6 +16,8 @@ import { CheckIcon, ArrowUpRightIcon, WhatsAppIcon, ClockIcon } from "@/componen
 import { formatIDR } from "@/lib/format";
 import { treatmentHref, TREATMENT_CATEGORIES, type Treatment } from "@/data/treatments";
 import IconList from "@/components/shared/IconList";
+import BreadcrumbJsonLd from "@/components/shared/BreadcrumbJsonLd";
+import { HOME_CRUMB, TREATMENTS_CRUMB, toHeroCrumbs } from "@/lib/breadcrumbs";
 import {
   isIconDisplay,
   isSectionTable,
@@ -521,8 +523,13 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
   // show here, so the honest fix is no sidebar photo: the "At a glance"
   // card now opens the column directly.
 
+  // treatmentHref, not /ubud-bali/<slug>: Eye Rejuvenation lives at the
+  // site root and its breadcrumb has to point at the URL that exists.
+  const trail = [HOME_CRUMB, TREATMENTS_CRUMB, { name: treatment.name, path: treatmentHref(treatment) }];
+
   return (
     <>
+      <BreadcrumbJsonLd trail={trail} />
       <PageHero
         eyebrow={category?.label}
         // The live page's own <h1>, not the catalogue name — see the `h1`
@@ -530,11 +537,7 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
         // keeps `name`: a crumb reading "Rediscover Radiance with Profhilo
         // in Ubud" would be the longest thing on the page.
         title={treatment.h1 ?? treatment.name}
-        crumbs={[
-          { label: "Home", href: "/" },
-          { label: "Treatments", href: "/ubud-bali" },
-          { label: treatment.name },
-        ]}
+        crumbs={toHeroCrumbs(trail)}
         description={treatment.shortDescription}
         image={heroImage}
         imageAlt={`${treatment.name} at Healthy Look Aesthetic, Ubud`}
