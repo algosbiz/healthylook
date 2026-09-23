@@ -40,6 +40,18 @@ import {
 import { whatsappHrefFor } from "@/lib/constants";
 
 /**
+ * "Why here → How we treat you" (#safety) and "Who performs this → Treated
+ * by a licensed doctor" (#doctor) are switched off at the client's request
+ * (Sept 2026), but kept rather than deleted in case they come back.
+ *
+ * Off means not rendered at all, not hidden with CSS: the markup never
+ * reaches the HTML, so there is nothing for Google to crawl or index. Flip
+ * either to true to bring its section back exactly as it was.
+ */
+const SHOW_SAFETY_SECTION = false;
+const SHOW_DOCTOR_SECTION = false;
+
+/**
  * The treatment detail page body, shared by both routes that render one:
  * /ubud-bali/[...slug] for the 31 treatments that live under /ubud-bali/,
  * and /eye-rejuvenaton-treatment for the one that does not.
@@ -1181,6 +1193,7 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
 
       {/* Clinic safety commitments — the clinic's own published protocols,
           shown on every treatment page because they apply to every one. */}
+      {SHOW_SAFETY_SECTION && (
       <section id="safety" className="scroll-mt-24 bg-ink-brown py-section text-white">
         <Container>
           {/* ── CLIENT REVISION, CORRECTED — "TREATMENT JOURNEY" REVERTS TO
@@ -1225,6 +1238,7 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
           </div>
         </Container>
       </section>
+      )}
 
       {/* Where the hero claims "Doctor-performed", this is where that claim
           is evidenced, directly after the safety protocols that lead into it.
@@ -1234,7 +1248,7 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
           that with two doctors' portraits would restate the wrong claim in
           pictures. Those pages still name the performer in the hero badge
           and in the At-a-glance box. */}
-      {isDoctorPerformed && (
+      {SHOW_DOCTOR_SECTION && isDoctorPerformed && (
         <div id="doctor" className="scroll-mt-24">
           <DoctorCredit
             as={copy.headingLevels.doctor}
