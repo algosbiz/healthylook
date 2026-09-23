@@ -6,7 +6,7 @@ import {
   MapPinIcon,
   PhoneIcon,
 } from "@/components/ui/icons";
-import type { SiteCopy } from "@/lib/site-copy";
+import type { HeaderCopy } from "@/lib/site-copy";
 
 /**
  * The slim strip above the navigation, over the hero only.
@@ -44,7 +44,7 @@ const socialIcons = {
   whatsapp: WhatsAppIcon,
 };
 
-export default function TopBar({ copy }: { copy: SiteCopy }) {
+export default function TopBar({ copy }: { copy: HeaderCopy }) {
   return (
     <div className="hidden bg-background lg:block">
       <Container className="flex h-11 items-center justify-between gap-8">

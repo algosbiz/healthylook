@@ -87,3 +87,33 @@ export type SiteCopy = {
     relatedEyebrow: string;
   };
 };
+
+/**
+ * The slice of SiteCopy the header actually reads.
+ *
+ * <Header> is a client component, so whatever it is handed is serialized
+ * into every page's HTML. Handed the whole object, every page shipped all
+ * of the site's copy, including labels for sections that are switched off
+ * (the treatment page's "Why Here / How we treat you"), which left their
+ * text in the source for crawlers to find. A header field that isn't
+ * listed here is a type error in the header, not a silent blank.
+ */
+const HEADER_COPY_KEYS = [
+  "siteName",
+  "bookingHref",
+  "bookingLabel",
+  "whatsappNumber",
+  "phoneE164",
+  "phoneDisplay",
+  "email",
+  "openingHours",
+  "socialLinks",
+  "mapsHref",
+  "address",
+] as const satisfies readonly (keyof SiteCopy)[];
+
+export type HeaderCopy = Pick<SiteCopy, (typeof HEADER_COPY_KEYS)[number]>;
+
+export function toHeaderCopy(copy: SiteCopy): HeaderCopy {
+  return Object.fromEntries(HEADER_COPY_KEYS.map((key) => [key, copy[key]])) as HeaderCopy;
+}

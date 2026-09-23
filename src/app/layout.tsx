@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import PublicChrome from "@/components/PublicChrome";
 import { buildNavItems } from "@/components/header/navItems";
 import { getSiteCopy, getTreatments, type SiteCopy } from "@/lib/site-content";
+import { toHeaderCopy } from "@/lib/site-copy";
 import { SITE_URL } from "@/lib/constants";
 import StickyCTA from "@/components/ui/StickyCTA";
 import WhatsAppFloatingButton from "@/components/ui/WhatsAppFloatingButton";
@@ -219,7 +220,7 @@ export default async function RootLayout({
             Skip to content
           </a>
 
-          <Header navItems={navItems} copy={copy} />
+          <Header navItems={navItems} copy={toHeaderCopy(copy)} />
         </PublicChrome>
 
         {/* flex-1 pushes the footer to the bottom of the viewport even when

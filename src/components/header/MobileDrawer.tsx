@@ -3,7 +3,7 @@ import MobileNavItem from "./MobileNavItem";
 import Button from "@/components/ui/Button";
 import { CloseIcon, WhatsAppIcon, PhoneIcon, MailIcon } from "@/components/ui/icons";
 import { whatsappHrefFor } from "@/lib/constants";
-import type { SiteCopy } from "@/lib/site-copy";
+import type { HeaderCopy } from "@/lib/site-copy";
 
 /**
  * The slide-out mobile menu. Owns no state itself (`open`/`onClose` are
@@ -25,7 +25,7 @@ export default function MobileDrawer({
   // compiled list so the drawer still renders without it.
   items = NAV_ITEMS,
 }: {
-  copy: SiteCopy;
+  copy: HeaderCopy;
   open: boolean;
   onClose: () => void;
   items?: NavItem[];

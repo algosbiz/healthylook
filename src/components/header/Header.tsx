@@ -11,7 +11,7 @@ import MobileDrawer from "./MobileDrawer";
 import { NAV_ITEMS, type NavItem } from "./navItems";
 import TopBar from "./TopBar";
 import { whatsappHrefFor } from "@/lib/constants";
-import type { SiteCopy } from "@/lib/site-copy";
+import type { HeaderCopy } from "@/lib/site-copy";
 
 /**
  * THE HEADER — two states, and a split first one.
@@ -111,7 +111,7 @@ export default function Header({
 }: {
   navItems?: NavItem[];
   /** Resolved on the server — this is a client component and cannot read the CMS. */
-  copy: SiteCopy;
+  copy: HeaderCopy;
 }) {
   const pathname = usePathname();
   const overHero = HERO_ROUTES.some((pattern) => pattern.test(pathname));
