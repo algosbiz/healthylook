@@ -160,8 +160,27 @@ const nextConfig: NextConfig = {
    * ranking signal to the real URL rather than treating both as
    * duplicates.
    */
+  /**
+   * Next's own trailing-slash redirect (`/foo/` → `/foo`, 308) is switched
+   * off and re-added by hand at the end of `redirects()` below.
+   *
+   * Left to itself, Next puts that rule ahead of every rule in this file,
+   * so an old WordPress URL with its slash — which is how WordPress
+   * published nearly all of them — went through two hops:
+   *
+   *   /lip-filler-in-ubud/ → 308 → /lip-filler-in-ubud → 301 → /ubud-bali/lip-filler
+   *
+   * It landed in the right place, but Ahrefs reports the first hop as the
+   * redirect, pointing at a URL that is itself a redirect, and every hop
+   * is one more chance for a crawler to give up. With the order under our
+   * control, each rule here accepts an optional trailing slash and
+   * answers in one hop; only paths no rule knows fall through to the
+   * generic slash-stripping one.
+   */
+  skipTrailingSlashRedirect: true,
+
   async redirects() {
-    return [
+    const routes = [
       { source: "/about", destination: "/our-doctor", permanent: true },
       { source: "/treatments", destination: "/ubud-bali", permanent: true },
       { source: "/treatments/:path*", destination: "/ubud-bali/:path*", permanent: true },
@@ -228,10 +247,8 @@ const nextConfig: NextConfig = {
        *    code would only invalidate what crawlers have already recorded.
        *
        * 2. No trailing slashes, though most of the sheet's rows carry one.
-       *    Next normalises `/foo/` to `/foo` (308) before redirect matching
-       *    runs, so a source written as `/foo/` would never match anything.
-       *    Written this way both spellings work; the slashed form simply
-       *    arrives via one extra hop.
+       *    The `{/}?` added at the bottom of redirects() makes every source
+       *    here match both spellings, in a single hop.
        *
        * 3. The sheet's first block spells its URLs with a doubled slash
        *    after the hostname — `healthylook-aesthetic.com//botox-in-ubud-bali`.
@@ -311,6 +328,15 @@ const nextConfig: NextConfig = {
        * same final destination instead.
        */
       { source: "/slimming-body-contouring-ubud", destination: "/ubud-bali#body-treatments", statusCode: 301 },
+    ];
+
+    return [
+      // `{/}?` is an optional trailing slash, so `/foo` and `/foo/` both
+      // match and go straight to the destination. Sources above are
+      // written without the slash; this is the one place it is added.
+      ...routes.map((route) => ({ ...route, source: `${route.source}{/}?` })),
+      // Next's built-in rule, re-added last (see skipTrailingSlashRedirect).
+      { source: "/:path+/", destination: "/:path+", permanent: true },
     ];
   },
 };
