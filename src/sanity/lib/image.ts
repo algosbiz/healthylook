@@ -10,11 +10,27 @@ const builder = createImageUrlBuilder({
   dataset: sanityDataset,
 });
 
+/**
+ * Studio saves an image field the moment any of its sub-fields is touched,
+ * so an editor who types the alt text before the upload finishes, or removes
+ * the file and keeps the alt, leaves `{ _type, alt }` with no `asset`. The
+ * builder throws on that, and because the root layout reads every treatment
+ * for the nav, one such field turned every server render on the site into a
+ * 500 — the PRP page's "What is PRP Treatment?" block did exactly this. A
+ * field with no file is an absent image, not an error.
+ */
+function hasImageFile(source: SanityImageSource): boolean {
+  if (typeof source !== "object") return true;
+  // A bare reference or asset document is itself the file.
+  if ("_ref" in source || "_id" in source || "url" in source) return true;
+  return Boolean((source as { asset?: unknown }).asset);
+}
+
 export function sanityImageUrl(
   source: SanityImageSource | null | undefined,
   width = 1600,
 ): string | null {
-  if (!isSanityConfigured || !source) return null;
+  if (!isSanityConfigured || !source || !hasImageFile(source)) return null;
   return builder.image(source).auto("format").fit("max").width(width).url();
 }
 
