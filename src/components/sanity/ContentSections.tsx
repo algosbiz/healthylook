@@ -149,13 +149,25 @@ export function FeatureGridBlock({ section }: { section: FeatureGridSection }) {
           })}
         />
       ) : (
-      <div className={`mt-14 grid gap-px bg-hairline ${gridColumns[section.columns || 3]}`}>
+      // ── THE RULES ARE BORDERS, NOT GAPS ──────────────────────────────
+      // These used to be 1px gaps over a hairline-coloured grid, which only
+      // works when the cards fill every slot. Five cards across three
+      // columns leaves one slot empty, and the gap colour filled it as a
+      // solid cream block — on the homepage, both grids on /our-doctor,
+      // and /special-offers at tablet width. The card colour now sits
+      // behind the whole grid, so an empty slot reads as one more card
+      // with nothing in it, and each card draws its own right and bottom
+      // rule. The negative margins push the last column's right rule and
+      // the last row's bottom rule outside the clipped box, which leaves
+      // only the rules between cards, the same as before.
+      <div className={`mt-14 overflow-hidden ${dark ? "bg-ink-brown" : "bg-paper"}`}>
+      <div className={`-mb-px -mr-px grid ${gridColumns[section.columns || 3]}`}>
         {section.items.map((item, index) => {
           const src = sanityImageUrl(item.image);
           const isTransferOffer = item.title === "Enjoy the Complimentary Transfer*";
           const isAirlineOffer = item.title === "Special Discount for Airline Staffs";
           return (
-            <Reveal key={item._key} delay={index * 60} className={dark ? "bg-ink-brown" : "bg-paper"}>
+            <Reveal key={item._key} delay={index * 60} className="border-b border-r border-hairline">
               <article className="h-full p-7 lg:p-9">
                 {src && item.image && (
                   <Img
@@ -206,6 +218,7 @@ export function FeatureGridBlock({ section }: { section: FeatureGridSection }) {
             </Reveal>
           );
         })}
+      </div>
       </div>
       )}
     </SectionShell>
