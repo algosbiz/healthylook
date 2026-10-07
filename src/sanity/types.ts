@@ -178,8 +178,9 @@ export type SanityTreatmentHighlight = SanityKeyed & {
  * and images. No class names or arbitrary HTML enter Sanity.
  *
  * Treatment highlights is the one component whose content is not a collection,
- * so it carries its own optional fields here. All of them empty is the normal
- * state and means "render what the component ships with".
+ * so it carries its own optional fields here; Doctors carries only its
+ * heading. All of them empty is the normal state and means "render what the
+ * component ships with".
  */
 export type CuratedSection = SectionBase<"curatedSection"> & {
   component: CuratedSectionComponent;
@@ -187,6 +188,9 @@ export type CuratedSection = SectionBase<"curatedSection"> & {
   highlightsTitle?: string;
   highlightsIntro?: string;
   highlights?: SanityTreatmentHighlight[];
+  doctorsEyebrow?: string;
+  doctorsTitle?: string;
+  doctorsIntro?: string;
 };
 
 export type PricingPromisePoint = SanityKeyed & {

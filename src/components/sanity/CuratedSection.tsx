@@ -71,7 +71,13 @@ export default async function CuratedSection({ section }: { section: CuratedSect
     case "whyUs":
       return <WhyUs />;
     case "doctors":
-      return <Doctors />;
+      return (
+        <Doctors
+          eyebrow={section.doctorsEyebrow}
+          title={section.doctorsTitle}
+          description={section.doctorsIntro}
+        />
+      );
     case "testimonials":
       return <Testimonials />;
     case "clinicExperience":

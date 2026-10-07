@@ -1,10 +1,13 @@
 import { defineArrayMember, defineField, defineType } from "sanity";
+import { DOCTORS_SECTION_HEADING } from "../../../../data/doctors";
 import { sectionSettingsFields } from "./shared";
 
-/** Only Treatment highlights carries editable content of its own, so its
- *  fields stay out of the way for the other twelve components. */
+/** Only Treatment highlights and Doctors carry editable content of their
+ *  own, so each one's fields stay out of the way for the other components. */
 const onlyTreatmentHighlights = ({ parent }: { parent?: unknown }) =>
   (parent as { component?: string })?.component !== "treatmentHighlights";
+const onlyDoctors = ({ parent }: { parent?: unknown }) =>
+  (parent as { component?: string })?.component !== "doctors";
 
 const components = [
   ["Homepage hero", "homeHero"],
@@ -92,6 +95,41 @@ export const curatedSection = defineType({
       description:
         "Empty = every card the website comes with is shown. Add items and only the ones picked here are shown — this list replaces the built-in one, it does not add to it. So either leave it empty, or list every card that should appear. · ID: Kosong = semua kartu bawaan website tampil. Kalau diisi, hanya kartu yang dipilih di sini yang tampil — daftar ini mengganti daftar bawaan, bukan menambahnya. Jadi: kosongkan saja, atau tulis semua kartu yang ingin ditampilkan.",
       validation: (Rule) => Rule.max(12),
+    }),
+
+    /* ── DOCTORS HEADING, MADE EDITABLE ───────────────────────────────
+     * The doctor cards already come from the Doctor collection; only the
+     * heading above them was a constant in the component. Same rule as
+     * the highlights fields: empty renders the current wording, which the
+     * placeholder shows so nobody has to guess what "empty" means.
+     */
+    defineField({
+      name: "doctorsEyebrow",
+      title: "Eyebrow",
+      type: "string",
+      hidden: onlyDoctors,
+      placeholder: DOCTORS_SECTION_HEADING.eyebrow,
+      description:
+        "Small line above the heading. Leave empty to keep the current wording. · ID: Baris kecil di atas judul. Kosongkan untuk memakai teks yang sekarang.",
+    }),
+    defineField({
+      name: "doctorsTitle",
+      title: "Heading",
+      type: "string",
+      hidden: onlyDoctors,
+      placeholder: DOCTORS_SECTION_HEADING.title,
+      description:
+        "Leave empty to keep the current wording. · ID: Kosongkan untuk memakai teks yang sekarang.",
+    }),
+    defineField({
+      name: "doctorsIntro",
+      title: "Intro paragraph",
+      type: "text",
+      rows: 3,
+      hidden: onlyDoctors,
+      placeholder: DOCTORS_SECTION_HEADING.description,
+      description:
+        "Leave empty to keep the current wording. · ID: Kosongkan untuk memakai teks yang sekarang.",
     }),
 
     ...sectionSettingsFields,

@@ -4,6 +4,7 @@ import DoctorProfile from "@/components/shared/DoctorProfile";
 import Reveal from "@/components/ui/Reveal";
 import Button from "@/components/ui/Button";
 import { getDoctors } from "@/lib/site-content";
+import { DOCTORS_SECTION_HEADING } from "@/data/doctors";
 
 /**
  * SECTION 07 — DOCTOR / TEAM (homepage placement)
@@ -27,16 +28,28 @@ import { getDoctors } from "@/lib/site-content";
  *
  * Together that takes the section from roughly three screens to under one.
  * Nothing was deleted — /our-doctor still carries every word.
+ *
+ * The heading props are Studio overrides (curatedSection's `doctors*`
+ * fields). Each one left empty falls back on its own, so an editor can
+ * change just the title without having to retype the other two.
  */
-export default async function Doctors() {
+export default async function Doctors({
+  eyebrow,
+  title,
+  description,
+}: {
+  eyebrow?: string;
+  title?: string;
+  description?: string;
+} = {}) {
   const doctors = await getDoctors();
   return (
     <section className="bg-background py-section">
       <Container>
         <SectionHeading
-          eyebrow="Our Doctors"
-          title="The people who will actually treat you"
-          description="Every consultation, treatment plan, and injection is handled by a licensed doctor."
+          eyebrow={eyebrow || DOCTORS_SECTION_HEADING.eyebrow}
+          title={title || DOCTORS_SECTION_HEADING.title}
+          description={description || DOCTORS_SECTION_HEADING.description}
         />
 
         {/* `md`, not `lg`: two portrait cards side by side are comfortable

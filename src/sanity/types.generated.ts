@@ -362,6 +362,9 @@ export type CuratedSection = {
   highlights?: Array<{
     _key: string;
   } & TreatmentHighlight>;
+  doctorsEyebrow?: string;
+  doctorsTitle?: string;
+  doctorsIntro?: string;
   anchor?: string;
   isHidden?: boolean;
 };
@@ -882,6 +885,9 @@ export type PageByPathQueryResult = {
       badge?: string;
       slug: string | null;
     }> | null;
+    doctorsEyebrow?: string;
+    doctorsTitle?: string;
+    doctorsIntro?: string;
     anchor?: string;
     isHidden?: boolean;
     image: null;
