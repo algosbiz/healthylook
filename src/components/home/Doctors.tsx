@@ -4,7 +4,8 @@ import DoctorProfile from "@/components/shared/DoctorProfile";
 import Reveal from "@/components/ui/Reveal";
 import Button from "@/components/ui/Button";
 import { getDoctors } from "@/lib/site-content";
-import { DOCTORS_SECTION_HEADING } from "@/data/doctors";
+import { curatedCopy, type SectionCopy } from "@/data/sectionCopy";
+import { subheadingLevel, type HeadingLevel } from "@/lib/headings";
 
 /**
  * SECTION 07 — DOCTOR / TEAM (homepage placement)
@@ -29,27 +30,23 @@ import { DOCTORS_SECTION_HEADING } from "@/data/doctors";
  * Together that takes the section from roughly three screens to under one.
  * Nothing was deleted — /our-doctor still carries every word.
  *
- * The heading props are Studio overrides (curatedSection's `doctors*`
- * fields). Each one left empty falls back on its own, so an editor can
- * change just the title without having to retype the other two.
+ * `copy` is the section's wording from Studio (curatedSection's `doctors*`
+ * fields), each field already falling back to its default on its own, so an
+ * editor can change just the heading without retyping the rest.
  */
 export default async function Doctors({
-  eyebrow,
-  title,
-  description,
-}: {
-  eyebrow?: string;
-  title?: string;
-  description?: string;
-} = {}) {
+  copy = curatedCopy("doctors"),
+  as = "h2",
+}: { copy?: SectionCopy<"doctors">; as?: HeadingLevel } = {}) {
   const doctors = await getDoctors();
   return (
     <section className="bg-background py-section">
       <Container>
         <SectionHeading
-          eyebrow={eyebrow || DOCTORS_SECTION_HEADING.eyebrow}
-          title={title || DOCTORS_SECTION_HEADING.title}
-          description={description || DOCTORS_SECTION_HEADING.description}
+          as={as}
+          eyebrow={copy.eyebrow}
+          title={copy.title}
+          description={copy.intro}
         />
 
         {/* `md`, not `lg`: two portrait cards side by side are comfortable
@@ -58,13 +55,19 @@ export default async function Doctors({
             removing. */}
         <div className="mt-16 grid gap-14 md:grid-cols-2 md:gap-12 lg:gap-20">
           {doctors.map((doctor, index) => (
-            <DoctorProfile key={doctor.id} doctor={doctor} index={index} compact />
+            <DoctorProfile
+              key={doctor.id}
+              doctor={doctor}
+              index={index}
+              compact
+              headingAs={subheadingLevel(as)}
+            />
           ))}
         </div>
 
         <Reveal delay={100} className="mt-16 flex justify-center">
-          <Button href="/our-doctor" variant="outline" withArrow>
-            Read their full profiles
+          <Button href={copy.buttonHref} variant="outline" withArrow>
+            {copy.buttonLabel}
           </Button>
         </Reveal>
       </Container>

@@ -42,11 +42,26 @@ export const siteSettings = defineType({
       readOnly: true,
       initialValue: "Healthy Look Aesthetic",
     }),
+    /* ── HIDDEN: FIELDS THE SITE DOES NOT READ ─────────────────────────
+     * Announcement bar, Default SEO and Brand intro could be filled in and
+     * published, and nothing changed: no component renders the first, the
+     * layout builds its metadata from Tagline and Site description, and
+     * Brand intro was taken out of the homepage design on purpose. A field
+     * that silently does nothing is worse than no field, so they are hidden
+     * rather than deleted — the stored values stay in the dataset for
+     * whoever wires one up.
+     *
+     * The hero's headline and subheadline moved onto the Homepage hero
+     * section itself (curatedSection's `hero*` fields), next to the rest of
+     * the hero's wording. The old headline only ever reached a screen
+     * reader; the visible one was hard-coded.
+     */
     defineField({
       name: "announcement",
       title: "Announcement bar",
       type: "string",
       group: "brand",
+      hidden: true,
       validation: (Rule) => Rule.max(140),
     }),
     defineField({ name: "tagline", title: "Tagline", type: "string", group: "brand" }),
@@ -58,13 +73,20 @@ export const siteSettings = defineType({
       group: "brand",
       description: "Used as the default meta description and in structured data.",
     }),
-    defineField({ name: "heroHeadline", title: "Home hero headline", type: "string", group: "brand" }),
+    defineField({
+      name: "heroHeadline",
+      title: "Home hero headline",
+      type: "string",
+      group: "brand",
+      hidden: true,
+    }),
     defineField({
       name: "heroSubheadline",
       title: "Home hero subheadline",
       type: "text",
       rows: 2,
       group: "brand",
+      hidden: true,
     }),
     defineField({
       name: "brandIntro",
@@ -72,7 +94,7 @@ export const siteSettings = defineType({
       type: "text",
       rows: 3,
       group: "brand",
-      description: "One sentence. Opens the brand story section.",
+      hidden: true,
     }),
     defineField({
       name: "brandStory",
@@ -271,7 +293,7 @@ export const siteSettings = defineType({
       ],
     }),
 
-    defineField({ name: "defaultSeo", title: "Default SEO", type: "seo", group: "seo" }),
+    defineField({ name: "defaultSeo", title: "Default SEO", type: "seo", group: "seo", hidden: true }),
   ],
   preview: {
     prepare: () => ({ title: "Site settings" }),

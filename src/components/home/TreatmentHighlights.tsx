@@ -6,6 +6,8 @@ import TreatmentThumb from "@/components/shared/TreatmentThumb";
 import { CheckIcon, ArrowUpRightIcon } from "@/components/ui/icons";
 import { treatmentHref, type Treatment } from "@/data/treatments";
 import { getTreatments } from "@/lib/site-content";
+import { curatedCopy, type SectionCopy } from "@/data/sectionCopy";
+import { subheadingLevel, type HeadingLevel } from "@/lib/headings";
 
 /**
  * SECTION — TREATMENT HIGHLIGHTS
@@ -117,11 +119,6 @@ type Highlight = {
   badge?: string;
 };
 
-const DEFAULT_EYEBROW = "Signature Technology";
-const DEFAULT_TITLE = "Treatment Highlights";
-const DEFAULT_DESCRIPTION =
-  "A few of the technologies we're especially proud to offer — some exclusive to Healthy Look in Bali, all chosen for what they do for you.";
-
 /**
  * ── EVERY PROP IS AN OVERRIDE, NOT A REQUIREMENT ────────────────────────
  * The clinic can now choose the treatments and write the bullets in Studio
@@ -136,15 +133,14 @@ const DEFAULT_DESCRIPTION =
  */
 export default async function TreatmentHighlights({
   entries,
-  eyebrow,
-  title,
-  description,
+  copy = curatedCopy("treatmentHighlights"),
+  as = "h2",
 }: {
   entries?: HighlightEntry[];
-  eyebrow?: string;
-  title?: string;
-  description?: string;
+  copy?: SectionCopy<"treatmentHighlights">;
+  as?: HeadingLevel;
 } = {}) {
+  const CardHeading = subheadingLevel(as);
   const source = entries?.length ? entries : HIGHLIGHT_ENTRIES;
 
   // Resolved in the component, not at module scope: the lookup goes
@@ -177,9 +173,10 @@ export default async function TreatmentHighlights({
       <Container>
         <SectionHeading
           align="left"
-          eyebrow={eyebrow || DEFAULT_EYEBROW}
-          title={title || DEFAULT_TITLE}
-          description={description || DEFAULT_DESCRIPTION}
+          as={as}
+          eyebrow={copy.eyebrow}
+          title={copy.title}
+          description={copy.intro}
           className="lg:max-w-2xl"
         />
 
@@ -213,7 +210,7 @@ export default async function TreatmentHighlights({
                 />
               </div>
               <div className="flex flex-col justify-center p-7 sm:col-span-3 sm:p-10">
-                <h3 className="flex items-start justify-between gap-3 font-sans text-h3 leading-tight text-ink transition-colors duration-300 group-hover:text-primary">
+                <CardHeading className="flex items-start justify-between gap-3 font-sans text-h3 leading-tight text-ink transition-colors duration-300 group-hover:text-primary">
                   <span className="flex flex-wrap items-center gap-x-3 gap-y-2">
                     {featured.treatment.name}
                     {/* Same pill as the "Most Popular" badge on the
@@ -228,7 +225,7 @@ export default async function TreatmentHighlights({
                     )}
                   </span>
                   <ArrowUpRightIcon className="mt-1.5 h-4 w-4 shrink-0 text-primary opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                </h3>
+                </CardHeading>
                 <p className="mt-4 measure font-sans text-copy leading-relaxed text-text-secondary">
                   {featured.treatment.shortDescription}
                 </p>
@@ -268,10 +265,10 @@ export default async function TreatmentHighlights({
                   position={treatment.imagePosition}
                 />
                 <div className="flex flex-1 flex-col p-7">
-                  <h3 className="flex items-start justify-between gap-3 font-sans text-h4 leading-tight text-ink transition-colors duration-300 group-hover:text-primary">
+                  <CardHeading className="flex items-start justify-between gap-3 font-sans text-h4 leading-tight text-ink transition-colors duration-300 group-hover:text-primary">
                     {treatment.name}
                     <ArrowUpRightIcon className="mt-1 h-4 w-4 shrink-0 text-primary opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                  </h3>
+                  </CardHeading>
                   <ul className="mt-5 flex flex-1 flex-col gap-2.5">
                     {facts.map((fact) => (
                       <li

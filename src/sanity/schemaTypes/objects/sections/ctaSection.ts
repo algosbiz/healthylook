@@ -1,5 +1,5 @@
 import { defineField, defineType } from "sanity";
-import { sectionSettingsFields } from "./shared";
+import { sectionSettingsFields, sectionHeadingLevelField } from "./shared";
 
 export const ctaSection = defineType({
   name: "ctaSection",
@@ -35,6 +35,7 @@ export const ctaSection = defineType({
       },
       initialValue: "brown",
     }),
+    sectionHeadingLevelField,
     ...sectionSettingsFields,
   ],
   preview: {

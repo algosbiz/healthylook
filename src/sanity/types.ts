@@ -2,6 +2,7 @@ import type { PortableTextBlock } from "@portabletext/types";
 import type { Treatment } from "@/data/treatments";
 import type { PricingSection } from "@/data/pricing";
 import type { Doctor } from "@/data/doctors";
+import type { CuratedCopyFieldName } from "@/data/sectionCopy";
 
 export type SanityKeyed = {
   _key: string;
@@ -42,6 +43,8 @@ type SectionBase<TType extends string> = SanityKeyed & {
   _type: TType;
   isHidden?: boolean;
   anchor?: string;
+  /** "h2" | "h3" | "h4", on the sections whose schema offers the choice. */
+  headingLevel?: string;
 };
 
 export type HeroSection = SectionBase<"heroSection"> & {
@@ -177,21 +180,18 @@ export type SanityTreatmentHighlight = SanityKeyed & {
  * live in related collections while bespoke blocks cover page-specific text
  * and images. No class names or arbitrary HTML enter Sanity.
  *
- * Treatment highlights is the one component whose content is not a collection,
- * so it carries its own optional fields here; Doctors carries only its
- * heading. All of them empty is the normal state and means "render what the
- * component ships with".
+ * Every component's wording is optional and per section; the field names
+ * come from CURATED_COPY in src/data/sectionCopy.ts, so they cannot drift
+ * from the Studio schema that is built from the same list. All of them empty
+ * is the normal state and means "render what the component ships with".
+ * Treatment highlights also carries its card list.
  */
-export type CuratedSection = SectionBase<"curatedSection"> & {
-  component: CuratedSectionComponent;
-  highlightsEyebrow?: string;
-  highlightsTitle?: string;
-  highlightsIntro?: string;
-  highlights?: SanityTreatmentHighlight[];
-  doctorsEyebrow?: string;
-  doctorsTitle?: string;
-  doctorsIntro?: string;
-};
+export type CuratedSection = SectionBase<"curatedSection"> &
+  Partial<Record<CuratedCopyFieldName, string>> & {
+    component: CuratedSectionComponent;
+    highlights?: SanityTreatmentHighlight[];
+    headingLevel?: string;
+  };
 
 export type PricingPromisePoint = SanityKeyed & {
   _type: "pricingPromisePoint";

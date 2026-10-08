@@ -4,6 +4,8 @@ import { isSanityHostedImage } from "@/sanity/lib/image";
 import Reveal from "@/components/ui/Reveal";
 import Container from "@/components/ui/Container";
 import { getPartners } from "@/lib/site-content";
+import { curatedCopy, type SectionCopy } from "@/data/sectionCopy";
+import type { HeadingLevel } from "@/lib/headings";
 
 /**
  * PARTNER BRANDS
@@ -40,7 +42,10 @@ import { getPartners } from "@/lib/site-content";
  * both edges, and they keep moving. The slight opacity lift on hover is all
  * that is left of the old treatment.
  */
-export default async function Partners() {
+export default async function Partners({
+  copy = curatedCopy("partners"),
+  as: Heading = "h2",
+}: { copy?: SectionCopy<"partners">; as?: HeadingLevel } = {}) {
   const partners = await getPartners();
   return (
     <section className="border-y border-hairline bg-background py-14 lg:py-16">
@@ -50,10 +55,10 @@ export default async function Partners() {
             replaced it with "Products & devices we use" — accurate, but
             it's their line to write, not mine, and a content audit flagged
             it as missing on all 28 pages. */}
-        <h2 className="sr-only">Only the Best Worldwide Products</h2>
+        <Heading className="sr-only">{copy.title}</Heading>
         <Reveal className="flex justify-center">
           <span aria-hidden="true" className="eyebrow text-muted">
-            Only the Best Worldwide Products
+            {copy.title}
           </span>
         </Reveal>
       </Container>

@@ -5,6 +5,7 @@ import Button from "@/components/ui/Button";
 import { ArrowUpRightIcon, VerifiedIcon } from "@/components/ui/icons";
 import { whatsappHrefFor } from "@/lib/constants";
 import type { Doctor } from "@/data/doctors";
+import type { SubheadingLevel } from "@/lib/headings";
 import { getSiteCopy } from "@/lib/site-content";
 
 /**
@@ -132,12 +133,15 @@ export default async function DoctorProfile({
   index,
   showCta = true,
   compact = false,
+  headingAs: NameHeading = "h3",
 }: {
   doctor: Doctor;
   index: number;
   showCta?: boolean;
   /** Homepage rendering: portrait, name, one paragraph, link. */
   compact?: boolean;
+  /** One level below the section heading the card sits under. */
+  headingAs?: SubheadingLevel;
 }) {
   const copy = await getSiteCopy();
   if (compact) {
@@ -162,7 +166,7 @@ export default async function DoctorProfile({
 
           <span className="mt-7 eyebrow text-primary-strong">{doctor.title}</span>
 
-          <h3 className="mt-4 font-sans text-h4 font-medium leading-tight text-ink">
+          <NameHeading className="mt-4 font-sans text-h4 font-medium leading-tight text-ink">
             <Link
               href="/our-doctor"
               // `-my-2.5 py-2.5` for the tap target: the name sat on a 25px
@@ -177,7 +181,7 @@ export default async function DoctorProfile({
               {doctor.name}
               <ArrowUpRightIcon className="mt-1.5 h-3.5 w-3.5 shrink-0 text-primary opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
             </Link>
-          </h3>
+          </NameHeading>
 
           {/* One paragraph — the credentials one. */}
           <p className="mt-5 measure font-sans text-copy leading-body text-text-secondary">
@@ -241,9 +245,9 @@ export default async function DoctorProfile({
           {/* The name stays in Poppins, not the script face. A medical
               credential set in a decorative script reads as marketing;
               set in the clinical voice it reads as a qualification. */}
-          <h3 className="mt-5 font-sans text-h3 font-medium leading-tight text-ink">
+          <NameHeading className="mt-5 font-sans text-h3 font-medium leading-tight text-ink">
             {doctor.name}
-          </h3>
+          </NameHeading>
         </Reveal>
 
         {/* Directly under the name, above the bio — the order is the

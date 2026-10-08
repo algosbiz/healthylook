@@ -3,6 +3,8 @@ import Img from "@/components/ui/Img";
 import Reveal from "@/components/ui/Reveal";
 import Button from "@/components/ui/Button";
 import { getSiteCopy } from "@/lib/site-content";
+import { curatedCopy, type SectionCopy } from "@/data/sectionCopy";
+import type { HeadingLevel } from "@/lib/headings";
 
 /**
  * SECTION 03 — INTRODUCTION / BRAND STORY
@@ -19,7 +21,10 @@ import { getSiteCopy } from "@/lib/site-content";
  * "medical spa" it explicitly says it isn't — so it's set as a bordered
  * aside rather than folded into body copy where it would be skimmed past.
  */
-export default async function BrandStory() {
+export default async function BrandStory({
+  copy: section = curatedCopy("brandStory"),
+  as: Heading = "h2",
+}: { copy?: SectionCopy<"brandStory">; as?: HeadingLevel } = {}) {
   const copy = await getSiteCopy();
   return (
     <section id="story" className="bg-paper py-section">
@@ -74,18 +79,18 @@ export default async function BrandStory() {
             <Reveal>
               <span className="eyebrow flex items-center gap-3 text-primary-strong">
                 <span className="h-px w-8 bg-primary/40" aria-hidden="true" />
-                Our Philosophy
+                {section.eyebrow}
               </span>
             </Reveal>
 
             <Reveal delay={100}>
-              <h2 className="mt-8 font-script text-h1 leading-script text-primary">
+              <Heading className="mt-8 font-script text-h1 leading-script text-primary">
                 {copy.brandPhilosophy.map((line) => (
                   <span key={line} className="block">
                     {line}
                   </span>
                 ))}
-              </h2>
+              </Heading>
             </Reveal>
 
             {/* The lead paragraph carries the products and platforms by
@@ -118,8 +123,8 @@ export default async function BrandStory() {
 
             <Reveal delay={330}>
               <div className="mt-10">
-                <Button href="/our-doctor" variant="quiet" size="sm" withArrow>
-                  Meet our doctors
+                <Button href={section.buttonHref} variant="quiet" size="sm" withArrow>
+                  {section.buttonLabel}
                 </Button>
               </div>
             </Reveal>

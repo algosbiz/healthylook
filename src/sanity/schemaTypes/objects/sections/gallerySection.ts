@@ -1,5 +1,5 @@
 import { defineArrayMember, defineField, defineType } from "sanity";
-import { sectionSettingsFields, toneField } from "./shared";
+import { sectionSettingsFields, toneField, sectionHeadingLevelField } from "./shared";
 
 export const gallerySection = defineType({
   name: "gallerySection",
@@ -55,6 +55,7 @@ export const gallerySection = defineType({
     }),
 
     toneField,
+    sectionHeadingLevelField,
     ...sectionSettingsFields,
   ],
   preview: {

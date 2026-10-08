@@ -1,5 +1,5 @@
 import { defineArrayMember, defineField, defineType } from "sanity";
-import { sectionSettingsFields } from "./shared";
+import { sectionSettingsFields, sectionHeadingLevelField } from "./shared";
 
 export const faqSection = defineType({
   name: "faqSection",
@@ -28,6 +28,7 @@ export const faqSection = defineType({
       options: { layout: "radio", list: ["light", "dark"] },
       initialValue: "light",
     }),
+    sectionHeadingLevelField,
     ...sectionSettingsFields,
   ],
   preview: {

@@ -1,7 +1,7 @@
 "use client";
 
 import { WhatsAppIcon, ArrowRightIcon } from "@/components/ui/icons";
-import { whatsappHref } from "@/lib/constants";
+import { WHATSAPP_NUMBER, whatsappHrefFor } from "@/lib/constants";
 import type { Status } from "@/lib/useEnquirySubmit";
 
 /**
@@ -97,7 +97,13 @@ export function SubmitRow({
 }
 
 /** Shown in place of the whole form once the server confirms delivery. */
-export function SentNotice({ children }: { children: React.ReactNode }) {
+export function SentNotice({
+  children,
+  whatsappNumber = WHATSAPP_NUMBER,
+}: {
+  children: React.ReactNode;
+  whatsappNumber?: string;
+}) {
   return (
     <div role="status" aria-live="polite" className="flex flex-col gap-5">
       <p className="font-sans text-h4 leading-snug text-ink">
@@ -108,7 +114,7 @@ export function SentNotice({ children }: { children: React.ReactNode }) {
       </p>
       <div>
         <a
-          href={whatsappHref()}
+          href={whatsappHrefFor(whatsappNumber)}
           target="_blank"
           rel="noopener noreferrer"
           className="group inline-flex items-center gap-2.5 font-sans text-caption font-medium uppercase tracking-caps-wide text-primary-strong transition-colors hover:text-primary-hover"

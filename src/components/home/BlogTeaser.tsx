@@ -6,6 +6,8 @@ import SectionHeading from "@/components/ui/SectionHeading";
 import TreatmentThumb from "@/components/shared/TreatmentThumb";
 import { ArrowUpRightIcon } from "@/components/ui/icons";
 import { getBlogPosts } from "@/lib/site-content";
+import { curatedCopy, withCount, type SectionCopy } from "@/data/sectionCopy";
+import { subheadingLevel, type HeadingLevel } from "@/lib/headings";
 
 /**
  * OUR BLOG — restored.
@@ -23,7 +25,11 @@ import { getBlogPosts } from "@/lib/site-content";
  */
 const FEATURED_COUNT = 3;
 
-export default async function BlogTeaser() {
+export default async function BlogTeaser({
+  copy = curatedCopy("blogTeaser"),
+  as = "h2",
+}: { copy?: SectionCopy<"blogTeaser">; as?: HeadingLevel } = {}) {
+  const CardHeading = subheadingLevel(as);
   const blogPosts = await getBlogPosts();
   // Articles only, not the treatment-page links also mixed into getBlogPosts()
   // — client request (via Irene, WhatsApp): don't present a treatment page as
@@ -38,14 +44,15 @@ export default async function BlogTeaser() {
         <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
           <SectionHeading
             align="left"
-            eyebrow="Our Blog"
-            title="Read before you book"
-            description="What each treatment actually does, who it suits, and what to expect. Written by the doctors who perform them."
+            as={as}
+            eyebrow={copy.eyebrow}
+            title={copy.title}
+            description={copy.intro}
             className="lg:max-w-2xl"
           />
           <Reveal delay={120} className="shrink-0">
-            <Button href="/our-blog" variant="quiet" withArrow>
-              All {articles.length} articles
+            <Button href={copy.buttonHref} variant="quiet" withArrow>
+              {withCount(copy.buttonLabel, articles.length)}
             </Button>
           </Reveal>
         </div>
@@ -67,12 +74,12 @@ export default async function BlogTeaser() {
                   aspect="landscape"
                 />
                 <div className="flex flex-1 flex-col p-7">
-                  <h3 className="flex items-start justify-between gap-3 font-sans text-h4 leading-snug text-ink transition-colors duration-300 group-hover:text-primary">
+                  <CardHeading className="flex items-start justify-between gap-3 font-sans text-h4 leading-snug text-ink transition-colors duration-300 group-hover:text-primary">
                     {post.title}
                     <ArrowUpRightIcon className="mt-1 h-4 w-4 shrink-0 text-primary opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                  </h3>
+                  </CardHeading>
                   <p className="mt-5 font-sans text-micro uppercase tracking-caps text-muted">
-                    Read the article
+                    {copy.readLabel}
                   </p>
                 </div>
               </Link>

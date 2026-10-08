@@ -43,14 +43,17 @@ export default function ContactForm({
   timeSlots = BOOKING_TIME_SLOTS,
   treatmentOptions = BOOKING_TREATMENT_OPTIONS,
   withSchedule = false,
+  whatsappNumber,
 }: {
   /** Resolved by the server parent; falls back to the compiled list. */
   timeSlots?: string[];
   treatmentOptions?: string[];
   withSchedule?: boolean;
+  /** Site settings' number, for the WhatsApp links in the sent and error notices. */
+  whatsappNumber?: string;
 }) {
   const { status, fieldErrors, fallbackHref, formRef, submit, turnstileResetSignal } =
-    useEnquirySubmit();
+    useEnquirySubmit({ whatsappNumber });
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -87,7 +90,7 @@ export default function ContactForm({
 
   if (status === "sent") {
     return (
-      <SentNotice>
+      <SentNotice whatsappNumber={whatsappNumber}>
         It has been sent to our team and we reply during opening hours, every day
         10.00 &ndash; 18.00. If you&rsquo;d like an answer sooner, message us on
         WhatsApp.

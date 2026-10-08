@@ -20,12 +20,15 @@ export const clinicHighlight = defineType({
       type: "string",
       validation: (Rule) => Rule.required().max(120),
     }),
+    // Hidden and optional: the highlights strip under the hero shows the
+    // title only, at the client's request, so this was a required box that
+    // fed nothing. Existing values stay stored.
     defineField({
       name: "tagline",
       title: "Short tagline",
       type: "string",
-      description: "Three or four words. Used in the highlights strip under the hero.",
-      validation: (Rule) => Rule.required().max(80),
+      hidden: true,
+      validation: (Rule) => Rule.max(80),
     }),
     defineField({
       name: "description",
@@ -36,7 +39,7 @@ export const clinicHighlight = defineType({
       validation: (Rule) => Rule.required(),
     }),
   ],
-  preview: { select: { title: "title", subtitle: "tagline" } },
+  preview: { select: { title: "title", subtitle: "description" } },
 });
 
 export const safetyProtocol = defineType({

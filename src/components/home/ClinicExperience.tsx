@@ -5,6 +5,8 @@ import Reveal from "@/components/ui/Reveal";
 import Button from "@/components/ui/Button";
 import { MapPinIcon, ClockIcon } from "@/components/ui/icons";
 import { getSiteCopy } from "@/lib/site-content";
+import { curatedCopy, type SectionCopy } from "@/data/sectionCopy";
+import type { HeadingLevel } from "@/lib/headings";
 
 /**
  * SECTION 10 — CLINIC / EXPERIENCE
@@ -38,7 +40,10 @@ const STRIP = [
   { src: "/images/clinic/clinic-05.jpg", alt: "The clinic at Ubud Nyuh Bali Resort" },
 ];
 
-export default async function ClinicExperience() {
+export default async function ClinicExperience({
+  copy: section = curatedCopy("clinicExperience"),
+  as: Heading = "h2",
+}: { copy?: SectionCopy<"clinicExperience">; as?: HeadingLevel } = {}) {
   const copy = await getSiteCopy();
   return (
     // Blush, not white. This is the "what is it actually like to go there"
@@ -78,13 +83,13 @@ export default async function ClinicExperience() {
             <Reveal>
               <span className="eyebrow flex items-center gap-3 text-primary-strong">
                 <span className="h-px w-8 bg-primary/40" aria-hidden="true" />
-                The Clinic
+                {section.eyebrow}
               </span>
             </Reveal>
             <Reveal delay={90}>
-              <h2 className="mt-8 font-script text-h2 leading-heading text-primary">
-                Set inside a five-star resort in Ubud
-              </h2>
+              <Heading className="mt-8 font-script text-h2 leading-heading text-primary">
+                {section.title}
+              </Heading>
             </Reveal>
 
             <Reveal delay={150} variant="image" className="mt-10 hidden lg:block">
@@ -113,16 +118,13 @@ export default async function ClinicExperience() {
                     Only the hyphen in "five-star" is ours. */}
             <Reveal delay={140}>
               <p className="measure font-sans text-lead text-text">
-                Tucked inside a five-star resort, the clinic pairs clinical
-                precision with a setting that is private, calm and comfortable —
-                an unhurried hour away from the noise of a typical clinic day.
+                {section.intro}
               </p>
             </Reveal>
 
             <Reveal delay={180}>
               <p className="mt-6 measure font-sans text-body leading-body text-text-secondary">
-                We combine the advance of aesthetic medicine with the tranquility
-                and hospitality of the five-star resort.
+                {section.body}
               </p>
             </Reveal>
 
@@ -154,11 +156,11 @@ export default async function ClinicExperience() {
 
             <Reveal delay={260}>
               <div className="mt-10 flex flex-wrap gap-4">
-                <Button href="/ubud-bali" variant="primary" withArrow>
-                  Explore our treatments
+                <Button href={section.buttonHref} variant="primary" withArrow>
+                  {section.buttonLabel}
                 </Button>
                 <Button href={copy.mapsHref} variant="outline" external>
-                  Open in Google Maps
+                  {section.mapsButtonLabel}
                 </Button>
               </div>
             </Reveal>

@@ -1,5 +1,5 @@
 import { defineField, defineType } from "sanity";
-import { sectionSettingsFields, toneField } from "./shared";
+import { sectionSettingsFields, toneField, sectionHeadingLevelField } from "./shared";
 
 const sources = [
   { title: "All treatments directory", value: "treatmentsDirectory" },
@@ -27,6 +27,7 @@ export const collectionSection = defineType({
     defineField({ name: "title", title: "Heading", type: "string" }),
     defineField({ name: "description", title: "Description", type: "text", rows: 4 }),
     toneField,
+    sectionHeadingLevelField,
     ...sectionSettingsFields,
   ],
   preview: {

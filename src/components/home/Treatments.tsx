@@ -9,6 +9,8 @@ import Reveal from "@/components/ui/Reveal";
 import Button from "@/components/ui/Button";
 import { ArrowUpRightIcon } from "@/components/ui/icons";
 import { formatIDR } from "@/lib/format";
+import { curatedCopy, withCount, type SectionCopy } from "@/data/sectionCopy";
+import { subheadingLevel, type HeadingLevel } from "@/lib/headings";
 import {
   TREATMENT_CATEGORIES,
   treatmentHref,
@@ -57,12 +59,17 @@ export default function Treatments({
   popular,
   countLabel,
   mostPopular,
+  copy = curatedCopy("treatments"),
+  as = "h2",
 }: {
   popular: Record<TreatmentCategoryId, Treatment[]>;
   countLabel: string;
   /** Slugs carrying the badge — resolved on the server, same reason as `popular`. */
   mostPopular: string[];
+  copy?: SectionCopy<"treatments">;
+  as?: HeadingLevel;
 }) {
+  const ItemHeading = subheadingLevel(as);
   const [active, setActive] = useState<TreatmentCategoryId>("facial-enhancement");
   const [hovered, setHovered] = useState<string | null>(null);
 
@@ -117,9 +124,10 @@ export default function Treatments({
             the rest" offer means something. */}
         <SectionHeading
           align="left"
-          eyebrow="What We Do"
-          title="Treatments"
-          subtitle={`${countLabel} treatments across facial enhancement, skin, body, and hair.`}
+          as={as}
+          eyebrow={copy.eyebrow}
+          title={copy.title}
+          subtitle={withCount(copy.intro, countLabel)}
           className="lg:max-w-xl"
         />
 
@@ -193,7 +201,7 @@ export default function Treatments({
                     </span>
 
                     <div className="flex-1">
-                      <h3 className="flex flex-wrap items-center gap-x-3 font-sans text-h3 leading-tight text-ink transition-colors duration-300 group-hover:text-primary">
+                      <ItemHeading className="flex flex-wrap items-center gap-x-3 font-sans text-h3 leading-tight text-ink transition-colors duration-300 group-hover:text-primary">
                         {treatment.name}
                         {/* ── CLIENT REVISION — "MOST POPULAR" NAMES FIVE
                             SPECIFIC TREATMENTS ── Used to mark whichever row
@@ -206,11 +214,11 @@ export default function Treatments({
                             data/treatments.ts. */}
                         {mostPopular.includes(treatment.slug) && (
                           <span className="rounded-full bg-primary/10 px-2.5 py-1 font-sans text-nano font-semibold uppercase tracking-caps text-primary-strong">
-                            Most Popular
+                            {copy.badgeLabel}
                           </span>
                         )}
                         <ArrowUpRightIcon className="h-4 w-4 shrink-0 -translate-x-2 text-primary opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100" />
-                      </h3>
+                      </ItemHeading>
 
                       <p className="mt-3 measure font-sans text-copy leading-relaxed text-text-secondary">
                         {treatment.shortDescription}
@@ -251,8 +259,8 @@ export default function Treatments({
             the page after the click actually is. Now sits after the
             shortlist rather than before it — see the note above. */}
         <Reveal delay={120} className="mt-14 flex justify-center lg:justify-start">
-          <Button href="/ubud-bali" variant="outline" size="sm" withArrow>
-            Explore Our Treatments
+          <Button href={copy.buttonHref} variant="outline" size="sm" withArrow>
+            {copy.buttonLabel}
           </Button>
         </Reveal>
       </Container>

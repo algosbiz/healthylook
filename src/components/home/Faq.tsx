@@ -4,6 +4,8 @@ import Accordion from "@/components/ui/Accordion";
 import Button from "@/components/ui/Button";
 import { whatsappHrefFor } from "@/lib/constants";
 import { getClinicFaqs, getSiteCopy } from "@/lib/site-content";
+import { curatedCopy, type SectionCopy } from "@/data/sectionCopy";
+import { subheadingLevel, type HeadingLevel } from "@/lib/headings";
 
 /**
  * SECTION 12 — FAQ
@@ -31,7 +33,10 @@ import { getClinicFaqs, getSiteCopy } from "@/lib/site-content";
  * The accordion keeps every answer in the DOM while collapsed, so nothing
  * here is hidden from search engines or from in-page find.
  */
-export default async function Faq() {
+export default async function Faq({
+  copy: section = curatedCopy("homeFaq"),
+  as: Heading = "h2",
+}: { copy?: SectionCopy<"homeFaq">; as?: HeadingLevel } = {}) {
   const copy = await getSiteCopy();
   const clinicFaqs = await getClinicFaqs();
   const items = clinicFaqs.map((faq, index) => ({
@@ -50,21 +55,19 @@ export default async function Faq() {
             <Reveal>
               <span className="eyebrow flex items-center gap-3 text-primary-strong">
                 <span className="h-px w-8 bg-primary/40" aria-hidden="true" />
-                Questions
+                {section.eyebrow}
               </span>
             </Reveal>
 
             <Reveal delay={90}>
-              <h2 className="mt-8 font-script text-h2 leading-heading text-primary">
-                Asked &amp; answered
-              </h2>
+              <Heading className="mt-8 font-script text-h2 leading-heading text-primary">
+                {section.title}
+              </Heading>
             </Reveal>
 
             <Reveal delay={150}>
               <p className="mt-6 measure-narrow font-sans text-copy leading-body text-text-secondary">
-                The things people ask us before they book. Questions about a
-                specific treatment are answered in full on that treatment&rsquo;s
-                own page.
+                {section.intro}
               </p>
             </Reveal>
 
@@ -90,7 +93,7 @@ export default async function Faq() {
                   external
                   withArrow
                 >
-                  Ask us something else
+                  {section.buttonLabel}
                 </Button>
               </div>
             </Reveal>
@@ -100,7 +103,7 @@ export default async function Faq() {
             <Reveal delay={120}>
               {/* First item open on load: an accordion where every row is
                   closed reads as an empty list of links. */}
-              <Accordion items={items} defaultOpen={0} />
+              <Accordion items={items} defaultOpen={0} headingAs={subheadingLevel(Heading)} />
             </Reveal>
           </div>
         </div>

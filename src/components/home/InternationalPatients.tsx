@@ -4,6 +4,8 @@ import Button from "@/components/ui/Button";
 import { CheckIcon } from "@/components/ui/icons";
 import { whatsappHrefFor } from "@/lib/constants";
 import { getSiteCopy } from "@/lib/site-content";
+import { curatedCopy, type SectionCopy } from "@/data/sectionCopy";
+import type { HeadingLevel } from "@/lib/headings";
 
 /**
  * SECTION 11 — INTERNATIONAL PATIENTS  (client revision note 16)
@@ -32,7 +34,10 @@ import { getSiteCopy } from "@/lib/site-content";
  * form three sections further down would answer their question with an
  * email address. The enquiry form is still there for anyone who prefers it.
  */
-export default async function InternationalPatients() {
+export default async function InternationalPatients({
+  copy: section = curatedCopy("internationalPatients"),
+  as: Heading = "h2",
+}: { copy?: SectionCopy<"internationalPatients">; as?: HeadingLevel } = {}) {
   const copy = await getSiteCopy();
   return (
     <section className="bg-ink-brown py-section text-white">
@@ -42,14 +47,14 @@ export default async function InternationalPatients() {
             <Reveal>
               <span className="eyebrow flex items-center gap-3 text-gold-soft">
                 <span className="h-px w-8 bg-gold-soft/50" aria-hidden="true" />
-                International Patients
+                {section.eyebrow}
               </span>
             </Reveal>
 
             <Reveal delay={100}>
-              <h2 className="mt-8 font-script text-h2 leading-heading text-white">
-                International standard care with Balinese hospitality
-              </h2>
+              <Heading className="mt-8 font-script text-h2 leading-heading text-white">
+                {section.title}
+              </Heading>
             </Reveal>
           </div>
 
@@ -97,7 +102,7 @@ export default async function InternationalPatients() {
             <Reveal delay={140}>
               <div className="mt-12 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
                 <p className="font-sans text-lead text-white/75">
-                  Planning your treatment before arriving?
+                  {section.closing}
                 </p>
                 <Button
                   href={whatsappHrefFor(copy.whatsappNumber, 
@@ -108,7 +113,7 @@ export default async function InternationalPatients() {
                   external
                   withArrow
                 >
-                  Message us on WhatsApp
+                  {section.buttonLabel}
                 </Button>
               </div>
             </Reveal>

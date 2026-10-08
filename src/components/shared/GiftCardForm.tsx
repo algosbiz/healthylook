@@ -57,9 +57,9 @@ import { GIFT_CARD_VALUES, GIFT_CARD_DESIGNS } from "@/data/offers";
  * legitimate date for someone in Los Angeles. The clinic confirms the date
  * with the buyer anyway; a wrong constraint is worse than none.
  */
-export default function GiftCardForm() {
+export default function GiftCardForm({ whatsappNumber }: { whatsappNumber?: string } = {}) {
   const { status, fieldErrors, fallbackHref, formRef, submit, turnstileResetSignal } =
-    useEnquirySubmit({ subject: "Gift card order" });
+    useEnquirySubmit({ subject: "Gift card order", whatsappNumber });
 
   const amountOptions = GIFT_CARD_VALUES.map((value) =>
     value === null ? "Custom Amount" : formatIDR(value),
@@ -107,7 +107,7 @@ export default function GiftCardForm() {
 
   if (status === "sent") {
     return (
-      <SentNotice>
+      <SentNotice whatsappNumber={whatsappNumber}>
         We&rsquo;ll confirm the amount, the design and the delivery date with you,
         and send payment details. Gift cards are delivered by noon Bali time on
         your chosen date.

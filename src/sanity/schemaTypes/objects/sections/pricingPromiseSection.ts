@@ -1,5 +1,5 @@
 import { defineArrayMember, defineField, defineType } from "sanity";
-import { sectionSettingsFields } from "./shared";
+import { sectionSettingsFields, sectionHeadingLevelField } from "./shared";
 
 // Always the dark brown band — this section exists for exactly one job
 // (the trust statement at the top of a price list), so unlike the generic
@@ -47,6 +47,7 @@ export const pricingPromiseSection = defineType({
       ],
       validation: (Rule) => Rule.min(2).max(4),
     }),
+    sectionHeadingLevelField,
     ...sectionSettingsFields,
   ],
   preview: {

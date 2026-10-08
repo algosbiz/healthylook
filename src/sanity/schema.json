@@ -2271,6 +2271,27 @@
           },
           "optional": true
         },
+        "headingLevel": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "h2"
+              },
+              {
+                "type": "string",
+                "value": "h3"
+              },
+              {
+                "type": "string",
+                "value": "h4"
+              }
+            ]
+          },
+          "optional": true
+        },
         "anchor": {
           "type": "objectAttribute",
           "value": {
@@ -2362,6 +2383,118 @@
           },
           "optional": true
         },
+        "heroEyebrow": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "heroTitle": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "heroTitleSecondLine": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "heroIntro": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "heroButtonLabel": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "heroButtonHref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "brandStoryEyebrow": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "brandStoryButtonLabel": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "brandStoryButtonHref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "partnersTitle": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "treatmentsEyebrow": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "treatmentsTitle": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "treatmentsIntro": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "treatmentsBadgeLabel": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "treatmentsButtonLabel": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "treatmentsButtonHref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
         "highlightsEyebrow": {
           "type": "objectAttribute",
           "value": {
@@ -2377,6 +2510,279 @@
           "optional": true
         },
         "highlightsIntro": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "whyUsEyebrow": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "whyUsTitle": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "whyUsClosing": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "whyUsLinkLabel": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "whyUsLinkHref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "doctorsEyebrow": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "doctorsTitle": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "doctorsIntro": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "doctorsButtonLabel": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "doctorsButtonHref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "testimonialsTitle": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "testimonialsSubtitle": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "clinicEyebrow": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "clinicTitle": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "clinicIntro": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "clinicBody": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "clinicButtonLabel": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "clinicButtonHref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "clinicMapsButtonLabel": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "internationalEyebrow": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "internationalTitle": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "internationalClosing": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "internationalButtonLabel": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "faqEyebrow": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "faqTitle": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "faqIntro": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "faqButtonLabel": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "blogEyebrow": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "blogTitle": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "blogIntro": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "blogButtonLabel": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "blogButtonHref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "blogReadLabel": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "bookingEyebrow": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "bookingTitle": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "bookingIntro": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "bookingWhatsappLabel": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "bookingFormTitle": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "bookingFormNote": {
           "type": "objectAttribute",
           "value": {
             "type": "string"
@@ -2405,24 +2811,24 @@
           },
           "optional": true
         },
-        "doctorsEyebrow": {
+        "headingLevel": {
           "type": "objectAttribute",
           "value": {
-            "type": "string"
-          },
-          "optional": true
-        },
-        "doctorsTitle": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string"
-          },
-          "optional": true
-        },
-        "doctorsIntro": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string"
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "h2"
+              },
+              {
+                "type": "string",
+                "value": "h3"
+              },
+              {
+                "type": "string",
+                "value": "h4"
+              }
+            ]
           },
           "optional": true
         },
@@ -2539,6 +2945,27 @@
           },
           "optional": true
         },
+        "headingLevel": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "h2"
+              },
+              {
+                "type": "string",
+                "value": "h3"
+              },
+              {
+                "type": "string",
+                "value": "h4"
+              }
+            ]
+          },
+          "optional": true
+        },
         "anchor": {
           "type": "objectAttribute",
           "value": {
@@ -2622,6 +3049,27 @@
               {
                 "type": "string",
                 "value": "blush"
+              }
+            ]
+          },
+          "optional": true
+        },
+        "headingLevel": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "h2"
+              },
+              {
+                "type": "string",
+                "value": "h3"
+              },
+              {
+                "type": "string",
+                "value": "h4"
               }
             ]
           },
@@ -2749,6 +3197,27 @@
               {
                 "type": "string",
                 "value": "dark"
+              }
+            ]
+          },
+          "optional": true
+        },
+        "headingLevel": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "h2"
+              },
+              {
+                "type": "string",
+                "value": "h3"
+              },
+              {
+                "type": "string",
+                "value": "h4"
               }
             ]
           },
@@ -2892,6 +3361,27 @@
               {
                 "type": "string",
                 "value": "brown"
+              }
+            ]
+          },
+          "optional": true
+        },
+        "headingLevel": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "h2"
+              },
+              {
+                "type": "string",
+                "value": "h3"
+              },
+              {
+                "type": "string",
+                "value": "h4"
               }
             ]
           },
@@ -3049,6 +3539,27 @@
           },
           "optional": true
         },
+        "headingLevel": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "h2"
+              },
+              {
+                "type": "string",
+                "value": "h3"
+              },
+              {
+                "type": "string",
+                "value": "h4"
+              }
+            ]
+          },
+          "optional": true
+        },
         "anchor": {
           "type": "objectAttribute",
           "value": {
@@ -3162,6 +3673,27 @@
               {
                 "type": "string",
                 "value": "brown"
+              }
+            ]
+          },
+          "optional": true
+        },
+        "headingLevel": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "h2"
+              },
+              {
+                "type": "string",
+                "value": "h3"
+              },
+              {
+                "type": "string",
+                "value": "h4"
               }
             ]
           },
@@ -3288,6 +3820,27 @@
               {
                 "type": "string",
                 "value": "brown"
+              }
+            ]
+          },
+          "optional": true
+        },
+        "headingLevel": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "h2"
+              },
+              {
+                "type": "string",
+                "value": "h3"
+              },
+              {
+                "type": "string",
+                "value": "h4"
               }
             ]
           },

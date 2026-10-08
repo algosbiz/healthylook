@@ -35,3 +35,18 @@ export function headingLevel(
 ): HeadingLevel {
   return value === "h2" || value === "h3" || value === "h4" ? value : fallback;
 }
+
+/** A heading inside a section: card titles, questions, doctor names. */
+export type SubheadingLevel = "h3" | "h4" | "h5";
+
+/**
+ * The level for headings inside a section whose own heading is `level`.
+ *
+ * Sections offer one choice, for their own heading, and everything inside
+ * follows one step below it. A second dropdown for the cards would only let
+ * an editor put an H2 card under an H3 section, which is an outline no page
+ * should have.
+ */
+export function subheadingLevel(level: HeadingLevel): SubheadingLevel {
+  return level === "h2" ? "h3" : level === "h3" ? "h4" : "h5";
+}

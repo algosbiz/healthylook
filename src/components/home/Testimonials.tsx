@@ -4,6 +4,8 @@ import SectionHeading from "@/components/ui/SectionHeading";
 import { QuoteIcon, StarIcon } from "@/components/ui/icons";
 import { type Testimonial } from "@/data/testimonials";
 import { getFeaturedTestimonials } from "@/lib/site-content";
+import { curatedCopy, type SectionCopy } from "@/data/sectionCopy";
+import type { HeadingLevel } from "@/lib/headings";
 
 /**
  * SECTION 09 — TESTIMONIALS
@@ -53,6 +55,8 @@ type TestimonialsProps = {
    * treatment's, never for the clinic-wide fallback set.
    */
   subject?: string;
+  copy?: SectionCopy<"testimonials">;
+  as?: HeadingLevel;
 };
 
 /** Below this, a row can't fill the viewport, so it's laid out statically. */
@@ -172,6 +176,8 @@ function MarqueeRow({
 export default async function Testimonials({
   items,
   subject,
+  copy = curatedCopy("testimonials"),
+  as = "h2",
 }: TestimonialsProps) {
   const list = items ?? (await getFeaturedTestimonials());
   if (list.length === 0) return null;
@@ -206,12 +212,9 @@ export default async function Testimonials({
 
         <SectionHeading
           className="mt-7"
-          title="In their words"
-          subtitle={
-            subject
-              ? `What patients say about ${subject}`
-              : "What patients say about our Ubud clinic"
-          }
+          as={as}
+          title={copy.title}
+          subtitle={subject ? `What patients say about ${subject}` : copy.subtitle}
         />
       </Container>
 

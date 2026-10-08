@@ -112,14 +112,3 @@ export const doctors: Doctor[] = [
     },
   },
 ];
-
-// The homepage Doctors section heading. It can be overridden per page in
-// Studio (curatedSection's `doctors*` fields); these are what renders when
-// those fields are empty, and the Studio fields show them as placeholders
-// so an editor sees the current wording before typing over it.
-export const DOCTORS_SECTION_HEADING = {
-  eyebrow: "Our Doctors",
-  title: "The people who will actually treat you",
-  description:
-    "Every consultation, treatment plan, and injection is handled by a licensed doctor.",
-};

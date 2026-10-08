@@ -1,5 +1,5 @@
 import { defineArrayMember, defineField, defineType } from "sanity";
-import { sectionSettingsFields, toneField } from "./shared";
+import { sectionSettingsFields, toneField, sectionHeadingLevelField } from "./shared";
 
 export const featureGridSection = defineType({
   name: "featureGridSection",
@@ -61,6 +61,7 @@ export const featureGridSection = defineType({
         && (parent as { layout?: string }).layout !== "cards",
     }),
     toneField,
+    sectionHeadingLevelField,
     ...sectionSettingsFields,
   ],
   preview: {

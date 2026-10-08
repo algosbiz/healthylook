@@ -17,16 +17,25 @@ import {
   getPopularTreatments,
   getTreatmentCountLabel,
 } from "@/lib/site-content";
+import { curatedCopy } from "@/data/sectionCopy";
+import { headingLevel } from "@/lib/headings";
 import type { CuratedSection as CuratedSectionValue } from "@/sanity/types";
 
+/**
+ * Every component takes the same two things from its section: `copy`, the
+ * wording with the editor's fields laid over the defaults, and `as`, the
+ * level of its heading. Called from code instead — treatment and blog pages —
+ * the same components receive neither and render their defaults.
+ */
 export default async function CuratedSection({ section }: { section: CuratedSectionValue }) {
+  const as = headingLevel(section.headingLevel, "h2");
   switch (section.component) {
     case "homeHero":
-      return <Hero />;
+      return <Hero copy={curatedCopy("homeHero", section)} />;
     case "brandStory":
-      return <BrandStory />;
+      return <BrandStory copy={curatedCopy("brandStory", section)} as={as} />;
     case "partners":
-      return <Partners />;
+      return <Partners copy={curatedCopy("partners", section)} as={as} />;
     case "treatments": {
       const popular = Object.fromEntries(
         await Promise.all(
@@ -41,6 +50,8 @@ export default async function CuratedSection({ section }: { section: CuratedSect
           popular={popular}
           countLabel={await getTreatmentCountLabel()}
           mostPopular={await getMostPopularSlugs()}
+          copy={curatedCopy("treatments", section)}
+          as={as}
         />
       );
     }
@@ -63,32 +74,27 @@ export default async function CuratedSection({ section }: { section: CuratedSect
                 ]
               : [],
           )}
-          eyebrow={section.highlightsEyebrow}
-          title={section.highlightsTitle}
-          description={section.highlightsIntro}
+          copy={curatedCopy("treatmentHighlights", section)}
+          as={as}
         />
       );
     case "whyUs":
-      return <WhyUs />;
+      return <WhyUs copy={curatedCopy("whyUs", section)} as={as} />;
     case "doctors":
-      return (
-        <Doctors
-          eyebrow={section.doctorsEyebrow}
-          title={section.doctorsTitle}
-          description={section.doctorsIntro}
-        />
-      );
+      return <Doctors copy={curatedCopy("doctors", section)} as={as} />;
     case "testimonials":
-      return <Testimonials />;
+      return <Testimonials copy={curatedCopy("testimonials", section)} as={as} />;
     case "clinicExperience":
-      return <ClinicExperience />;
+      return <ClinicExperience copy={curatedCopy("clinicExperience", section)} as={as} />;
     case "internationalPatients":
-      return <InternationalPatients />;
+      return (
+        <InternationalPatients copy={curatedCopy("internationalPatients", section)} as={as} />
+      );
     case "homeFaq":
-      return <Faq />;
+      return <Faq copy={curatedCopy("homeFaq", section)} as={as} />;
     case "blogTeaser":
-      return <BlogTeaser />;
+      return <BlogTeaser copy={curatedCopy("blogTeaser", section)} as={as} />;
     case "booking":
-      return <BookingSection />;
+      return <BookingSection copy={curatedCopy("booking", section)} as={as} />;
   }
 }

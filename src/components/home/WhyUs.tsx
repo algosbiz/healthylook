@@ -3,6 +3,8 @@ import Container from "@/components/ui/Container";
 import Reveal from "@/components/ui/Reveal";
 import Img from "@/components/ui/Img";
 import { getSiteCopy } from "@/lib/site-content";
+import { curatedCopy, type SectionCopy } from "@/data/sectionCopy";
+import { subheadingLevel, type HeadingLevel } from "@/lib/headings";
 
 /**
  * SECTION 06 — WHY PATIENTS CHOOSE HEALTHY LOOK
@@ -39,8 +41,12 @@ import { getSiteCopy } from "@/lib/site-content";
  * The licence number stays in the open, on the left, because it is the one
  * credential a sceptical reader can go and verify for themselves.
  */
-export default async function WhyUs() {
+export default async function WhyUs({
+  copy: section = curatedCopy("whyUs"),
+  as: Heading = "h2",
+}: { copy?: SectionCopy<"whyUs">; as?: HeadingLevel } = {}) {
   const copy = await getSiteCopy();
+  const ItemHeading = subheadingLevel(Heading);
   return (
     <section className="bg-ink-brown py-section text-white">
       <Container>
@@ -49,14 +55,14 @@ export default async function WhyUs() {
             <Reveal>
               <span className="eyebrow flex items-center gap-3 text-gold-soft">
                 <span className="h-px w-8 bg-gold-soft/50" aria-hidden="true" />
-                Why Patients Choose Healthy Look
+                {section.eyebrow}
               </span>
             </Reveal>
 
             <Reveal delay={100}>
-              <h2 className="mt-8 font-script text-h2 leading-heading text-white">
-                Not all aesthetic providers are equal
-              </h2>
+              <Heading className="mt-8 font-script text-h2 leading-heading text-white">
+                {section.title}
+              </Heading>
             </Reveal>
 
             <Reveal delay={160}>
@@ -100,9 +106,9 @@ export default async function WhyUs() {
                       </span>
 
                       <div className="flex-1">
-                        <h3 className="font-sans text-h4 leading-tight text-white">
+                        <ItemHeading className="font-sans text-h4 leading-tight text-white">
                           {highlight.title}
-                        </h3>
+                        </ItemHeading>
                         <p className="mt-3 measure font-sans text-copy leading-body text-white/55">
                           {highlight.description}
                         </p>
@@ -117,14 +123,12 @@ export default async function WhyUs() {
                 used to be — see the note at the top of this file. */}
             <Reveal delay={120}>
               <p className="mt-10 measure font-sans text-copy leading-body text-white/55">
-                Every treatment here is held to seven published safety
-                standards, from a one-patient-one-syringe policy to
-                hyaluronidase reversal kept on hand for every filler.{" "}
+                {section.closing}{" "}
                 <Link
-                  href="/our-doctor"
+                  href={section.linkHref}
                   className="text-gold-soft underline decoration-gold-soft/40 underline-offset-4 transition-colors hover:decoration-gold-soft"
                 >
-                  Read all seven
+                  {section.linkLabel}
                 </Link>
                 .
               </p>

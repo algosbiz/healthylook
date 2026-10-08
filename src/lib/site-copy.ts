@@ -22,9 +22,6 @@ export type SiteCopy = {
   siteName: string;
   tagline: string;
   description: string;
-  heroHeadline: string;
-  heroSubheadline: string;
-  brandIntro: string;
   brandStory: string[];
   brandPhilosophy: string[];
   phoneDisplay: string;

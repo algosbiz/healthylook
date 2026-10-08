@@ -4,6 +4,8 @@ import ContactForm from "@/components/shared/ContactForm";
 import { WhatsAppIcon, PhoneIcon, MailIcon, MapPinIcon, ClockIcon } from "@/components/ui/icons";
 import { whatsappHrefFor } from "@/lib/constants";
 import { getSiteCopy } from "@/lib/site-content";
+import { curatedCopy, type SectionCopy } from "@/data/sectionCopy";
+import { subheadingLevel, type HeadingLevel } from "@/lib/headings";
 
 /**
  * SECTION 13 — FINAL CTA + ENQUIRY
@@ -25,8 +27,12 @@ import { getSiteCopy } from "@/lib/site-content";
  * globals.css sets `scroll-padding-top` so the fixed header doesn't cover
  * the heading on arrival.
  */
-export default async function BookingSection() {
+export default async function BookingSection({
+  copy: section = curatedCopy("booking"),
+  as: Heading = "h2",
+}: { copy?: SectionCopy<"booking">; as?: HeadingLevel } = {}) {
   const copy = await getSiteCopy();
+  const FormHeading = subheadingLevel(Heading);
   return (
     <section id="book" className="scroll-mt-24 bg-section py-section">
       <Container>
@@ -35,7 +41,7 @@ export default async function BookingSection() {
             <Reveal>
               <span className="eyebrow flex items-center gap-3 text-primary-strong">
                 <span className="h-px w-8 bg-primary/40" aria-hidden="true" />
-                Book an appointment
+                {section.eyebrow}
               </span>
             </Reveal>
 
@@ -46,9 +52,9 @@ export default async function BookingSection() {
                 the homepage as well as /our-doctor, since this is one shared
                 section. */}
             <Reveal delay={90}>
-              <h2 className="mt-8 font-script text-h1 leading-script text-primary">
-                Start your Journey to Confidence
-              </h2>
+              <Heading className="mt-8 font-script text-h1 leading-script text-primary">
+                {section.title}
+              </Heading>
             </Reveal>
 
             {/* ── CLIENT REVISION — "OUR DOCTOR" ────────────────────────
@@ -60,8 +66,7 @@ export default async function BookingSection() {
                 wording, unchanged). */}
             <Reveal delay={150}>
               <p className="mt-8 measure-narrow font-sans text-lead text-text">
-                Tell us what you&rsquo;re thinking about and our doctor will tell
-                you honestly whether it&rsquo;s the right treatment for you.
+                {section.intro}
               </p>
             </Reveal>
 
@@ -84,7 +89,7 @@ export default async function BookingSection() {
                     className="flex items-center gap-4 py-2.5 font-sans text-copy-lg text-ink transition-colors hover:text-primary"
                   >
                     <WhatsAppIcon className="h-5 w-5 shrink-0 text-primary" />
-                    Message us on WhatsApp
+                    {section.whatsappLabel}
                   </a>
                 </li>
                 <li>
@@ -137,17 +142,18 @@ export default async function BookingSection() {
           <div className="lg:col-span-7">
             <Reveal delay={140}>
               <div className="rounded-edge border border-primary/15 bg-background p-8 sm:p-12">
-                <h3 className="font-sans text-h4 text-ink">
-                  Send us a message
-                </h3>
+                <FormHeading className="font-sans text-h4 text-ink">
+                  {section.formTitle}
+                </FormHeading>
                 <p className="mt-2 font-sans text-sm text-text-secondary">
-                  We reply during opening hours, every day 10.00 - 18.00.
+                  {section.formNote}
                 </p>
 
                 <div className="mt-10">
                   <ContactForm
                     timeSlots={copy.bookingTimeSlots}
                     treatmentOptions={copy.bookingTreatmentOptions}
+                    whatsappNumber={copy.whatsappNumber}
                   />
                 </div>
               </div>

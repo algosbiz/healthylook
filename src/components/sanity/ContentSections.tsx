@@ -13,6 +13,7 @@ import IconList, { isIconListLayout } from "@/components/shared/IconList";
 import { getSanityResultGalleries } from "@/sanity/lib/content";
 import { TREATMENT_CATEGORIES } from "@/data/treatments";
 import { getResultGroups } from "@/lib/site-content";
+import { headingLevel, subheadingLevel } from "@/lib/headings";
 import type {
   CategoryNavSection,
   CtaSection,
@@ -54,6 +55,7 @@ export function RichTextBlock({ section }: { section: RichTextSection }) {
       >
         {(section.title || section.eyebrow) && (
           <SectionHeading
+            as={headingLevel(section.headingLevel, "h2")}
             eyebrow={section.eyebrow}
             title={section.title || ""}
             subtitle={section.subtitle}
@@ -90,6 +92,7 @@ export function SplitContentBlock({ section }: { section: SplitContentSection })
         </Reveal>
         <div className={`lg:col-span-7 ${imageFirst ? "lg:order-2" : "lg:order-1"}`}>
           <SectionHeading
+            as={headingLevel(section.headingLevel, "h2")}
             eyebrow={section.eyebrow}
             title={section.title}
             align="left"
@@ -116,9 +119,12 @@ const gridColumns = {
 
 export function FeatureGridBlock({ section }: { section: FeatureGridSection }) {
   const dark = section.tone === "brown";
+  const level = headingLevel(section.headingLevel, "h2");
+  const CardHeading = subheadingLevel(level);
   return (
     <SectionShell tone={section.tone} anchor={section.anchor}>
       <SectionHeading
+        as={level}
         eyebrow={section.eyebrow}
         title={section.title}
         description={section.description}
@@ -178,9 +184,9 @@ export function FeatureGridBlock({ section }: { section: FeatureGridSection }) {
                     className="mb-7"
                   />
                 )}
-                <h3 className={`font-sans text-h4 ${dark ? "text-white" : "text-ink"}`}>
+                <CardHeading className={`font-sans text-h4 ${dark ? "text-white" : "text-ink"}`}>
                   {item.title}
-                </h3>
+                </CardHeading>
                 {item.note && (
                   <p className={`mt-1.5 font-sans text-caption italic ${dark ? "text-white/50" : "text-muted"}`}>
                     {item.note}
@@ -251,6 +257,7 @@ export async function GalleryBlock({ section }: { section: GallerySection }) {
           plain body text here, matching every other gallery section's
           description on the site instead of this one special case. */}
       <SectionHeading
+        as={headingLevel(section.headingLevel, "h2")}
         eyebrow={section.eyebrow}
         title={section.title}
         description={section.description}
@@ -290,11 +297,13 @@ export async function GalleryBlock({ section }: { section: GallerySection }) {
 
 export function FaqBlock({ section }: { section: FaqSection }) {
   const dark = section.tone === "dark";
+  const level = headingLevel(section.headingLevel, "h2");
   return (
     <SectionShell tone={dark ? "brown" : "paper"} anchor={section.anchor}>
       <div className="grid gap-12 lg:grid-cols-12 lg:gap-20">
         <div className="lg:col-span-5">
           <SectionHeading
+            as={level}
             eyebrow={section.eyebrow}
             title={section.title}
             description={section.description}
@@ -305,6 +314,7 @@ export function FaqBlock({ section }: { section: FaqSection }) {
         <div className="lg:col-span-7">
           <Accordion
             tone={dark ? "dark" : "light"}
+            headingAs={subheadingLevel(level)}
             items={section.items.map((item) => ({
               id: item._key,
               question: item.question,
@@ -324,6 +334,7 @@ export function CtaBlock({ section }: { section: CtaSection }) {
     <SectionShell tone={tone} anchor={section.anchor}>
       <div className="mx-auto max-w-4xl text-center">
         <SectionHeading
+          as={headingLevel(section.headingLevel, "h2")}
           eyebrow={section.eyebrow}
           title={section.title}
           description={section.text}
@@ -365,10 +376,13 @@ export function CtaBlock({ section }: { section: CtaSection }) {
  * rhythm (`py-section`) SectionShell always applies.
  */
 export function PricingPromiseBlock({ section }: { section: PricingPromiseSection }) {
+  const level = headingLevel(section.headingLevel, "h2");
+  const PointHeading = subheadingLevel(level);
   return (
     <section id={section.anchor} className="scroll-mt-24 bg-ink-brown py-12 lg:py-14">
       <Container>
         <SectionHeading
+          as={level}
           tone="dark"
           eyebrow={section.eyebrow || "Our pricing promise"}
           title={section.title}
@@ -382,9 +396,9 @@ export function PricingPromiseBlock({ section }: { section: PricingPromiseSectio
                   and the safety grid on /our-doctor). */}
               <Reveal delay={index * 90}>
                 <div className="border-t border-gold-soft/40 pt-4">
-                  <h3 className="font-sans text-label font-medium leading-snug text-white">
+                  <PointHeading className="font-sans text-label font-medium leading-snug text-white">
                     {point.label}
-                  </h3>
+                  </PointHeading>
                   {point.detail && (
                     <p className="mt-1.5 font-sans text-caption leading-body text-white/55">
                       {point.detail}

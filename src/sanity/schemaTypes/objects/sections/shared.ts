@@ -1,5 +1,6 @@
 import type { FieldDefinition } from "sanity";
 import { defineField } from "sanity";
+import { headingLevelField } from "../headingLevel";
 
 export const sectionSettingsFields: FieldDefinition[] = [
   defineField({
@@ -20,6 +21,15 @@ export const sectionSettingsFields: FieldDefinition[] = [
     description: "Keeps the content in the document without rendering it on the website.",
   }),
 ];
+
+/** For the sections that have a heading of their own. */
+export const sectionHeadingLevelField = headingLevelField({
+  initialValue: "h2",
+  applies:
+    "The level of this section's heading. Headings inside the section — cards, questions, points — follow one level below it.",
+  appliesId:
+    "Level untuk heading section ini. Heading di dalam section — kartu, pertanyaan, poin — otomatis satu level di bawahnya.",
+});
 
 export const toneField = defineField({
   name: "tone",

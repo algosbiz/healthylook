@@ -1,5 +1,5 @@
 import { defineField, defineType } from "sanity";
-import { sectionSettingsFields, toneField } from "./shared";
+import { sectionSettingsFields, toneField, sectionHeadingLevelField } from "./shared";
 
 export const richTextSection = defineType({
   name: "richTextSection",
@@ -36,6 +36,7 @@ export const richTextSection = defineType({
       initialValue: "narrow",
     }),
     toneField,
+    sectionHeadingLevelField,
     ...sectionSettingsFields,
   ],
   preview: {

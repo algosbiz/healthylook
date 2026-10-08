@@ -4,6 +4,7 @@ import Button from "@/components/ui/Button";
 import Reveal from "@/components/ui/Reveal";
 import Highlights from "./Highlights";
 import { getSiteCopy } from "@/lib/site-content";
+import { curatedCopy, type SectionCopy } from "@/data/sectionCopy";
 
 /**
  * SECTION 01 — HERO
@@ -50,8 +51,10 @@ import { getSiteCopy } from "@/lib/site-content";
  * her in half, so the focal point shifts right on small screens to keep her
  * whole.
  */
-export default async function Hero() {
-  const copy = await getSiteCopy();
+export default async function Hero({
+  copy = curatedCopy("homeHero"),
+}: { copy?: SectionCopy<"homeHero"> } = {}) {
+  const site = await getSiteCopy();
   return (
     <section className="relative isolate flex min-h-[100svh] flex-col justify-end overflow-hidden bg-ink-brown">
       <div className="absolute inset-0 -z-10">
@@ -151,7 +154,7 @@ export default async function Hero() {
                 which it clears comfortably. */}
             <span className="eyebrow flex items-center gap-3 text-white">
               <span className="h-px w-10 bg-accent/70" aria-hidden="true" />
-              Ubud · Bali
+              {copy.eyebrow}
             </span>
           </Reveal>
 
@@ -164,7 +167,7 @@ export default async function Hero() {
                 aria-hidden="true"
                 className="block font-script text-display leading-display"
               >
-                Helping You Look &amp; Feel Your Best
+                {copy.title}
               </span>
               {/* ── CLIENT REVISION — SMALLER "WITHOUT SURGERY", ROUND 2 ──
                   First pass went `text-h3` → `text-lead` (matching the
@@ -183,15 +186,15 @@ export default async function Hero() {
                 aria-hidden="true"
                 className="mt-2 block font-sans text-label font-light uppercase tracking-caps text-white/80"
               >
-                Without Surgery
+                {copy.titleSecondLine}
               </span>
-              <span className="sr-only">{copy.heroHeadline}</span>
+              <span className="sr-only">{`${copy.title} ${copy.titleSecondLine}`}</span>
             </h1>
           </Reveal>
 
           <Reveal delay={220}>
             <p className="mt-9 max-w-xl font-sans text-lead text-white/75">
-              {copy.heroSubheadline}
+              {copy.intro}
             </p>
           </Reveal>
 
@@ -200,11 +203,11 @@ export default async function Hero() {
               {/* Gold, not the white it was. White-on-photo is the safe
                   choice and it is also why the first screen had no brand
                   colour anywhere in it. */}
-              <Button href={copy.bookingHref} variant="accent" size="lg" withArrow>
-                {copy.bookingLabel}
+              <Button href={site.bookingHref} variant="accent" size="lg" withArrow>
+                {site.bookingLabel}
               </Button>
-              <Button href="/ubud-bali" variant="outlineLight" size="lg">
-                Explore Treatments
+              <Button href={copy.buttonHref} variant="outlineLight" size="lg">
+                {copy.buttonLabel}
               </Button>
             </div>
           </Reveal>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { whatsappHref } from "@/lib/constants";
+import { WHATSAPP_NUMBER, whatsappHrefFor } from "@/lib/constants";
 
 /**
  * Everything the site's forms do that is NOT their fields.
@@ -32,7 +32,15 @@ export type Status = "idle" | "sending" | "sent" | "error";
 /** A page-supplied answer, rendered in the email as a labelled row. */
 export type EnquiryExtra = { label: string; value: string };
 
-export function useEnquirySubmit({ subject }: { subject?: string } = {}) {
+export function useEnquirySubmit({
+  subject,
+  whatsappNumber = WHATSAPP_NUMBER,
+}: {
+  subject?: string;
+  /** Site settings' number, from the server parent; the compiled one if absent. */
+  whatsappNumber?: string;
+} = {}) {
+  const whatsappHref = (message?: string) => whatsappHrefFor(whatsappNumber, message);
   const [status, setStatus] = useState<Status>("idle");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   /**

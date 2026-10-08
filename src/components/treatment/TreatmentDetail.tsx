@@ -937,7 +937,7 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
                       {treatment.startingPrice != null && (
                         <div className="flex items-baseline justify-between gap-5 border-b border-hairline py-3.5">
                           <dt className="font-sans text-copy text-ink">
-                            Starting from
+                            {glanceLabels.startingFrom}
                           </dt>
                           <dd className="font-sans text-sm tabular-nums text-primary-strong">
                             {formatIDR(treatment.startingPrice)}

@@ -1,13 +1,10 @@
 import { defineArrayMember, defineField, defineType } from "sanity";
-import { DOCTORS_SECTION_HEADING } from "../../../../data/doctors";
+import { CURATED_COPY, copyFieldName, type CopyField } from "../../../../data/sectionCopy";
+import { headingLevelField } from "../headingLevel";
 import { sectionSettingsFields } from "./shared";
 
-/** Only Treatment highlights and Doctors carry editable content of their
- *  own, so each one's fields stay out of the way for the other components. */
 const onlyTreatmentHighlights = ({ parent }: { parent?: unknown }) =>
   (parent as { component?: string })?.component !== "treatmentHighlights";
-const onlyDoctors = ({ parent }: { parent?: unknown }) =>
-  (parent as { component?: string })?.component !== "doctors";
 
 const components = [
   ["Homepage hero", "homeHero"],
@@ -25,12 +22,62 @@ const components = [
   ["Booking", "booking"],
 ] as const;
 
+const KEEP_CURRENT =
+  "Leave empty to keep the current wording, shown greyed out. · ID: Kosongkan untuk memakai teks yang sekarang (yang tampil samar).";
+
+const LINK_PATTERN = /^(\/|#|https?:\/\/|mailto:|tel:)/;
+
+function describe(field: CopyField): string {
+  const hint = field.link
+    ? ([
+        "A page on this site starting with /, e.g. /ubud-bali, or a full https:// address.",
+        "Halaman di website ini diawali /, misalnya /ubud-bali, atau alamat lengkap https://.",
+      ] as const)
+    : field.hint;
+  return hint ? `${hint[0]} ${KEEP_CURRENT.replace(" · ID: ", ` · ID: ${hint[1]} `)}` : KEEP_CURRENT;
+}
+
+/* ── EVERY SECTION'S WORDING, FROM ONE LIST ───────────────────────────
+ * Each component's text fields are generated from CURATED_COPY in
+ * src/data/sectionCopy.ts, which is also where the component reads its
+ * defaults and where sanity/types.ts gets the field names. A field is
+ * added there, once — see that file for why.
+ *
+ * Every field is hidden unless its own component is picked, so an editor
+ * only ever sees the handful that belong to the section they opened.
+ */
+const copyFields = Object.entries(CURATED_COPY).flatMap(([component, spec]) =>
+  Object.entries(spec.fields as Record<string, CopyField>).map(([key, field]) => {
+    const common = {
+      name: copyFieldName(spec.prefix, key),
+      title: field.title,
+      hidden: ({ parent }: { parent?: unknown }) =>
+        (parent as { component?: string })?.component !== component,
+      placeholder: field.default,
+      description: describe(field),
+    };
+    if (field.multiline) return defineField({ ...common, type: "text", rows: 3 });
+    return defineField({
+      ...common,
+      type: "string",
+      validation: field.link
+        ? (Rule) =>
+            Rule.custom((value) =>
+              !value || LINK_PATTERN.test(value)
+                ? true
+                : "Start with / for a page on this site, or https:// for another website. · ID: Awali dengan / untuk halaman di website ini, atau https:// untuk website lain.",
+            )
+        : undefined,
+    });
+  }),
+);
+
 export const curatedSection = defineType({
   name: "curatedSection",
   title: "Existing styled section",
   type: "object",
   description:
-    "Reuses one of the website's established data-driven components exactly. Edit its records from the related collection; use the other section types for editable text and images.",
+    "One of the website's built-in sections. Its text can be changed below; the records it lists (doctors, reviews, treatments, posts) are edited in their own collections.",
   fields: [
     defineField({
       name: "component",
@@ -42,46 +89,16 @@ export const curatedSection = defineType({
       validation: (Rule) => Rule.required(),
     }),
 
-    /* ── TREATMENT HIGHLIGHTS, MADE EDITABLE ──────────────────────────
-     * Every other component here draws its records from a collection, so
-     * this section type only ever had to name one. Treatment highlights
-     * was the exception: which treatments appeared, and the bullets on
-     * each card, were a constant in the component file. The only lever in
-     * Studio was "Hide this section", which takes all the cards down at
-     * once — so dropping one treatment, or fixing one bullet, needed a
-     * deploy.
-     *
-     * All four fields are optional and empty by default. Left empty, the
-     * section renders exactly the list the component has always shipped,
-     * so nothing moves until someone deliberately fills these in. Filling
-     * `highlights` replaces the whole list, not part of it — a half-
-     * overridden list would be impossible to reason about in Studio.
+    ...copyFields,
+
+    /* ── TREATMENT HIGHLIGHTS: THE CARDS ──────────────────────────────
+     * Which treatments appear, and the bullets on each card, were a
+     * constant in the component file, so dropping one treatment or fixing
+     * one bullet needed a deploy. Empty renders exactly the list the
+     * component has always shipped. Filling it replaces the whole list,
+     * not part of it — a half-overridden list would be impossible to
+     * reason about in Studio.
      */
-    defineField({
-      name: "highlightsEyebrow",
-      title: "Eyebrow",
-      type: "string",
-      hidden: onlyTreatmentHighlights,
-      description:
-        "Small line above the heading. Leave empty to keep the current wording. · ID: Baris kecil di atas judul. Kosongkan untuk memakai teks yang sekarang.",
-    }),
-    defineField({
-      name: "highlightsTitle",
-      title: "Heading",
-      type: "string",
-      hidden: onlyTreatmentHighlights,
-      description:
-        "Leave empty to keep the current wording. · ID: Kosongkan untuk memakai teks yang sekarang.",
-    }),
-    defineField({
-      name: "highlightsIntro",
-      title: "Intro paragraph",
-      type: "text",
-      rows: 3,
-      hidden: onlyTreatmentHighlights,
-      description:
-        "Leave empty to keep the current wording. · ID: Kosongkan untuk memakai teks yang sekarang.",
-    }),
     defineField({
       name: "highlights",
       title: "Treatments in this section",
@@ -97,40 +114,18 @@ export const curatedSection = defineType({
       validation: (Rule) => Rule.max(12),
     }),
 
-    /* ── DOCTORS HEADING, MADE EDITABLE ───────────────────────────────
-     * The doctor cards already come from the Doctor collection; only the
-     * heading above them was a constant in the component. Same rule as
-     * the highlights fields: empty renders the current wording, which the
-     * placeholder shows so nobody has to guess what "empty" means.
-     */
-    defineField({
-      name: "doctorsEyebrow",
-      title: "Eyebrow",
-      type: "string",
-      hidden: onlyDoctors,
-      placeholder: DOCTORS_SECTION_HEADING.eyebrow,
-      description:
-        "Small line above the heading. Leave empty to keep the current wording. · ID: Baris kecil di atas judul. Kosongkan untuk memakai teks yang sekarang.",
-    }),
-    defineField({
-      name: "doctorsTitle",
-      title: "Heading",
-      type: "string",
-      hidden: onlyDoctors,
-      placeholder: DOCTORS_SECTION_HEADING.title,
-      description:
-        "Leave empty to keep the current wording. · ID: Kosongkan untuk memakai teks yang sekarang.",
-    }),
-    defineField({
-      name: "doctorsIntro",
-      title: "Intro paragraph",
-      type: "text",
-      rows: 3,
-      hidden: onlyDoctors,
-      placeholder: DOCTORS_SECTION_HEADING.description,
-      description:
-        "Leave empty to keep the current wording. · ID: Kosongkan untuk memakai teks yang sekarang.",
-    }),
+    // The hero's heading is the page's H1 and stays one, so it has no choice.
+    {
+      ...headingLevelField({
+        initialValue: "h2",
+        applies:
+          "The level of this section's heading. Headings inside the section — cards, questions, doctor names — follow one level below it.",
+        appliesId:
+          "Level untuk heading section ini. Heading di dalam section — kartu, pertanyaan, nama dokter — otomatis satu level di bawahnya.",
+      }),
+      hidden: ({ parent }: { parent?: unknown }) =>
+        (parent as { component?: string })?.component === "homeHero",
+    },
 
     ...sectionSettingsFields,
   ],

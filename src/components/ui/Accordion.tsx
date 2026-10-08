@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { ReactNode } from "react";
 import { PlusIcon, MinusIcon } from "./icons";
 import { useCollapse } from "@/lib/useCollapse";
+import type { SubheadingLevel } from "@/lib/headings";
 
 export type AccordionItem = {
   id: string;
@@ -35,17 +36,19 @@ function AccordionRow({
   isOpen,
   onToggle,
   dark,
+  Heading,
 }: {
   item: AccordionItem;
   isOpen: boolean;
   onToggle: () => void;
   dark: boolean;
+  Heading: SubheadingLevel;
 }) {
   const { wrapperProps, innerProps } = useCollapse(isOpen);
 
   return (
     <div className={`border-b ${dark ? "border-white/15" : "border-hairline"}`}>
-      <h3>
+      <Heading>
         <button
           type="button"
           onClick={onToggle}
@@ -63,7 +66,7 @@ function AccordionRow({
             {isOpen ? <MinusIcon className="h-5 w-5" /> : <PlusIcon className="h-5 w-5" />}
           </span>
         </button>
-      </h3>
+      </Heading>
 
       <div id={`panel-${item.id}`} {...wrapperProps}>
         <div {...innerProps}>
@@ -84,10 +87,13 @@ export default function Accordion({
   tone = "light",
   /** Index to leave open on first paint; -1 for all closed. */
   defaultOpen = -1,
+  /** One level below the heading of the section the questions sit in. */
+  headingAs = "h3",
 }: {
   items: AccordionItem[];
   tone?: "light" | "dark";
   defaultOpen?: number;
+  headingAs?: SubheadingLevel;
 }) {
   const [openId, setOpenId] = useState<string | null>(
     defaultOpen >= 0 && items[defaultOpen] ? items[defaultOpen].id : null,
@@ -102,6 +108,7 @@ export default function Accordion({
           key={item.id}
           item={item}
           dark={dark}
+          Heading={headingAs}
           isOpen={openId === item.id}
           onToggle={() => setOpenId(openId === item.id ? null : item.id)}
         />

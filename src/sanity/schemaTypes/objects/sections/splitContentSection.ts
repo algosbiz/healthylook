@@ -1,5 +1,5 @@
 import { defineField, defineType } from "sanity";
-import { sectionSettingsFields, toneField } from "./shared";
+import { sectionSettingsFields, toneField, sectionHeadingLevelField } from "./shared";
 
 export const splitContentSection = defineType({
   name: "splitContentSection",
@@ -29,6 +29,7 @@ export const splitContentSection = defineType({
     }),
     defineField({ name: "action", title: "Optional action", type: "link" }),
     toneField,
+    sectionHeadingLevelField,
     ...sectionSettingsFields,
   ],
   preview: {
