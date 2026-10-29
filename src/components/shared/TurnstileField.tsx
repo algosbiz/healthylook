@@ -131,56 +131,113 @@ export default function TurnstileField({
     if (!SITE_KEY) return;
 
     let cancelled = false;
+    let started = false;
 
-    loadTurnstile()
-      .then(() => {
-        if (cancelled) return;
+    /**
+     * Loads Turnstile and draws the widget. Idempotent: whichever of the
+     * triggers below fires first starts it, and the rest are already off.
+     */
+    function start() {
+      if (started) return;
+      started = true;
 
-        // Rendered directly, NOT inside turnstile.ready().
-        //
-        // `ready()` exists to QUEUE work for callers who run before api.js
-        // has loaded. Called afterwards it logs "turnstile.ready() would
-        // break if called *before* the Turnstile api.js script is loaded"
-        // and never invokes the callback — so wrapping this in it left the
-        // container permanently empty, with only that warning to say so.
-        // By this line the script's own onload has already fired, which is
-        // exactly the case `ready()` does not handle.
-        const container = containerRef.current;
-        // Guarded against StrictMode's double-invoked effects, which would
-        // otherwise render two widgets into the same div and leave two
-        // hidden inputs of the same name in the form.
-        if (!container || widgetIdRef.current !== null) return;
+      loadTurnstile()
+        .then(() => {
+          if (cancelled) return;
 
-        widgetIdRef.current =
-          window.turnstile?.render(container, {
-            sitekey: SITE_KEY,
-            // Explicit rather than "auto": the site has no dark mode, so
-            // "auto" would drop a dark widget onto a cream page for
-            // anyone whose OS is set to dark.
-            theme: "light",
-            // "normal" (a fixed 300×65) rather than "flexible".
-            //
-            // Flexible stretches to its container, but it does NOT shrink
-            // below 300px — and a 300px-wide child inside the form's flex
-            // column stops the whole column shrinking with it. Measured at
-            // a 320px viewport: the form went from 214px wide to 300px and
-            // its right edge landed 33px off-screen, taking the page's
-            // horizontal scroll with it.
-            //
-            // So the width is pinned instead, and the wrapper below scales
-            // the widget down when there is less than 300px to give it.
-            size: "normal",
-            action,
-          }) ?? null;
-      })
-      .catch(() => {
-        // Already reported by script.onerror. Nothing to show the visitor
-        // here: the submit attempt is what will tell them, and it offers
-        // WhatsApp.
-      });
+          // Rendered directly, NOT inside turnstile.ready().
+          //
+          // `ready()` exists to QUEUE work for callers who run before api.js
+          // has loaded. Called afterwards it logs "turnstile.ready() would
+          // break if called *before* the Turnstile api.js script is loaded"
+          // and never invokes the callback — so wrapping this in it left the
+          // container permanently empty, with only that warning to say so.
+          // By this line the script's own onload has already fired, which is
+          // exactly the case `ready()` does not handle.
+          const container = containerRef.current;
+          // Guarded against StrictMode's double-invoked effects, which would
+          // otherwise render two widgets into the same div and leave two
+          // hidden inputs of the same name in the form.
+          if (!container || widgetIdRef.current !== null) return;
+
+          widgetIdRef.current =
+            window.turnstile?.render(container, {
+              sitekey: SITE_KEY,
+              // Explicit rather than "auto": the site has no dark mode, so
+              // "auto" would drop a dark widget onto a cream page for
+              // anyone whose OS is set to dark.
+              theme: "light",
+              // "normal" (a fixed 300×65) rather than "flexible".
+              //
+              // Flexible stretches to its container, but it does NOT shrink
+              // below 300px — and a 300px-wide child inside the form's flex
+              // column stops the whole column shrinking with it. Measured at
+              // a 320px viewport: the form went from 214px wide to 300px and
+              // its right edge landed 33px off-screen, taking the page's
+              // horizontal scroll with it.
+              //
+              // So the width is pinned instead, and the wrapper below scales
+              // the widget down when there is less than 300px to give it.
+              size: "normal",
+              action,
+            }) ?? null;
+        })
+        .catch(() => {
+          // Already reported by script.onerror. Nothing to show the visitor
+          // here: the submit attempt is what will tell them, and it offers
+          // WhatsApp.
+        });
+    }
+
+    // ── WHY IT DOES NOT START ON MOUNT ────────────────────────────────────
+    // The booking form sits at the bottom of nearly every page, so starting
+    // here put Turnstile on every page load: api.js, then the challenge
+    // frame and the ~0.9 MB of scripts it pulls in — more than half of a
+    // 1.7 MB page, fetched while the hero image and the fonts were still
+    // trying to arrive, by a visitor who in most cases never reaches the
+    // form. Lighthouse's throttled mobile run put the largest paint at 6.7
+    // to 12.5 s with that traffic on the wire.
+    //
+    // It starts when the form is about to matter instead: 600 px before it
+    // scrolls into view (a visible widget needs a second or two, so it is
+    // ready by the time the visitor gets there), or the moment a field in
+    // the form takes focus (keyboard users and anchor links skip the
+    // scroll). A form that is already on screen — /book-now — starts at
+    // once, which is the same behaviour as before for the page where the
+    // form is the point.
+    const wrapper = wrapperRef.current;
+    const form = wrapper?.closest("form") ?? null;
+    let observer: IntersectionObserver | null = null;
+
+    function stopWatching() {
+      observer?.disconnect();
+      form?.removeEventListener("focusin", onFocus);
+    }
+    function onFocus() {
+      stopWatching();
+      start();
+    }
+
+    if (wrapper && typeof IntersectionObserver !== "undefined") {
+      observer = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((entry) => entry.isIntersecting)) {
+            stopWatching();
+            start();
+          }
+        },
+        { rootMargin: "600px 0px" },
+      );
+      observer.observe(wrapper);
+      form?.addEventListener("focusin", onFocus);
+    } else {
+      // No observer to wait with: behave as before rather than never load.
+      start();
+    }
 
     return () => {
       cancelled = true;
+      stopWatching();
       const widgetId = widgetIdRef.current;
       if (widgetId) {
         window.turnstile?.remove(widgetId);

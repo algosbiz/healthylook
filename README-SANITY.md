@@ -209,9 +209,13 @@ Treatments remain separate structured documents because prices, treatment time, 
 
 The Presentation tool loads `SANITY_STUDIO_PREVIEW_ORIGIN` and enables Next.js Draft Mode through `/api/draft-mode/enable`. `SANITY_API_READ_TOKEN` must be a Viewer token and must never use the `NEXT_PUBLIC_` prefix.
 
-Published changes are picked up by Sanity Live. A webhook is also available as
-the immediate, deterministic cache invalidation path. The site has a 60-second
-ISR fallback, so a missed webhook cannot freeze published content indefinitely:
+Visitors' pages read published content with the read token, under their own
+cache tags (see `sanityFetch`), so a published change reaches them through the
+webhook below, which is the immediate, deterministic path, and the 60-second
+revalidate behind it, so a missed webhook cannot freeze published content
+indefinitely. `<SanityLive />` and `<VisualEditing />` are mounted only while
+draft mode is on (`src/components/sanity/SanityRuntime.tsx`) — that is, inside
+Studio's Presentation tool — and are not sent to ordinary visitors:
 
 - URL: `https://your-domain.example/api/revalidate/sanity`
 - Method: `POST`
