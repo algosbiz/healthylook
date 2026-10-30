@@ -61,6 +61,7 @@ export default function SanityHeroSection({ section }: { section: HeroSection })
           alt={section.image.alt}
           fill
           priority
+          fetchPriority="high"
           sizes="100vw"
           quality={85}
           className="object-cover object-center"

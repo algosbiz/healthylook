@@ -110,6 +110,11 @@ export default function PageHero({
             // in Img.tsx about "only the homepage hero" predates inner pages
             // having a hero image of their own.
             priority
+            // `priority` preloads the file, but the <img> itself carried no
+            // fetchpriority, and Lighthouse's discovery audit fails on exactly
+            // that: with the hero fetched at the default priority it queued
+            // behind the stylesheet and the fonts instead of ahead of them.
+            fetchPriority="high"
             // `image` is either a Sanity CDN URL (already resized and
             // format-negotiated there) or one of a handful of local
             // fallback paths (e.g. when a post has no cover image) — only
