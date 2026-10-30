@@ -23,12 +23,22 @@ import SanityRuntime from "@/components/sanity/SanityRuntime";
 // `display: "swap"` matters more in the redesign than it did before: the
 // hero headline is enormous script, so a blocked font would leave the
 // strongest element on the page invisible during load.
+//
+// `preload: false` on Poppins only. Five weights × two styles is ten files,
+// and preloading all of them put ten high-priority font requests in the
+// <head>, racing the stylesheet, the hero photo and — the one that matters —
+// the script face below, whose headline is the homepage's LCP element.
+// PageSpeed mobile measured that <h1> at 2.3 s of render delay. Poppins
+// still loads as soon as the CSS asks for a weight, and `swap` plus
+// next/font's metric-matched fallback keeps the text visible and the
+// layout still while it does.
 const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
   style: ["normal", "italic"],
   display: "swap",
+  preload: false,
 });
 
 // The brand's real script face, self-hosted from the clinic's own webfont
