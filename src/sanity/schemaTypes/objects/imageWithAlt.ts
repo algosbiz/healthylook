@@ -45,8 +45,9 @@ export const imageWithAlt = defineType({
       type: "string",
     }),
     /* ── ON BY DEFAULT ─────────────────────────────────────────────────
-     * Read by a treatment section's figures and by images in rich text;
-     * cards, heroes and galleries always crop to their layout's shape.
+     * Read by a treatment section's figures, by images in rich text and by
+     * the image-and-text section; cards, heroes and galleries always crop
+     * to their layout's shape.
      *
      * It began opt-in, to protect photographs composed against the 16:9
      * crop. Then the clinic uploaded a three-panel diagram into a Sylfirm X
@@ -63,7 +64,7 @@ export const imageWithAlt = defineType({
       type: "boolean",
       initialValue: true,
       description:
-        "On: the image shows whole, in its own shape — right for diagrams and anything with text in it. Turn off to crop a photograph to the page's frame (16:9 in treatment sections, 4:3 in articles). · ID: Nyala: gambar tampil utuh sesuai bentuk aslinya — cocok untuk diagram dan gambar yang ada tulisannya. Matikan untuk memotong foto mengikuti bingkai halaman (16:9 di section treatment, 4:3 di artikel).",
+        "On: the image shows whole, in its own shape — right for diagrams and anything with text in it. Turn off to crop a photograph to the page's frame (16:9 in treatment sections, 4:3 in articles, 3:4 portrait beside text). · ID: Nyala: gambar tampil utuh sesuai bentuk aslinya — cocok untuk diagram dan gambar yang ada tulisannya. Matikan untuk memotong foto mengikuti bingkai halaman (16:9 di section treatment, 4:3 di artikel, 3:4 portrait di samping teks).",
     }),
   ],
   preview: {

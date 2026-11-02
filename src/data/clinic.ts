@@ -22,7 +22,7 @@ export const CLINIC_PHILOSOPHY =
   "Our philosophy is centered on delivering natural-looking results that enhance your unique features and help you become the best version of yourself.";
 
 export const CLINIC_SAFETY_STATEMENT =
-  "Your safety is our highest priority. At Healthy Looks, every treatment is delivered in accordance with internationally recognized medical standards while embracing the warmth and personalized care of Balinese hospitality.";
+  "Your safety is our highest priority. At Healthy Look, every treatment is delivered in accordance with internationally recognized medical standards while embracing the warmth and personalized care of Balinese hospitality.";
 
 /**
  * ── CLIENT REVISION 2 + 8 — THE HIGHLIGHTS ────────────────────────────

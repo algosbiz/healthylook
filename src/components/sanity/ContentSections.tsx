@@ -8,7 +8,7 @@ import SanityPortableText from "./SanityPortableText";
 import SectionShell from "./SectionShell";
 import ScrollNavButton from "./ScrollNavButton";
 import TransferOfferDetails from "./TransferOfferDetails";
-import { sanityImageUrl } from "@/sanity/lib/image";
+import { sanityImageRatio, sanityImageUrl } from "@/sanity/lib/image";
 import IconList, { isIconListLayout } from "@/components/shared/IconList";
 import { getSanityResultGalleries } from "@/sanity/lib/content";
 import { TREATMENT_CATEGORIES } from "@/data/treatments";
@@ -83,10 +83,16 @@ export function SplitContentBlock({ section }: { section: SplitContentSection })
           variant="image"
           className={`lg:col-span-5 ${imageFirst ? "lg:order-1" : "lg:order-2"}`}
         >
+          {/* Whole by default, the same rule as a treatment section's
+              figure; 3:4 only when "Show the whole image" is turned off.
+              It was always 3:4, which cut both ends off the team photo on
+              /our-doctor — a 3:2 group shot has no 3:4 crop that keeps
+              everyone in it. */}
           <Img
             src={src}
             alt={section.image.alt}
             aspect="portrait"
+            ratio={section.image.uncropped === false ? undefined : sanityImageRatio(section.image)}
             sizes="(max-width: 1024px) 100vw, 42vw"
           />
         </Reveal>
