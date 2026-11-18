@@ -17,12 +17,24 @@ import type { PriceGroup } from "@/data/treatments";
 /**
  * /pricing's price list, with a "Find a treatment" picker above it.
  *
- * The list is 45 treatments and roughly 27,000px of scroll, so on a phone the
+ * The list is 33 treatments and roughly 27,000px of scroll, so on a phone the
  * only ways to reach a price were the four category links or a lot of thumb.
  * This is modelled on the picker on anaya-aesthetics.com's price list — a
- * closed bar that opens into a search box over a list of treatments — at the
- * client's request. Choosing a treatment narrows the page to that one price
- * table; "All treatments" (or the link under the bar) puts the rest back.
+ * closed bar that opens into a search box and a list of treatments — at the
+ * client's request.
+ *
+ * ── TYPING FILTERS THE PAGE, NOT A DROPDOWN ────────────────────────────
+ * The first version only narrowed the dropdown's own list while typing, and
+ * the page behind it kept showing whatever was already there. The clinic's
+ * reply: typed "voluma", and the price on screen was still Botox's. So the
+ * page itself now follows the search box on every keystroke, and the panel
+ * shrinks to just the box so it isn't sitting on top of the answer. The
+ * treatment list is what you see with nothing typed: a way to browse.
+ *
+ * Which treatment is not always enough, though — "Juvederm Voluma" is one
+ * line in a long Dermal Filler table. When what was typed matched a price
+ * row rather than a treatment's name, that row is highlighted, and on
+ * Enter the page scrolls to it.
  *
  * ── WHY IT TAKES DATA RATHER THAN SERVER-RENDERED TABLES ───────────────
  * Showing and hiding needs state, so the entry blocks render here. The
@@ -56,17 +68,31 @@ function normalize(value: string): string {
     .replace(/[̀-ͯ]/g, "");
 }
 
+/**
+ * The words of a string, padded with a space at each end — " juvederm
+ * voluma " — so that a typed word can be looked for as " voluma". Matching
+ * on where a word STARTS is what keeps "lip" from lighting up
+ * "Mesolipolysis"; matching anywhere inside a word did exactly that.
+ */
+function wordsOf(value: string): string {
+  return ` ${normalize(value).replace(/[^a-z0-9]+/g, " ").trim()} `;
+}
+
 type IndexedEntry = {
   entry: PricingEntry;
   /** Name + the category it sits in: "skin" finds every skin treatment. */
   nameKey: string;
-  rows: { label: string; key: string }[];
+  /** `id` is "<group index>:<row index>", the form PriceTable highlights by. */
+  rows: { id: string; key: string }[];
 };
 
-type Result = {
-  category: PricingCategory;
-  items: { entry: PricingEntry; hint?: string }[];
+type Match = {
+  entry: PricingEntry;
+  /** Rows that matched, when the treatment's name alone did not. */
+  hits: ReadonlySet<string>;
 };
+
+const NO_HITS: ReadonlySet<string> = new Set();
 
 export default function PricingExplorer({
   categories,
@@ -78,64 +104,79 @@ export default function PricingExplorer({
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
+  // Bumped to ask for a scroll to the result once it is on screen.
+  const [scrollTick, setScrollTick] = useState(0);
 
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  const resultsRef = useRef<HTMLDivElement>(null);
   // Set when a category link is clicked while the list is narrowed: the
   // target doesn't exist yet, so the scroll has to wait for the full list.
   const pendingScrollId = useRef<string | null>(null);
-  // Set when a treatment is picked, read once the narrowed list is on screen.
-  const scrollToResults = useRef(false);
-  const resultsRef = useRef<HTMLDivElement>(null);
   const panelId = useId();
 
+  const search = query.trim();
+  const searching = search !== "";
+
   // Built once. Matching then only walks plain strings.
-  const index = useMemo(() => {
-    const byCategory = categories.map((category) => ({
-      category,
-      entries: category.entries.map<IndexedEntry>((entry) => ({
-        entry,
-        nameKey: normalize(`${entry.name} ${category.label}`),
-        rows: entry.groups.flatMap((group) =>
-          group.rows.map((row) => ({
-            label: row.label,
-            key: normalize(`${group.title ?? ""} ${row.label}`),
-          })),
-        ),
+  const index = useMemo(
+    () =>
+      categories.map((category) => ({
+        category,
+        entries: category.entries.map<IndexedEntry>((entry) => ({
+          entry,
+          nameKey: wordsOf(`${entry.name} ${category.label}`),
+          // Name, group title and row label only. The medi facials' step-by-
+          // step rundowns (`description`) are left out on purpose: they
+          // mention "HIFU" or "lip" in passing, and with them in, a search
+          // for one treatment lit up a dozen facials that merely use it.
+          rows: entry.groups.flatMap((group, groupIndex) =>
+            group.rows.map((row, rowIndex) => ({
+              id: `${groupIndex}:${rowIndex}`,
+              key: wordsOf(`${group.title ?? ""} ${row.label}`),
+            })),
+          ),
+        })),
       })),
-    }));
-    return byCategory;
-  }, [categories]);
+    [categories],
+  );
 
   const total = useMemo(
     () => categories.reduce((sum, category) => sum + category.entries.length, 0),
     [categories],
   );
 
-  // What the dropdown lists. Every typed word has to be found somewhere in
-  // the treatment's name, its category, or one of its price rows — so "lip"
-  // finds the filler table through its "Lips" row, and the row that matched
-  // is shown under the name so it is clear why it's there.
-  const results = useMemo<Result[]>(() => {
-    const tokens = normalize(query).split(/\s+/).filter(Boolean);
+  // What the typed words find. Every word has to turn up somewhere in a
+  // treatment's name, its category, or one of its price rows. A treatment
+  // whose own name carries all of them is shown plain; one that only got in
+  // through its rows also reports which rows, so they can be pointed at.
+  const matches = useMemo(() => {
+    const tokens = normalize(search)
+      .split(/[^a-z0-9]+/)
+      .filter(Boolean)
+      .map((token) => ` ${token}`);
+    if (!tokens.length) return [];
     return index
       .map(({ category, entries }) => ({
         category,
-        items: entries.flatMap(({ entry, nameKey, rows }) => {
-          if (!tokens.length) return [{ entry }];
-          if (tokens.every((token) => nameKey.includes(token))) return [{ entry }];
-          const row = rows.find((candidate) =>
-            tokens.every((token) => `${nameKey} ${candidate.key}`.includes(token)),
+        items: entries.flatMap<Match>(({ entry, nameKey, rows }) => {
+          if (tokens.every((token) => nameKey.includes(token))) {
+            return [{ entry, hits: NO_HITS }];
+          }
+          const hits = new Set(
+            rows
+              .filter((row) => tokens.every((token) => (nameKey + row.key).includes(token)))
+              .map((row) => row.id),
           );
-          return row ? [{ entry, hint: row.label }] : [];
+          return hits.size ? [{ entry, hits }] : [];
         }),
       }))
       .filter((result) => result.items.length > 0);
-  }, [index, query]);
+  }, [index, search]);
 
-  const resultCount = results.reduce((sum, result) => sum + result.items.length, 0);
+  const matchCount = matches.reduce((sum, result) => sum + result.items.length, 0);
 
   const selected = useMemo(() => {
     if (!selectedKey) return null;
@@ -146,40 +187,56 @@ export default function PricingExplorer({
     return null;
   }, [categories, selectedKey]);
 
-  // The page body: everything, or just the chosen treatment.
-  const visible = useMemo(
-    () =>
-      categories
-        .map((category) => ({
-          ...category,
-          entries: selected
-            ? category.entries.filter((entry) => entry.key === selected.key)
-            : category.entries,
-        }))
-        .filter((category) => category.entries.length > 0),
-    [categories, selected],
-  );
+  // The page body: what was typed, else the chosen treatment, else all of it.
+  const visible = useMemo(() => {
+    if (searching) {
+      return matches.map(({ category, items }) => ({ ...category, items }));
+    }
+    return categories
+      .map((category) => ({
+        ...category,
+        items: category.entries
+          .filter((entry) => !selected || entry.key === selected.key)
+          .map<Match>((entry) => ({ entry, hits: NO_HITS })),
+      }))
+      .filter((category) => category.items.length > 0);
+  }, [categories, matches, searching, selected]);
+
+  const filtered = searching || selected !== null;
 
   function close(returnFocus = false) {
     setOpen(false);
-    setQuery("");
     if (returnFocus) triggerRef.current?.focus();
   }
 
+  function showAll() {
+    setQuery("");
+    setSelectedKey(null);
+  }
+
   function choose(key: string | null) {
-    scrollToResults.current = key !== null;
+    setQuery("");
     setSelectedKey(key);
+    if (key !== null) setScrollTick((tick) => tick + 1);
+    close(true);
+  }
+
+  // Enter in the search box: done typing, show me. Closes the panel (and
+  // with it the on-screen keyboard) and takes the page to the answer.
+  function commitSearch() {
+    if (!searching) return;
+    setScrollTick((tick) => tick + 1);
     close(true);
   }
 
   // While open: park the bar just under the fixed header and the sticky
-  // category bar, so the list drops into clear space. Left where it was, on
-  // a phone the bottom of the list ends up behind the WhatsApp / Book now
-  // strip. Only moved when it's clearly elsewhere, so a bar that's already
-  // about right doesn't twitch. And put the cursor in the search box — but
-  // only where there's a physical keyboard: on a touch screen that would
-  // slam the on-screen keyboard over the list before anyone has looked at
-  // it, and one tap on the field opens it instead.
+  // category bar, so the panel drops into clear space. Left where it was, on
+  // a phone the bottom of the browse list ends up behind the WhatsApp / Book
+  // now strip. Only moved when it's clearly elsewhere, so a bar that's
+  // already about right doesn't twitch. And put the cursor in the search
+  // box — but only where there's a physical keyboard: on a touch screen that
+  // would slam the on-screen keyboard over the list before anyone has looked
+  // at it, and one tap on the field opens it instead.
   useEffect(() => {
     if (!open) return;
     const root = rootRef.current;
@@ -211,40 +268,47 @@ export default function PricingExplorer({
     };
   }, [open]);
 
-  // The category links in the sticky bar above point at `#price-…` blocks.
-  // With the list narrowed to one treatment most of those blocks aren't in
-  // the page, so the click would do nothing. Put the full list back, then
-  // go where the link meant.
+  // Bring the result up under the sticky category bar. Picking a treatment
+  // leaves its table a screen's worth of heading and spacing below the bar —
+  // on a phone, off the bottom of the screen. If what was typed matched a
+  // price row, the row is the point: keep the treatment's name in view when
+  // the row fits on the same screen, otherwise bring the row to mid-screen.
   useEffect(() => {
-    if (!selectedKey) return;
+    if (!scrollTick) return;
+    const results = resultsRef.current;
+    if (!results) return;
+    let top = window.scrollY + results.getBoundingClientRect().top - 150;
+    const hit = results.querySelector<HTMLElement>("[data-price-hit]");
+    if (hit) {
+      const hitTop = window.scrollY + hit.getBoundingClientRect().top;
+      if (hitTop - top > window.innerHeight - 140) top = hitTop - window.innerHeight * 0.5;
+    }
+    window.scrollTo({ top, behavior: "smooth" });
+  }, [scrollTick]);
+
+  // The category links in the sticky bar above point at `#price-…` blocks.
+  // With the list narrowed most of those blocks aren't in the page, so the
+  // click would do nothing. Put the full list back, then go where the link
+  // meant.
+  useEffect(() => {
+    if (!filtered) return;
     function onClick(event: MouseEvent) {
       const link = (event.target as Element | null)?.closest?.('a[href^="#price-"]');
       if (!link) return;
       pendingScrollId.current = link.getAttribute("href")!.slice(1);
-      setSelectedKey(null);
+      showAll();
     }
     document.addEventListener("click", onClick);
     return () => document.removeEventListener("click", onClick);
-  }, [selectedKey]);
-
-  // Picking a treatment leaves its price table a screen's worth of heading
-  // and spacing below the bar — on a phone, off the bottom of the screen. So
-  // bring the result up under the sticky category bar.
-  useEffect(() => {
-    const wanted = scrollToResults.current;
-    scrollToResults.current = false;
-    if (!selectedKey || !wanted || !resultsRef.current) return;
-    const top = resultsRef.current.getBoundingClientRect().top;
-    window.scrollTo({ top: window.scrollY + top - 150, behavior: "smooth" });
-  }, [selectedKey]);
+  }, [filtered]);
 
   useEffect(() => {
-    if (selectedKey || !pendingScrollId.current) return;
+    if (filtered || !pendingScrollId.current) return;
     document
       .getElementById(pendingScrollId.current)
       ?.scrollIntoView({ behavior: "smooth", block: "start" });
     pendingScrollId.current = null;
-  }, [selectedKey]);
+  }, [filtered]);
 
   function onRootKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     if (event.key === "Escape" && open) {
@@ -267,18 +331,16 @@ export default function PricingExplorer({
     stops[next].focus();
   }
 
-  function onInputKeyDown(event: KeyboardEvent<HTMLInputElement>) {
-    if (event.key !== "Enter") return;
-    event.preventDefault();
-    const first = results[0]?.items[0];
-    if (first) choose(first.entry.key);
-  }
-
   const optionBase =
     "flex w-full min-h-11 flex-col justify-center border-l-2 px-4 py-2.5 text-left font-sans text-label leading-snug transition-colors";
   const optionIdle =
     "border-transparent text-text-secondary hover:bg-wash hover:text-ink";
   const optionActive = "border-primary bg-primary/5 font-medium text-primary-strong";
+
+  const whatsappHref = whatsappHrefFor(
+    whatsappNumber,
+    `Hi Healthy Look, I'm looking for the price of ${search}.`,
+  );
 
   return (
     <div>
@@ -308,10 +370,10 @@ export default function PricingExplorer({
           <FilterIcon className="h-[18px] w-[18px] shrink-0 text-primary" />
           <span
             className={`min-w-0 flex-1 truncate font-sans text-body ${
-              selected ? "text-ink" : "text-text-secondary"
+              filtered ? "text-ink" : "text-text-secondary"
             }`}
           >
-            {selected ? selected.name : "Find a treatment"}
+            {searching ? `“${search}”` : selected ? selected.name : "Find a treatment"}
           </span>
           <span
             aria-hidden="true"
@@ -332,7 +394,11 @@ export default function PricingExplorer({
         >
           {/* 16px type: below that, iOS Safari zooms the page when a field
               takes focus and doesn't zoom back out. */}
-          <div className="flex shrink-0 items-center gap-3 border-b border-hairline px-4 py-1">
+          <div
+            className={`flex shrink-0 items-center gap-3 px-4 py-1 ${
+              searching && matchCount > 0 ? "" : "border-b border-hairline"
+            }`}
+          >
             <SearchIcon className="h-4 w-4 shrink-0 text-primary" />
             <input
               ref={inputRef}
@@ -343,8 +409,15 @@ export default function PricingExplorer({
               autoCorrect="off"
               spellCheck={false}
               value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              onKeyDown={onInputKeyDown}
+              onChange={(event) => {
+                setQuery(event.target.value);
+                setSelectedKey(null);
+              }}
+              onKeyDown={(event) => {
+                if (event.key !== "Enter") return;
+                event.preventDefault();
+                commitSearch();
+              }}
               placeholder="Search treatments or prices…"
               aria-label="Search treatments"
               className="min-h-11 min-w-0 flex-1 bg-transparent font-sans text-body text-ink placeholder:text-muted focus:outline-none focus-visible:outline-none"
@@ -365,15 +438,24 @@ export default function PricingExplorer({
           </div>
 
           <p className="sr-only" role="status">
-            {query
-              ? resultCount
-                ? `${resultCount} ${resultCount === 1 ? "treatment" : "treatments"} found`
+            {searching
+              ? matchCount
+                ? `${matchCount} ${matchCount === 1 ? "treatment" : "treatments"} found, shown below`
                 : "No treatments found"
               : ""}
           </p>
 
-          <div className="overflow-y-auto overscroll-contain py-1.5">
-            {!query && (
+          {/* Typing hands the answer to the page, so the panel is only the
+              box (and a one-line "nothing found"); with nothing typed it is
+              the list to browse. */}
+          {searching ? (
+            matchCount === 0 && (
+              <p className="px-5 py-4 font-sans text-label leading-relaxed text-text-secondary">
+                No treatment matches “{search}”.
+              </p>
+            )
+          ) : (
+            <div className="overflow-y-auto overscroll-contain py-1.5">
               <button
                 type="button"
                 data-option
@@ -382,68 +464,49 @@ export default function PricingExplorer({
               >
                 All treatments
               </button>
-            )}
 
-            {results.map(({ category, items }) => (
-              <div key={category.id} role="group" aria-label={category.label}>
-                <p aria-hidden="true" className="eyebrow px-4 pb-1 pt-4 text-muted">
-                  {category.label}
-                </p>
-                {items.map(({ entry, hint }) => (
-                  <button
-                    key={entry.key}
-                    type="button"
-                    data-option
-                    onClick={() => choose(entry.key)}
-                    aria-current={entry.key === selectedKey ? "true" : undefined}
-                    className={`${optionBase} ${entry.key === selectedKey ? optionActive : optionIdle}`}
-                  >
-                    {entry.name}
-                    {hint && (
-                      <span className="mt-0.5 block font-normal text-caption text-muted">
-                        {hint}
-                      </span>
-                    )}
-                  </button>
-                ))}
-              </div>
-            ))}
-
-            {query && resultCount === 0 && (
-              <div className="px-5 py-5">
-                <p className="font-sans text-label leading-relaxed text-text-secondary">
-                  No treatment matches “{query.trim()}”.
-                </p>
-                <a
-                  href={whatsappHrefFor(
-                    whatsappNumber,
-                    `Hi Healthy Look, I'm looking for the price of ${query.trim()}.`,
-                  )}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-3 inline-flex min-h-11 items-center gap-2 font-sans text-label text-link transition-colors hover:text-link-hover"
-                >
-                  <WhatsAppIcon className="h-4 w-4" />
-                  Ask us on WhatsApp
-                </a>
-              </div>
-            )}
-          </div>
+              {categories.map((category) => (
+                <div key={category.id} role="group" aria-label={category.label}>
+                  <p aria-hidden="true" className="eyebrow px-4 pb-1 pt-4 text-muted">
+                    {category.label}
+                  </p>
+                  {category.entries.map((entry) => (
+                    <button
+                      key={entry.key}
+                      type="button"
+                      data-option
+                      onClick={() => choose(entry.key)}
+                      aria-current={entry.key === selectedKey ? "true" : undefined}
+                      className={`${optionBase} ${entry.key === selectedKey ? optionActive : optionIdle}`}
+                    >
+                      {entry.name}
+                    </button>
+                  ))}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
-      {selected && (
-        <p
-          role="status"
-          className="-mt-6 mb-14 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center font-sans text-label text-text-secondary"
-        >
+      {filtered && (
+        <p className="-mt-6 mb-14 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center font-sans text-label text-text-secondary">
           <span>
-            Showing <span className="font-medium text-ink">{selected.name}</span>
-            <span className="text-muted"> · 1 of {total}</span>
+            {searching ? (
+              <>
+                {matchCount === 0 ? "No treatment" : `${matchCount} ${matchCount === 1 ? "treatment" : "treatments"}`}{" "}
+                matching <span className="font-medium text-ink">“{search}”</span>
+              </>
+            ) : (
+              <>
+                Showing <span className="font-medium text-ink">{selected?.name}</span>
+                <span className="text-muted"> · 1 of {total}</span>
+              </>
+            )}
           </span>
           <button
             type="button"
-            onClick={() => setSelectedKey(null)}
+            onClick={showAll}
             className="inline-flex min-h-11 items-center text-link underline underline-offset-4 transition-colors hover:text-link-hover"
           >
             Show all treatments
@@ -453,6 +516,24 @@ export default function PricingExplorer({
 
       {/* ── The price list ── */}
       <div ref={resultsRef} className="flex flex-col gap-20">
+        {searching && matchCount === 0 && (
+          <div className="mx-auto max-w-md text-center">
+            <p className="font-sans text-copy leading-relaxed text-text-secondary">
+              We couldn’t find “{search}” on the price list. Message us and we’ll tell you the
+              price.
+            </p>
+            <a
+              href={whatsappHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 inline-flex min-h-11 items-center gap-2 font-sans text-label text-link transition-colors hover:text-link-hover"
+            >
+              <WhatsAppIcon className="h-4 w-4" />
+              Ask us on WhatsApp
+            </a>
+          </div>
+        )}
+
         {visible.map((category) => (
           // 160px of scroll offset: an anchor here has to clear both the
           // fixed header (96px) and the sticky category nav beneath it
@@ -460,7 +541,7 @@ export default function PricingExplorer({
           <div key={category.id} id={`price-${category.id}`} className="scroll-mt-40">
             <SectionHeading eyebrow={category.number} title={category.label} align="left" />
             <div className="mt-12 flex flex-col gap-14">
-              {category.entries.map((entry) => (
+              {category.items.map(({ entry, hits }) => (
                 <div
                   key={entry.key}
                   className="grid gap-8 border-t border-hairline pt-9 lg:grid-cols-12 lg:gap-14"
@@ -477,7 +558,7 @@ export default function PricingExplorer({
                     )}
                   </div>
                   <div className="lg:col-span-8">
-                    <PriceTable groups={entry.groups} />
+                    <PriceTable groups={entry.groups} highlight={hits} />
                   </div>
                 </div>
               ))}
