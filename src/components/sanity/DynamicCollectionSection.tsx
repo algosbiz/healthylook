@@ -1,7 +1,7 @@
 import Link from "next/link";
 import ContactForm from "@/components/shared/ContactForm";
 import GiftCardForm from "@/components/shared/GiftCardForm";
-import PriceTable from "@/components/shared/PriceTable";
+import PricingExplorer, { type PricingCategory } from "@/components/shared/PricingExplorer";
 import TreatmentThumb from "@/components/shared/TreatmentThumb";
 import Reveal from "@/components/ui/Reveal";
 import SectionHeading from "@/components/ui/SectionHeading";
@@ -112,53 +112,55 @@ async function BlogDirectory({ section }: { section: CollectionSection }) {
 }
 
 async function PricingDirectory({ section }: { section: CollectionSection }) {
-  const [all, extraSections] = await Promise.all([getTreatments(), getExtraPricingSections()]);
-  const treatments = all.filter((item) => item.priceGroups?.length);
+  const [all, extraSections, copy] = await Promise.all([
+    getTreatments(),
+    getExtraPricingSections(),
+    getSiteCopy(),
+  ]);
+  // The November SEO copy lives in Sanity as draft-only duplicates of the
+  // treatments it changes, slugged `<slug>-seo-nov-2026` (see
+  // scripts/sanity/duplicate-seo-copy-2026-11.cjs). With draft preview on
+  // they come through getTreatments() as extra treatments carrying the same
+  // prices as their original, so each one would be listed here twice. They
+  // are kept apart from the live price list on purpose.
+  const treatments = all.filter(
+    (item) => item.priceGroups?.length && !item.slug.endsWith("-seo-nov-2026"),
+  );
+  // Only what the price list needs crosses to the client component: the
+  // full treatment records carry far more than this page ever shows.
+  const categories: PricingCategory[] = TREATMENT_CATEGORIES.map((category, categoryIndex) => ({
+    id: category.id,
+    label: category.label,
+    number: String(categoryIndex + 1).padStart(2, "0"),
+    entries: [
+      ...treatments
+        .filter((item) => item.category === category.id)
+        .map((item) => ({
+          key: `treatment-${item.slug}`,
+          name: item.name,
+          description: item.shortDescription,
+          groups: item.priceGroups!,
+        })),
+      // Eye treatment, personalized mesotherapy, intimate care: price
+      // tables with no treatment page of their own. The client asked for
+      // them to sit under the category they belong to rather than in a
+      // "More treatments" catch-all — see extraPricingSections in
+      // data/pricing.ts. They are why a category can be worth rendering
+      // even when no treatment in it carries a price.
+      ...extraSections
+        .filter((item) => item.category === category.id)
+        .map((item) => ({
+          key: `extra-${item.id}`,
+          name: item.title,
+          groups: item.groups,
+        })),
+    ],
+  })).filter((category) => category.entries.length > 0);
+
   return (
     <SectionShell tone={section.tone} anchor={section.anchor}>
       <Heading section={section} />
-      <div className="flex flex-col gap-20">
-        {TREATMENT_CATEGORIES.map((category, categoryIndex) => {
-          const items = treatments.filter((item) => item.category === category.id);
-          // Eye treatment, personalized mesotherapy, intimate care: price
-          // tables with no treatment page of their own. The client asked for
-          // them to sit under the category they belong to rather than in a
-          // "More treatments" catch-all — see extraPricingSections in
-          // data/pricing.ts. They are why a category can be worth rendering
-          // even when no treatment in it carries a price.
-          const extras = extraSections.filter((item) => item.category === category.id);
-          if (!items.length && !extras.length) return null;
-          return (
-            // 160px of scroll offset: an anchor here has to clear both the
-            // fixed header (96px) and the sticky category nav beneath it
-            // (~54px, when a categoryNavSection is present on the page).
-            <div key={category.id} id={`price-${category.id}`} className="scroll-mt-40">
-              <SectionHeading eyebrow={String(categoryIndex + 1).padStart(2, "0")} title={category.label} align="left" />
-              <div className="mt-12 flex flex-col gap-14">
-                {items.map((item) => (
-                  <div key={item.slug} className="grid gap-8 border-t border-hairline pt-9 lg:grid-cols-12 lg:gap-14">
-                    <div className="lg:col-span-4">
-                      <h3 className="font-sans text-h3 text-ink">{item.name}</h3>
-                      <p className="mt-4 font-sans text-sm leading-relaxed text-text-secondary">{item.shortDescription}</p>
-                    </div>
-                    <div className="lg:col-span-8"><PriceTable groups={item.priceGroups!} /></div>
-                  </div>
-                ))}
-                {extras.map((item) => (
-                  <div key={item.id} className="grid gap-8 border-t border-hairline pt-9 lg:grid-cols-12 lg:gap-14">
-                    {/* No description line, unlike the treatments above — these
-                        three have no treatment page to summarise. */}
-                    <div className="lg:col-span-4">
-                      <h3 className="font-sans text-h3 text-ink">{item.title}</h3>
-                    </div>
-                    <div className="lg:col-span-8"><PriceTable groups={item.groups} /></div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      <PricingExplorer categories={categories} whatsappNumber={copy.whatsappNumber} />
     </SectionShell>
   );
 }
