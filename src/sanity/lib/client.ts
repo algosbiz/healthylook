@@ -98,8 +98,10 @@ const live = defineLive({
   stega: true,
   // Webhook tags provide immediate invalidation in production. The timed
   // fallback prevents a missed/misconfigured webhook from leaving published
-  // content frozen at the last deployment indefinitely.
-  fetchOptions: { revalidate: 60 },
+  // content frozen at the last deployment indefinitely. An hour, not a
+  // minute: every timed refresh redraws the page and Vercel bills it as
+  // ISR writes, while the webhook already handles real edits at once.
+  fetchOptions: { revalidate: 3600 },
 });
 
 export const SanityLive = live.SanityLive;
@@ -127,7 +129,7 @@ function fetchPublished<TResult>(
   return publishedClient.fetch<TResult>(query, options.params ?? {}, {
     next: {
       tags: options.tags ?? ["sanity"],
-      revalidate: options.revalidate ?? 60,
+      revalidate: options.revalidate ?? 3600,
     },
   });
 }
@@ -180,7 +182,7 @@ export async function sanityFetch<TResult>(
    *
    * So visitors' pages read with the token, directly. In practice that is
    * what served them all along, through the fallback. The webhook tags plus
-   * the 60-second revalidate keep it fresh. Live stays for draft mode below,
+   * the hourly revalidate keep it fresh. Live stays for draft mode below,
    * where it reads with `serverToken` and so sees everything.
    */
   if (!(await isDraftMode())) {

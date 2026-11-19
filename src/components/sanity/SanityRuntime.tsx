@@ -17,7 +17,7 @@ import { isSanityConfigured } from "@/sanity/env";
  *  · SanityLive opens a connection to Sanity and, on an event, revalidates
  *    the cache tags that event names. Public pages do not read through Live
  *    any more (see sanityFetch: published content is read with the token,
- *    under its own tags, refreshed by the webhook and the 60-second
+ *    under its own tags, refreshed by the webhook and the hourly
  *    revalidate), so there is nothing for it to revalidate. Only draft mode
  *    still reads through Live.
  *
