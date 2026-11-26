@@ -166,8 +166,12 @@ async function main() {
     return;
   }
 
+  // `drafts.seo-nov-2026-*` are review copies of other treatments, made by
+  // duplicate-seo-copy-2026-11.cjs. They have no published twin and a
+  // -seo-nov-2026 slug: publishing one would put a second Botox page live.
+  // `--only=botox` would match them too, since it is a substring test.
   const drafts = await client.fetch<TreatmentDoc[]>(
-    `*[_type == "treatment" && _id in path("drafts.**")]`,
+    `*[_type == "treatment" && _id in path("drafts.**") && !string::startsWith(_id, "drafts.seo-nov-2026-")]`,
   );
 
   const selected = ONLY

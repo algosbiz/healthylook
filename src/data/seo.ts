@@ -145,22 +145,17 @@ export const TREATMENT_SEO: Record<string, PageSeo> = {
     description:
       "Experience premium Linear HIFU treatments in Ubud, Bali. Achieve firmer, youthful skin with advanced, non-invasive technology.",
   },
-  // ── NEW DEVICE — XERF ───────────────────────────────────────────────
-  // Written here rather than left to the fallback, because this is the one
-  // treatment on the site with no live page to inherit a tag from and the
-  // one the clinic is actively launching. The phrases people are searching
-  // are the brand name and "skin tightening", which is what the title
-  // leads with; "no downtime" and "no fat loss" are in the description
-  // because they are the two objections the clinic's own document answers
-  // at greatest length.
-  // Updated to match what the clinic actually wrote in Studio after the
-  // treatment was published — theirs is the live tag now, since Sanity's
-  // copy wins over this file for any slug it holds. Kept in sync so the
-  // fallback can never serve a different title from the published one.
+  // ── XERF: CLINIC REVISION, 23 NOVEMBER 2026 ─────────────────────────
+  // Copy from the clinic's revised XERF document (Google Doc, "Updated
+  // 23 November 2026"), word for word. It replaces the first version of
+  // the page, built from "XERF Treatment Bali.docx"; that version is in git
+  // history. Sanity's treatment.xerf still holds the old copy and wins over
+  // this file wherever it has a value, so live does not change until the
+  // same copy is entered in Studio.
   xerf: {
-    title: "XERF Treatment in Bali - Non-Surgical Skin Tightening",
+    title: "XERF in Bali (Ubud) | Doctor-Led Skin Tightening | Healthy Look",
     description:
-      "Book XERF treatment in Ubud, Bali with a certified doctor. FDA-cleared dual-frequency RF tightens skin and lifts contours, no needles, no downtime required.",
+      "Lift and tighten your skin with XERF in Bali, performed by our doctors in Ubud. Personalized protocol, no needles, no downtime and free Bali transfer.",
   },
   "collagen-stimulator": {
     title: "Collagen Stimulator Ubud Bali",

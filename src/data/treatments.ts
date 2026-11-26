@@ -459,110 +459,56 @@ export const treatments: Treatment[] = [
       },
     ],
   },
-  // ── NEW DEVICE — XERF ───────────────────────────────────────────────
-  // Added on the clinic's own brief ("We have a new device, XERF, the
-  // viral skin tightening treatment… categorized as Facial Enhancement.
-  // The price starts from IDR 9.800.000") plus the full treatment document
-  // they supplied, "XERF Treatment Bali.docx". Every clinical statement
-  // below — the frequencies, the temperatures, the timelines, the
-  // contraindications — is theirs, verbatim or with spelling and grammar
-  // tidied only ("Decolettage" → "Décolletage", "Treatement" → "Treatment",
-  // hyphens in ranges → en dashes to match the rest of this file).
+  // ── XERF: CLINIC REVISION, 23 NOVEMBER 2026 ─────────────────────────
+  // Copy from the clinic's revised XERF document (Google Doc, "Updated
+  // 23 November 2026"), word for word. It replaces the first version of
+  // the page, built from "XERF Treatment Bali.docx"; that version is in git
+  // history. Sanity's treatment.xerf still holds the old copy and wins over
+  // this file wherever it has a value, so live does not change until the
+  // same copy is entered in Studio.
   //
-  // Sits beside HIFU deliberately: it is the other non-surgical tightening
-  // device, and the clinic's own document compares the two at length (see
-  // the "HIFU vs Thermage vs XERF" section in treatmentSections.ts).
+  // The answer box under the H1, the price heading, intro, promo badge and
+  // note are page wording kept in code: see src/data/treatmentPageExtras.ts.
+  // "Performed by Our Doctors" opens the About block.
   //
-  // ── PRICE: ONE FLAT FIGURE, NOT A MENU ──────────────────────────────
-  // The clinic confirmed XERF is sold at a single price with no tiers —
-  // not per area like HIFU, and not per shot count the way monopolar RF is
-  // often sold elsewhere. So `priceGroups` carries exactly one row, which
-  // is the minimum a price table can hold and perfectly valid: it is what
-  // puts XERF on /pricing at all, since that page lists only treatments
-  // that have a table and ignores `startingPrice` entirely.
-  //
-  // The row is labelled "Per session" rather than "XERF". On /pricing the
-  // treatment's own name is already the heading beside the table, so a row
-  // reading "XERF" under a heading reading "XERF" says nothing twice —
-  // and "Per session" is the true unit here, since the clinic's own FAQ
-  // prices repeat treatments one session at a time.
-  //
-  // ⚠ NO PACKAGE ROWS. The clinic's FAQ rules them out in its own words:
-  // "the number of sessions is best evaluated based on how your skin
-  // responds after the first session, instead of offering a package from
-  // the beginning." A "3x session" row here would be contradicted by this
-  // treatment's own page two screens further down.
+  // Price rows are the document's table: package as the label and treatment
+  // area as the description.
   {
     slug: "xerf",
     name: "XERF",
-    h1: "XERF Skin Tightening Treatment in Ubud Bali",
+    h1: "XERF in Bali – Doctor-Led Skin Tightening in Ubud",
     category: "facial-enhancement",
-    treatmentTime: "30–60 minutes, depending on the number of shots",
-    treatmentTimeShort: "30–60 minutes",
-    anaesthesia: "No",
-    downtime:
-      "None. Mild pinkness, if it occurs, usually subsides within a few hours",
-    initialResult: "Some improvement immediately; 2–4 weeks for noticeable change",
+    treatmentTime: "60–120 minutes, depending on the number of shots",
+    treatmentTimeShort: "60–120 minutes",
+    anaesthesia: "Yes",
+    downtime: "None",
+    initialResult: "Some improvement immediately",
     fullResult: "Approximately 3 months",
     performedBy: "Licensed doctor",
-    // Deliberately does NOT open the way `intro` does. The detail page
-    // prints this as the lead and the intro directly underneath it, so a
-    // short description that paraphrased the intro's first sentence — which
-    // this one did — read as the same paragraph twice. Same rule the rest
-    // of the catalogue follows: the description says what the treatment
-    // does for you, the intro says what it is.
+    // Card copy only; the hero shows the answer box from treatmentPageExtras.
     shortDescription:
       "A needle-free radiofrequency treatment that tightens and lifts the face, jawline, and neck at three different skin depths — no downtime, and no fat loss.",
-    // The manufacturer's own product shot, taken from the clinic's
-    // document. White-ground square, same as the other device photos on
-    // disk (lysiwave.jpg, sylfirm.jpg), so no `imagePosition` is needed.
     image: "/images/treatments/xerf.jpg",
-    startingPrice: 9800000,
-    // Synced from Sanity 2026-09-16. The clinic filled the real table in
-    // Studio: six tiers by shot count, not the single flat price this held
-    // while they were still deciding. Sanity is what the site serves; this
-    // matters only on the day Sanity cannot be reached, which is exactly
-    // the day a wrong price would be worst.
+    startingPrice: 5900000,
     priceGroups: [
       {
-        title: "XERF",
         rows: [
-          { label: "XERF 150 shots (double chin OR forehead & browlift)", price: 9800000 },
-          { label: "XERF 300 shots (Lower Face OR Neck & Double Chin)", price: 18500000 },
-          { label: "XERF 450 shots (Lower Face & Browlift)", price: 24500000 },
-          { label: "XERF 600 shots (Full Face or Neck & Decolettage)", price: 29500000 },
-          { label: "XERF 900 shots (Full Face & Neck)", price: 42500000 },
-          { label: "XERF 1050 shots (Full face, Neck, and Decolettage)", price: 49000000 },
+          { label: "XERF 100 shots", description: "Forehead or eye area or small double chin", price: 5900000 },
+          { label: "XERF 150 shots", description: "Double chin or forehead & eye area", price: 9800000 },
+          { label: "XERF 300 shots", description: "Lower face or neck & double chin", price: 18500000 },
+          { label: "XERF 450 shots", description: "Lower face & brow lift", price: 24500000 },
+          { label: "XERF 600 shots", description: "Full face or neck & décolletage", price: 29500000 },
+          { label: "XERF 900 shots", description: "Full face & neck", price: 42500000 },
+          { label: "XERF 1,050 shots", description: "Full face, neck & décolletage", price: 49000000 },
+          { label: "XERF Body", description: "Based on consultation", price: null },
         ],
       },
     ],
-    // ── THE DOCUMENT'S OWN OPENING ──────────────────────────────────────
-    // This used to hold the "What is XERF?" definition, and the two
-    // paragraphs the clinic actually opens with were missing from the page
-    // entirely. They are the lead-in, and they only work BEFORE the
-    // definition — a page that defines the technology and then asks "are
-    // you looking for a non-invasive way…?" reads backwards.
-    //
-    // So the opening sits here, where the page prints it directly under
-    // the short description, and the definition moved down into its own
-    // "What is XERF?" section — which is the order the document has.
-    // The clinic's two paragraphs are run together as one, because `intro`
-    // renders as a single <p>; no wording changed.
+    aboutHeading: "Performed by Our Doctors",
+    aboutHeadingLevel: "h2",
+    // Two paragraphs in the document; `intro` renders as one <p>.
     intro:
-      "Are you looking for a non-invasive way to achieve firmer, tighter, and more youthful-looking skin? If you have already searched for skin tightening, chances are you have seen XERF mentioned everywhere, from celebrity Instagram stories to clinic treatment menus. Our XERF treatment is now available in Bali, so you no longer need to travel overseas again to try one of the most talked-about non-surgical facelift alternatives.",
-    popularAreasTitle: "What areas can be treated with our XERF",
-    popularAreas: [
-      "Forehead",
-      "Brow lift",
-      "Cheek",
-      "Smile line",
-      "Marionette",
-      "Jawline",
-      "Under the chin area",
-      "Neck",
-      "Décolletage",
-      "Body",
-    ],
+      "At our clinic, XERF is never delegated to a nurse or therapist. Our doctors assess your facial anatomy, determine where and at what depth the energy should be delivered, and personally perform the entire treatment. Our head doctor personally tried and compared several monopolar RF devices before selecting XERF for our clinic. We chose XERF because its two frequencies can provide mild lifting in addition to skin tightening. It is also considerably less painful than other conventional monopolar RF treatments.",
   },
   {
     slug: "collagen-stimulator",

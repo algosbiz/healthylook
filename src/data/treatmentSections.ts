@@ -383,501 +383,154 @@ export const treatmentSections: Record<string, TreatmentSection[]> = {
       ],
     },
   ],
-  // ── NEW DEVICE — XERF ──────────────────────────────────────────────
-  // Source: the clinic's own "XERF Treatment Bali.docx", supplied with the
-  // brief to add the treatment. Every clinical claim is theirs. Edits were
-  // spelling and punctuation only, plus the two structural changes noted
-  // where they occur (the comparison table and the can/cannot table, both
-  // of which are tables in the document and have no table renderer here).
+  // ── XERF: CLINIC REVISION, 23 NOVEMBER 2026 ─────────────────────────
+  // Copy from the clinic's revised XERF document (Google Doc, "Updated
+  // 23 November 2026"), word for word. It replaces the first version of
+  // the page, built from "XERF Treatment Bali.docx"; that version is in git
+  // history. Sanity's treatment.xerf still holds the old copy and wins over
+  // this file wherever it has a value, so live does not change until the
+  // same copy is entered in Studio.
   //
-  // ── SECOND PASS: THE TABLES AND THE ARTWORK ────────────────────────
-  // The first pass flattened both of the document's tables into prose and
-  // left all three of its infographics out, because a treatment section
-  // had nowhere to put either. It has both now — `blocks` takes tables
-  // alongside prose, and a figure can render at its own proportions rather
-  // than being cropped square. Everything the document carries is on the
-  // page: the opening (now this treatment's `intro`), the definition,
-  // every section, both tables, all three diagrams, the highlight list,
-  // and the 13 FAQs.
+  // The price block follows "What Is XERF?" (treatmentPageExtras.ts sets
+  // that, with its heading and intro). "What to Expect" (the journey) and
+  // the before & after band still come after all of these sections.
   "xerf": [
     {
-      // The definition. It was this treatment's `intro` on the first pass,
-      // which put it above the clinic's own opening lines; those lead now
-      // and this follows, which is the document's order. See the note on
-      // `intro` in treatments.ts.
-      title: "What is XERF?",
+      // The document's "Meet our doctors" link, right under the About text.
+      blocks: [{ heading: "Meet our doctors", headingLink: "/our-doctor" }],
+    },
+    {
+      title: "What Is XERF?",
       blocks: [
         {
           paragraphs: [
-            "XERF is the world's first and only dual-frequency monopolar RF technology, combining 6.78 MHz and 2 MHz to deliver targeted thermal energy at three different skin depths, supporting collagen remodeling and gradual skin tightening. Designed with comfort in mind, XERF offers a more comfortable treatment experience with less pain, while delivering controlled thermal energy to the skin. Known as a beauty secret among Hollywood and Korean celebrities, XERF offers an advanced approach to skin tightening without surgery or needle.",
+            "XERF is an advanced non-surgical skin tightening technology developed by Cynosure Lutronic. It is the first monopolar radiofrequency system to combine two frequencies, 6.78 MHz and 2 MHz, allowing heat to reach the superficial, middle and deeper layers of the skin, including the SMAS, the layer addressed in a surgical facelift. Partial tightening (20%) is visible immediately due to the heating effect. Your skin continues to improve as new collagen forms, with the best result achieved at around 3 months.",
           ],
         },
+        { heading: "What Areas Can We Treat with XERF?", headingLevel: "h3" },
+      ],
+      points: [
+        "Forehead and brow lift",
+        "Cheeks, smile lines and marionette lines",
+        "Jawline and under the chin",
+        "Neck and décolletage",
+        "Selected body areas, such as the postpartum abdomen",
       ],
     },
     {
-      title: "Who is XERF Treatment For?",
-      blocks: [
-        {
-          paragraphs: [
-            "XERF is an ideal option for patients aged 30 and above with mild to moderate skin laxity, reduced elasticity, early jowling, or mild neck laxity who prefer a needle-free treatment with no downtime. It can also be suitable for patients in their mid-20s who want to support long-term collagen health and maintain skin firmness. However, results may be more subtle in younger patients because they typically have less age-related collagen loss and skin laxity to address.",
-          ],
-        },
-      ],
-    },
-    {
-      title: "The Science Behind RF Skin Tightening",
-      // The clinic asked for a background here too. `wash` rather than a
-      // third strong colour: brown and cream are already spoken for further
-      // down, and a page where every other section shouts has no landmarks
-      // left. It is the site's own subtlest tint, not a new one.
+      title: "How XERF Works to Target Deeper Skin Layers",
       tone: "wash",
       blocks: [
         {
           paragraphs: [
-            "As we age, our skin gradually loses collagen in both quantity and quality. From around age 25, collagen levels decline by approximately 1% per year, with the process becoming more noticeable through our 40s and beyond. For women, collagen loss can accelerate around menopause, contributing to reduced firmness, elasticity, and increased skin laxity. This is where radiofrequency (RF) technology comes in. Used in aesthetic medicine for more than 20 years, RF delivers high-frequency electrical energy into the tissue, where tissue resistance converts it into controlled heat.",
-            "When the dermis reaches the appropriate therapeutic temperature, the heat causes immediate collagen contraction while stimulating fibroblasts to produce new collagen and elastin. Over the following months, collagen continues to remodel, reorganize, and mature, creating an initial tightening effect followed by progressive improvement over approximately 3–6 months. By strengthening the skin's collagen-rich structural network, RF can improve firmness, elasticity, and overall skin quality by working with the skin's natural regenerative processes to promote a more youthful appearance.",
-          ],
-        },
-        {
-          heading: "Why dual-frequency matters",
-          paragraphs: [
-            "Conventional monopolar RF typically operates at a single 6.78 MHz frequency, primarily targeting more superficial tissue layers. XERF also uses 6.78 MHz, but combines it with a lower 2 MHz frequency, allowing energy to reach different tissue depths. This is important because facial ageing is a multi-layer process: collagen and elastin gradually decrease in the skin, fat compartments can lose volume or shift, muscles and connective tissues become less supportive, and the SMAS gradually loses elasticity. Together, these changes contribute to skin laxity, folds, sagging, and loss of facial definition. The SMAS is the connective tissue layer that surgeons tighten during a surgical facelift. By combining 6.78 MHz and 2 MHz frequencies, XERF is designed to address superficial, mid, and deeper tissue layers, supporting both skin quality and deeper tissue tightening for a more comprehensive approach to facial ageing.",
-          ],
-          // The manufacturer's diagram of exactly this paragraph — the same
-          // three technologies, drawn against the skin layers each one
-          // reaches. Placed on the block rather than the section so it sits
-          // directly under the argument it illustrates, not at the foot of
-          // the section below the collagen paragraphs.
-          //
-          // The clinic's own crop, which stops above the manufacturer's
-          // "CONFIDENTIAL" footer — that footer is on the version inside
-          // the source document and should not be republished.
-          image: {
-            src: "/images/treatments/xerf-rf-comparison.jpg",
-            alt: "Diagram comparing bipolar RF, single monopolar RF at 6.78 MHz, and XERF's dual monopolar 6.78 MHz plus 2 MHz, showing how deep each reaches through the epidermis, dermis, subcutaneous fat and SMAS layer.",
-            ratio: 2.089,
-          },
-        },
-      ],
-    },
-    {
-      title: "No Fat Loss, Just Tightened and Lifted",
-      blocks: [
-        {
-          paragraphs: [
-            "Not just another marketing claim. XERF has been studied and its findings have been published in peer-reviewed scientific journals. Because we know you hate marketing gimmicks as much as we do, we believe your treatment should be backed by science, not just beautiful promises.",
-            "A 2025 histological study evaluating dual-frequency 6.78 MHz + 2 MHz monopolar RF found no evidence of adipocyte apoptosis, with adipocytes remaining viable after treatment. More recently, a 2026 human clinical study specifically evaluating XERF found no clinical or imaging evidence of fat atrophy during follow-up. The study also reported no significant net change in facial volume at 3 months, supporting preservation of the subcutaneous compartment.",
+            "As we age, our skin gradually loses collagen, the protein responsible for keeping it firm and elastic. Collagen levels start to decline by around 1% each year from the age of 25, with the rate of loss potentially increasing around menopause. Over time, this can lead to softer facial contours, fine lines and looser skin.",
+            "Radiofrequency (RF) treatments help address these changes by using electrical energy to generate controlled heat within the skin. RF has been used in aesthetic medicine for more than 20 years. When the heat reaches the dermis, it causes existing collagen fibres to contract and stimulates the production of new collagen and elastin.",
+            "However, the depth at which RF energy works depends partly on its frequency. Conventional single-frequency RF treatments mainly target more superficial skin layers, while facial ageing also affects deeper tissues, including the SMAS (superficial musculoaponeurotic system).",
+            "XERF addresses this by combining two frequencies: 6.78 MHz and a lower 2 MHz. This allows the treatment to deliver energy across superficial, middle and deeper skin layers in a single session. It aims to improve skin tightness and provide a mild lifting effect while preserving natural facial fat.",
+            "This is also supported by early research. A 2025 preclinical study of this type of dual-frequency RF found no evidence of fat cell death. Similarly, a small 2026 clinical study of XERF found no evidence of fat loss or significant net changes in facial volume after three months.",
           ],
         },
       ],
     },
     {
-      title: "How Does XERF Work?",
-      blocks: [
-        {
-          paragraphs: [
-            "XERF uses RF energy to heat different layers of the skin. Its technology allows the treatment to target shallow, middle, or deeper tissue for a more tailored approach to skin tightening and rejuvenation.",
-          ],
-        },
-      ],
-      // This section's paragraph is three lines long and the diagram is the
-      // rest of the answer: it names each of the three depths, its
-      // frequency, and which areas it suits. Set at section level because
-      // there is only one block and the figure closes the section.
-      //
-      // Cropped from the source document's own artboard at 1325×695 rather
-      // than the 572×281 copy that came with the images — the depth
-      // captions are small type, and at the smaller size they went soft at
-      // the width this column renders.
-      image: {
-        src: "/images/treatments/xerf-multi-layer-targeting.jpg",
-        alt: "XERF multi-layer targeting diagram: shallow at 6.78 MHz for the forehead and brow, middle at 6.78 MHz for upper cheeks and neck, and deep at 6.78 MHz plus 2 MHz for the lower face, under the chin and jowl.",
-        ratio: 1.906,
-      },
-    },
-    {
-      title: "Safety Features Behind XERF",
-      tone: "brown",
-      // Four named features, two sentences each: a list wearing prose
-      // clothing. As cards the reader sees all four at once.
+      title: "Why Choose Us for XERF in Bali?",
       display: "cards",
       blocks: [
         {
-          heading: "Wave Fit™ Pulse Technology",
+          heading: "Doctor-Performed Treatments",
+          paragraphs: ["Every XERF treatment is performed by one of our doctors."],
+        },
+        {
+          heading: "Genuine XERF Device",
           paragraphs: [
-            "XERF continuously adjusts each RF pulse based on real-time feedback from the skin. Energy is delivered at controlled therapeutic temperatures, reaching approximately 55–65°C in the dermis to stimulate collagen, while the system monitors the skin surface to help prevent overheating. If the surface temperature exceeds 43°C, RF delivery automatically pauses for added safety.",
+            "We use only the original XERF system by Cynosure Lutronic, sourced through official distributors.",
           ],
         },
         {
-          heading: "Advanced Integrated Cryogen Delivery (ICD) Cooling",
+          heading: "Personalized Protocol, Never a Template",
           paragraphs: [
-            "XERF delivers up to 12 cooling bursts per shot, before, during, and after RF delivery. This helps maintain a comfortable surface temperature, protect the epidermis, minimise discomfort, and allow controlled delivery of RF energy into deeper tissue.",
+            "Two patients may receive the same number of shots yet require very different treatment plans. We determine where the energy is delivered, at what depth and with what focus, based on your skin thickness, degree of laxity and treatment goals.",
           ],
         },
         {
-          heading: "Real-Time Impedance Monitoring",
+          heading: "Honest Recommendations",
           paragraphs: [
-            "The system continuously monitors tissue impedance and adjusts energy delivery accordingly, helping maintain consistent and precise treatment. RF delivery automatically stops if the skin surface reaches the safety threshold.",
+            "In addition to XERF, we offer HIFU, Sylfirm X and injectables. This allows us to recommend the treatment best suited to your face, rather than relying on a single device.",
           ],
         },
         {
-          heading: "Patented Spider-Web Pattern Tip",
+          heading: "International Patient Expertise",
           paragraphs: [
-            "The unique Spider-Web pattern tip is designed to distribute RF energy more evenly across the treatment area, reducing energy concentration at the edges. This helps minimise hot spots and supports a more comfortable and controlled treatment.",
+            "With 95% of our patients travelling from overseas, we have extensive experience with diverse skin types and facial structures.",
+          ],
+        },
+        {
+          heading: "Transparent Nett Pricing",
+          paragraphs: [
+            "All prices are inclusive of tax, with no additional 11% tax added at checkout.",
+          ],
+        },
+        {
+          heading: "Complimentary Private Transfer",
+          paragraphs: [
+            "We provide private pick-up and drop-off anywhere in Bali*. After your treatment, you can also enjoy a wellness elixir at Ubud Nyuh Bali Resort.",
           ],
         },
       ],
     },
     {
-      // ── THE CAN / CANNOT TABLE, NOW ACTUALLY A TABLE ────────────────
-      // The document sets this out twice: once as prose under "What XERF
-      // Can Do" / "What XERF Cannot Do", and again as a two-column table
-      // of ticks and crosses. Both are here now — the prose makes the
-      // argument, the table is the scannable summary, which is how the
-      // document itself uses them.
-      //
-      // The ✓ and ✗ glyphs are not carried into the cells. They repeat
-      // what the two column headings already say, and a screen reader
-      // announces them as "check mark" before every single item.
-      //
-      // `labelFirstColumn: false` because the two columns are peers, not a
-      // label and its values — see that field's note.
-      title: "Our Honest Approach to XERF",
+      title: "What XERF Can and Cannot Do",
       blocks: [
         {
-          paragraphs: [
-            "Honesty and transparency are at the core of our clinic. XERF is an advanced skin-tightening technology, but it is not designed to address every aesthetic concern. Understanding what it can and cannot achieve helps you go into treatment with realistic expectations.",
-          ],
-        },
-        {
-          // The question mark is not a typo and not the document's: someone
-          // rewrote both of these headings in Studio after the page went
-          // live, and their wording is the newer decision. Brought back into
-          // this file so the two stop disagreeing — see the same reasoning
-          // on the XERF entry in seo.ts.
-          heading: "What XERF can do?",
-          paragraphs: [
-            "XERF works primarily by stimulating collagen remodeling and improving tissue firmness. This makes it effective for tightening and defining facial contours, enhancing jawline definition, smoothing fine lines and wrinkles, and softening the appearance of smile lines and marionette lines. It also lifts the brow, improves the appearance of hooded eyes, tightens and rejuvenates the neck, and improves skin laxity and crepey skin. Selected body areas, such as the postpartum belly, can be treated as well.",
-          ],
-        },
-        {
-          heading: "What XERF cannot do?",
-          paragraphs: [
-            "XERF is not a replacement for surgery. It cannot provide the same degree of lifting as a surgical facelift or neck lift, so patients with severe skin sagging, significant jowling, or substantial excess skin may see more dramatic results from a surgical approach instead.",
-            "XERF is also not designed to add volume, and it does not replace treatments such as dermal fillers or collagen stimulators. This is one reason it matters to choose a provider experienced in both energy-based treatments and advanced injectables. A skilled doctor can assess whether you would benefit most from XERF, injectables, or a combination of the two, rather than defaulting to a single technology for every concern.",
-            "XERF is not primarily a treatment for pigmentation or skin brightening, and it does not treat acne, rosacea, or the appearance of acne scars. Patients with active skin inflammation, unstable pigmentation, or a tendency toward post-inflammatory pigmentation need careful assessment before any energy-based treatment.",
-            "Our goal is not simply to offer XERF. It is to recommend the right treatment for your anatomy, skin condition, and aesthetic goals, even when that means telling you another treatment may be more appropriate.",
-          ],
-        },
-        {
           kind: "table",
+          columns: ["XERF can help with", "XERF cannot"],
+          // Two independent lists side by side, not a comparison.
           labelFirstColumn: false,
-          columns: ["XERF can help with", "XERF cannot do"],
           rows: [
-            [
-              "Tightens and defines facial contours",
-              "Does not add volume (not a replacement for dermal fillers)",
-            ],
-            [
-              "Enhances jawline definition",
-              "Cannot provide the same degree of lifting as a surgical facelift or neck lift",
-            ],
-            [
-              "Smooths fine lines and wrinkles",
-              "Not for severe skin sagging, significant jowling, or substantial skin excess",
-            ],
-            [
-              "Softens the appearance of smile lines and marionette lines",
-              "Does not treat pigmentation or brighten the skin",
-            ],
-            ["Lifts the brow and improves the appearance of hooded eyes", "Does not treat acne"],
-            ["Tightens and rejuvenates the neck", "Does not treat rosacea"],
-            [
-              "Improves skin laxity and crepey skin",
-              "Does not improve the appearance of acne scars",
-            ],
-            // The document's left column runs one item longer than its
-            // right. The empty cell is the document's own shape, not a
-            // dropped row.
-            ["Can be used on selected body areas (e.g. postpartum belly)", ""],
+            ["Tighten and define facial contours and the jawline", "Add volume (it is not a replacement for fillers or collagen stimulators)"],
+            ["Smooth fine lines, smile lines and marionette lines", "Provide the same degree of lifting as a surgical facelift or neck lift"],
+            ["Lift the brow and improve the appearance of hooded eyes", "Correct severe sagging, significant jowling or substantial excess skin"],
+            ["Tighten the neck and improve crepey skin", "Treat pigmentation, acne, rosacea or acne scars"],
+            ["Treat selected body areas, such as the postpartum abdomen", ""],
           ],
         },
-      ],
-    },
-    {
-      title: "Who Should Not Have XERF?",
-      blocks: [
-        {
-          heading: "Absolute contraindications",
-          paragraphs: [
-            "XERF is contraindicated in patients with implanted pacemakers, implantable cardioverter-defibrillators (ICDs/AICDs), or other active electrical medical devices, as RF energy may potentially interfere with their function.",
-          ],
-        },
-        {
-          heading: "Relative contraindications",
-          paragraphs: [
-            "XERF treatment should be carefully evaluated or postponed in patients with permanent fillers or facial implants, detected pathological abnormalities, or medical conditions that may impair peripheral nerve function, such as diabetes or multiple sclerosis. Treatment should also be avoided over areas with active infection or infected tissue. XERF is not recommended during pregnancy or lactation, and treatment should be postponed for clients who have undergone facelift surgery within the previous two months.",
-          ],
-        },
-      ],
-    },
-    {
-      // ── THE COMPARISON TABLE, RESTORED AS A TABLE ───────────────────
-      // Six attributes across three devices. The first pass rewrote it as
-      // one paragraph per device, which kept every value but lost the
-      // thing the table is FOR: reading across a row to see how the three
-      // differ on one attribute at a time. Both are here now — the per
-      // device paragraphs still read as prose for anyone scrolling, and
-      // the table underneath answers "which is more comfortable" in one
-      // glance instead of three.
-      //
-      // Every cell is the document's own wording. Nothing is added, and no
-      // device is ranked beyond what the clinic itself wrote — HIFU is a
-      // treatment this clinic also sells, which is why the honest version
-      // of this table is one it publishes rather than hides.
-      title: "HIFU vs Thermage vs XERF: Quick Comparison",
-      blocks: [
         {
           paragraphs: [
-            "HIFU, Thermage, and XERF are three of the most talked-about skin-tightening treatments right now, but each works differently and delivers different results. Here is how they differ in technology, target layer, focus, comfort, timeline, and cost, so you can see which one fits your skin and your goals.",
-          ],
-        },
-        {
-          heading: "XERF — dual-frequency RF",
-          paragraphs: [
-            "Dual-frequency RF at 6.78 MHz and 2 MHz, targeting the epidermis, dermis, fat, and SMAS. Its main focus is skin tightening, lifting, and collagen remodelling. Comfort is a warm sensation with integrated cooling. Some improvement appears early, with continued improvement up to 3–6 months. Cost consideration: mid to high.",
-          ],
-        },
-        {
-          heading: "Thermage — single-frequency RF",
-          paragraphs: [
-            "Single-frequency RF at 6.78 MHz, targeting the deep dermis and collagen. Its main focus is skin tightening and collagen remodeling. Comfort is a heating sensation with vibration and cooling. Results are visible from 4 weeks and continue up to 6 months. Cost consideration: high — premium pricing for a single-session treatment.",
-          ],
-        },
-        {
-          heading: "HIFU — focused ultrasound",
-          paragraphs: [
-            "Focused ultrasound (MFU-V), targeting the superficial dermis, deep dermis, and SMAS layer. Its main focus is lifting and contouring. Comfort is a tingling and warm sensation. Results are immediate, with the peak result after 6 weeks. Cost consideration: moderate — more affordable.",
-          ],
-        },
-        {
-          kind: "table",
-          columns: [
-            "Features",
-            "XERF (dual-frequency RF)",
-            "Thermage (single-frequency RF)",
-            "HIFU (focused ultrasound)",
-          ],
-          rows: [
-            [
-              "Technology",
-              "Dual-frequency RF (6.78 MHz + 2 MHz)",
-              "Single-frequency RF (6.78 MHz)",
-              "Focused ultrasound (MFU-V)",
-            ],
-            [
-              "Targets",
-              "Epidermis, dermis, fat, and SMAS",
-              "Deep dermis and collagen",
-              "Superficial dermis, deep dermis, SMAS layer",
-            ],
-            [
-              "Main focus",
-              "Skin tightening, lifting and collagen remodelling",
-              "Skin tightening and collagen remodeling",
-              "Lifting and contouring",
-            ],
-            [
-              "Comfort level",
-              "Warm sensation with integrated cooling",
-              "Heating sensation with vibration and cooling",
-              "Tingling and warm sensation",
-            ],
-            [
-              "Results timeline",
-              "Some improvement early, with continued improvement up to 3–6 months",
-              "Results visible from 4 weeks, continue up to 6 months",
-              "Immediate result with peak result after 6 weeks",
-            ],
-            [
-              "Cost consideration",
-              "Mid to high",
-              "High. Premium pricing for single-session treatment.",
-              "Moderate. More affordable.",
-            ],
+            "If another treatment is more appropriate for your concerns, we will advise you accordingly.",
           ],
         },
       ],
     },
     {
       title: "Can XERF Be Combined with Other Treatments?",
-      // The worst stretch on the page: an opening line followed by EIGHT
-      // heading-and-paragraph pairs, which is a table of contents written
-      // out longhand. The opening line stays prose above the grid — see
-      // how `cards` splits headed from unheaded blocks.
-      display: "cards",
       blocks: [
         {
           paragraphs: [
-            "While XERF is an advanced monopolar RF technology, no single treatment can address every aspect of facial aging. That is why a multi-modality approach can be recommended to address different causes of aging and achieve a more comprehensive result.",
+            "Yes. We often recommend a combined approach to address different signs of ageing. The table below shows how XERF can be combined with our other treatments:",
           ],
         },
         {
-          heading: "HIFU — yes, on the same day",
-          paragraphs: [
-            "XERF utilizes dual-wave RF to address multiple tissue layers, while HIFU delivers highly focused energy to the deeper supporting layers. Our HIFU can provide structural lifting, like the foundation of a building, while XERF complements the result by improving skin laxity, firmness, and tissue tightening. This combination is ideal for patients looking for a more holistic lifting and tightening approach without surgery.",
-          ],
-        },
-        {
-          heading: "Skin booster — yes, on the same day",
-          paragraphs: [
-            "HA-based skin boosters improve skin hydration by delivering hyaluronic acid directly into the dermal layer. They can help refine fine lines, improve elasticity, and smooth the overall skin texture. When combined with XERF, the two treatments address different aspects of skin aging: skin boosters improve hydration, plumpness, and dermal quality, while XERF works deeper to promote tightening and firmness.",
-          ],
-        },
-        {
-          heading: "Botox — yes, on the same day, XERF first",
-          paragraphs: [
-            "The heat and energy delivered during XERF may potentially affect freshly injected Botox and could reduce the longevity of the treatment. Performing XERF first allows the RF treatment to be completed before Botox is injected, helping to protect the intended placement and duration of the neuromodulator.",
-          ],
-        },
-        {
-          heading: "Collagen stimulator — yes",
-          paragraphs: [
-            "Collagen stimulators work by stimulating the skin's natural collagen production to create gradual, natural-looking improvement. When combined with XERF, which stimulates collagen through controlled thermal energy, the treatments can complement each other by addressing different aspects of aging. XERF focuses on deeper tightening and tissue support, while collagen stimulators improve dermal quality and can help restore volume loss, creating a more comprehensive approach to skin rejuvenation.",
-          ],
-        },
-        {
-          heading: "Dermal filler — yes, on the same day, XERF first",
-          paragraphs: [
-            "Hyaluronic acid fillers can be sensitive to heat and thermal stimulation. Performing XERF first minimizes the potential for thermal energy to affect freshly injected filler and allows the filler to be placed after the RF treatment has been completed.",
-          ],
-        },
-        {
-          heading: "Sylfirm RF microneedling — not on the same day",
-          paragraphs: [
-            "Treatments should be spaced approximately 3–4 weeks apart. RF microneedling delivers RF energy through microchannels created in the skin, making it particularly useful for concerns such as enlarged pores, acne scars, uneven texture, and superficial lines. When paired with XERF, RF microneedling can refine the skin's surface while XERF focuses on deeper tissue tightening. This allows the treatments to address different levels of the skin without unnecessarily combining two heat-based treatments in a single session.",
-          ],
-        },
-        {
-          heading: "Microneedling — not on the same day",
-          paragraphs: [
-            "XERF creates controlled thermal stimulation, while microneedling creates multiple microchannels and controlled micro-injury in the skin. Performing both treatments together can increase inflammation and erythema and may increase the risk of complications such as post-inflammatory hyperpigmentation. It is therefore preferable to space the treatments apart to allow the skin to recover.",
-          ],
-        },
-        {
-          heading: "Chemical peeling — possible, with assessment",
-          paragraphs: [
-            "Possible with certain gentle peels, depending on the patient and the type of peel. XERF creates controlled thermal stimulation, while chemical peeling induces controlled chemical exfoliation and injury to the skin. Combining both treatments requires careful assessment and appropriate timing to minimize irritation and other potential side effects. Stronger or deeper peels should generally be performed separately from XERF.",
+          kind: "table",
+          columns: ["Treatment", "Same day as XERF?", "Why"],
+          rows: [
+            ["HIFU", "Yes", "HIFU lifts the deeper structures, while XERF tightens and firms the skin"],
+            ["Skin booster", "Yes", "Skin boosters improve hydration, while XERF improves firmness"],
+            ["Botox", "Yes, XERF first", "Heat may reduce the longevity of freshly injected Botox"],
+            ["Dermal filler", "Yes, XERF first", "Freshly injected filler can be sensitive to heat"],
+            ["Collagen stimulator", "Yes", "Collagen stimulators improve volume and skin quality, while XERF focuses on tightening"],
+            ["Sylfirm X RF microneedling", "No, 3–4 weeks apart", "Avoids combining two heat-based treatments in one session"],
+            ["Microneedling", "No, spaced apart", "Reduces the risk of irritation and pigmentation"],
+            ["Chemical peel", "Gentle peels only, after assessment", "Stronger peels are performed separately"],
           ],
         },
       ],
     },
     {
-      // ── ONE ICON PER CLAIM ──────────────────────────────────────────
-      // The clinic's note: "this should be explained one picture one
-      // explanation… but i sent you the entire pic so you can crop it".
-      // It was their seven-icon strip above a separate list of the same
-      // seven claims, which asked the reader to count across to pair them
-      // up — and on a phone the strip and the list never shared a screen.
-      //
-      // The strip is cut into seven squares, detected from its own
-      // transparency rather than sliced at guessed offsets, and kept
-      // transparent so they sit on whatever surface the section has.
-      title: "Highlights",
-      display: "iconGrid",
-      tone: "blush",
+      title: "Is XERF Right for You?",
       blocks: [
         {
-          heading: "No needles",
-          image: {
-            src: "/images/treatments/xerf-highlight-icons/1.png",
-            alt: "A syringe crossed out.",
-            ratio: 1,
-          },
-        },
-        {
-          heading: "No pain",
-          image: {
-            src: "/images/treatments/xerf-highlight-icons/2.png",
-            alt: "A calm face with radiating lines.",
-            ratio: 1,
-          },
-        },
-        {
-          heading: "No downtime",
-          image: {
-            src: "/images/treatments/xerf-highlight-icons/3.png",
-            alt: "A calendar crossed out.",
-            ratio: 1,
-          },
-        },
-        {
-          heading: "No fat loss",
-          image: {
-            src: "/images/treatments/xerf-highlight-icons/4.png",
-            alt: "Fat cells crossed out.",
-            ratio: 1,
-          },
-        },
-        {
-          heading: "Result after just one session",
-          image: {
-            src: "/images/treatments/xerf-highlight-icons/5.png",
-            alt: "A clock with a spark.",
-            ratio: 1,
-          },
-        },
-        {
-          heading: "Personalized treatment",
-          image: {
-            src: "/images/treatments/xerf-highlight-icons/6.png",
-            alt: "A face in profile with a target on the jawline.",
-            ratio: 1,
-          },
-        },
-        {
-          heading: "Natural-looking lift",
-          image: {
-            src: "/images/treatments/xerf-highlight-icons/7.png",
-            alt: "Two leaves.",
-            ratio: 1,
-          },
-        },
-      ],
-    },
-    {
-      title: "Why Choose Healthy Look Aesthetic for XERF Treatment?",
-      // Five reasons, one line each. Cards, for the same reason.
-      display: "cards",
-      blocks: [
-        {
-          heading: "Doctor-Led Treatment",
           paragraphs: [
-            "Every treatment starts with a medical assessment and a personalized plan based on your facial anatomy and goals. XERF is performed by our doctor, never delegated to a nurse or therapist.",
-          ],
-        },
-        {
-          heading: "Complimentary Private Transfer from Anywhere in Bali*",
-          paragraphs: [
-            "No stress regarding transportation arrangements. We will handle it, so you can simply relax and enjoy the entire XERF experience.",
-          ],
-        },
-        {
-          heading: "Authentic Device",
-          paragraphs: [
-            "Non-negotiable. We only use authentic devices because your safety matters the most.",
-          ],
-        },
-        {
-          heading: "Multiple Modalities for Rejuvenation",
-          paragraphs: [
-            "Aging is multidimensional. Your treatment should be too. Our doctor is skilled not only in energy-based devices but is also trusted by thousands of patients for injectable treatments, including dermal fillers, Botox, and collagen stimulators.",
-          ],
-        },
-        {
-          heading: "Tested and Loved by Our Head Doctor",
-          paragraphs: [
-            "Our head doctor has personally experienced and evaluated multiple monopolar RF technologies before deciding that XERF was the right technology for Healthy Look Aesthetic.",
+            "XERF is well suited to patients aged around 30 and above with mild to moderate skin laxity, early jowling, reduced jawline definition or mild neck laxity who prefer a needle-free treatment with no downtime. It can also help patients in their mid-20s maintain skin firmness, although visible results are usually more subtle.",
           ],
         },
       ],

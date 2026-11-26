@@ -65,12 +65,18 @@ export default function PageHero({
   image,
   imageAlt,
   imagePosition = "object-center",
+  titleNote,
+  descriptionClassName = "",
   children,
 }: {
   eyebrow?: string;
   title: string;
   scriptTitle?: boolean;
+  /** A short line directly under the title, e.g. "Updated 23 November 2026". */
+  titleNote?: ReactNode;
   description?: string;
+  /** Extra classes on the description paragraph. */
+  descriptionClassName?: string;
   crumbs?: Crumb[];
   image: string;
   imageAlt: string;
@@ -210,9 +216,15 @@ export default function PageHero({
               </h1>
             </Reveal>
 
+            {titleNote && (
+              <Reveal delay={170}>
+                <p className="mt-4 font-sans text-caption text-text-secondary">{titleNote}</p>
+              </Reveal>
+            )}
+
             {description && (
               <Reveal delay={200}>
-                <p className="mt-7 max-w-xl font-sans text-lead text-text">
+                <p className={`mt-7 max-w-xl font-sans text-lead text-text ${descriptionClassName}`}>
                   {description}
                 </p>
               </Reveal>
