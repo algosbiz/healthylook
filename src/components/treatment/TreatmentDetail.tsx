@@ -38,6 +38,9 @@ import {
 } from "@/lib/site-content";
 
 import { whatsappHrefFor } from "@/lib/constants";
+import { curatedCopy } from "@/data/sectionCopy";
+import { formatIsoDate, getTreatmentPageExtras, isPastBaliDate } from "@/data/treatmentPageExtras";
+import { Fragment } from "react";
 
 /**
  * "Why here → How we treat you" (#safety) and "Who performs this → Treated
@@ -247,6 +250,12 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
   );
   const reviews = await getTestimonialsForTreatment(treatment.slug);
   const reviewsNameThisTreatment = await hasOwnTestimonials(treatment.slug);
+  // Page-specific wording kept in code (src/data/treatmentPageExtras.ts).
+  // Empty for every treatment that has no entry there.
+  const extras = getTreatmentPageExtras(treatment.slug);
+  const showPromo =
+    !!extras.promoBadge && !(extras.promoBadgeUntil && isPastBaliDate(extras.promoBadgeUntil));
+  const reviewsShown = extras.reviewsLimit ? reviews.slice(0, extras.reviewsLimit) : reviews;
   const related = (await getTreatments())
     .filter((t) => t.category === treatment.category && t.slug !== treatment.slug)
     .slice(0, 3);
@@ -342,6 +351,160 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
 
   // treatmentHref, not /ubud-bali/<slug>: Eye Rejuvenation lives at the
   // site root and its breadcrumb has to point at the URL that exists.
+  // The price block lives in one place so a page can put it after a chosen
+  // long-form section (extras.pricingAfter) instead of after the last one.
+  const sameTitle = (anchor: string | undefined, title: string | undefined) =>
+    !!anchor && title?.trim().toLowerCase() === anchor.trim().toLowerCase();
+  const isPricingAnchor = (title?: string) => sameTitle(extras.pricingAfter, title);
+  const pricingInline = sections.some((section) => isPricingAnchor(section.title));
+  // Same idea for the before & after block and the journey: a page can ask
+  // for them as panels inside the text column, after a chosen section.
+  const isResultsAnchor = (title?: string) => sameTitle(extras.resultsAfter, title);
+  const isJourneyAnchor = (title?: string) => sameTitle(extras.journeyAfter, title);
+  const resultsInline = sections.some((section) => isResultsAnchor(section.title));
+  const journeyInline =
+    journey.length > 0 && sections.some((section) => isJourneyAnchor(section.title));
+  const JourneyHeading = copy.headingLevels.journey;
+  const pricingBlock = treatment.priceGroups ? (
+    <Reveal delay={pricingInline ? 0 : 220}>
+      <div id="pricing" className={`scroll-mt-24 ${pricingInline ? "" : "mt-16"}`}>
+        <PricingHeading
+          className={
+            extras.pricingTitle
+              ? "font-sans text-h4 leading-tight text-ink"
+              : "font-script text-h3 text-primary"
+          }
+        >
+          {extras.pricingTitle ?? sectionHeadings.pricingTitle}
+        </PricingHeading>
+        {extras.pricingIntro && (
+          <p className="mt-6 measure font-sans text-body leading-body text-text-secondary">
+            {extras.pricingIntro}
+          </p>
+        )}
+        {showPromo && (
+          <p className="mt-6">
+            <span className="eyebrow inline-flex items-center rounded-edge bg-ink-brown px-4 py-2.5 text-white">
+              {extras.promoBadge}
+            </span>
+          </p>
+        )}
+        <div className="mt-8">
+          <PriceTable groups={treatment.priceGroups} />
+        </div>
+        {extras.pricingNote ? (
+          <p className="mt-6 measure font-sans text-label leading-relaxed text-muted">
+            {extras.pricingNote}
+          </p>
+        ) : (
+          !isNursePerformed && (
+            <p className="mt-6 measure font-sans text-label leading-relaxed text-muted">
+              Final pricing is confirmed at consultation, once a doctor has
+              assessed what you actually need. All prices are nett and
+              inclusive of tax.
+            </p>
+          )
+        )}
+      </div>
+    </Reveal>
+  ) : null;
+
+  const resultsIntro =
+    extras.resultsIntro ??
+    (resultGroup
+      ? `Real ${treatment.name} results from our Ubud clinic. Individual results vary. Your doctor will discuss what is realistic for you.`
+      : "See real patient results from our Ubud clinic. Individual results vary. Your doctor will discuss what is realistic for you.");
+
+  // The before & after block as a panel in the text column. Same content as
+  // the full-width band further down, which is skipped when this renders.
+  const resultsPanel = resultsInline ? (
+    <Reveal>
+      <div id="results" className="scroll-mt-24">
+        <ResultsHeading className="font-sans text-h4 leading-tight text-ink">
+          {extras.resultsTitle ?? sectionHeadings.resultsTitle}
+        </ResultsHeading>
+        <p className="mt-6 measure font-sans text-body leading-body text-text-secondary">
+          {resultsIntro}
+        </p>
+        {treatment.resultsNote && (
+          <SectionProseBlock
+            block={treatment.resultsNote}
+            className="mt-6 border-t border-primary/20 pt-6"
+          />
+        )}
+        {resultGroup && (
+          <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {resultGroup.images.slice(0, 6).map((src) => (
+              <Img
+                key={src}
+                src={src}
+                alt={`Before and after ${resultGroup.label} at Healthy Look Aesthetic, Ubud`}
+                aspect="square"
+                rounded="rounded-none"
+                sizes="(max-width: 640px) 50vw, 220px"
+              />
+            ))}
+          </div>
+        )}
+        <div className="mt-8">
+          <Button
+            href={resultGroup ? `/before-after#${resultGroup.slug}` : "/before-after"}
+            variant="outline"
+            withArrow
+          >
+            {resultGroup ? `View all ${resultGroup.images.length} results` : "View before & after"}
+          </Button>
+        </div>
+      </div>
+    </Reveal>
+  ) : null;
+
+  // The treatment journey as a dark panel in the text column, one step per
+  // row. Same steps as the full-width band, which is skipped when this renders.
+  const journeyTone = SECTION_TONES.brown;
+  const journeyPanel = journeyInline ? (
+    <Reveal>
+      <div id="journey" className={`scroll-mt-24 ${journeyTone.shell}`}>
+        <JourneyHeading className={`font-sans text-h4 leading-tight ${journeyTone.heading}`}>
+          {extras.journeyTitle ?? sectionHeadings.journeyTitle}
+        </JourneyHeading>
+        <ol className="mt-8 flex flex-col gap-8">
+          {journey.map((step, index) => (
+            <li key={step.label} className="border-t border-white/20 pt-6">
+              <span className="font-script text-h3 leading-none text-gold-soft/70" aria-hidden="true">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <h3 className="mt-3 font-sans text-copy-lg font-medium leading-snug text-white">
+                {step.label}
+              </h3>
+              {step.duration && (
+                <p className="mt-2 flex items-center gap-2 font-sans text-copy text-white/70">
+                  <ClockIcon className="h-3.5 w-3.5 shrink-0 text-gold-soft" />
+                  {step.duration}
+                </p>
+              )}
+              {step.body?.length ? (
+                <SanityPortableText
+                  value={step.body}
+                  spacing="space-y-3"
+                  className="mt-3 text-copy leading-body [&_a]:text-gold-soft [&_p]:text-white/75"
+                />
+              ) : step.description?.length ? (
+                <div className="mt-3 flex flex-col gap-3">
+                  {step.description.map((paragraph) => (
+                    <p key={paragraph.slice(0, 40)} className="font-sans text-copy leading-body text-white/75">
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
+              ) : null}
+            </li>
+          ))}
+        </ol>
+      </div>
+    </Reveal>
+  ) : null;
+
   const trail = [HOME_CRUMB, TREATMENTS_CRUMB, { name: treatment.name, path: treatmentHref(treatment) }];
 
   return (
@@ -355,7 +518,17 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
         // in Ubud" would be the longest thing on the page.
         title={treatment.h1 ?? treatment.name}
         crumbs={toHeroCrumbs(trail)}
-        description={treatment.shortDescription}
+        description={extras.answerBox ?? treatment.shortDescription}
+        descriptionClassName={
+          extras.answerBox ? `${treatment.slug.replace(/\//g, "-")}-answer-box` : ""
+        }
+        titleNote={
+          extras.updated ? (
+            <>
+              Updated <time dateTime={extras.updated}>{formatIsoDate(extras.updated)}</time>
+            </>
+          ) : undefined
+        }
         image={heroImage}
         imageAlt={`${treatment.name} at Healthy Look Aesthetic, Ubud`}
         imagePosition={heroImagePosition}
@@ -399,8 +572,16 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
                   as one. Same gold rule and same type, now an actual
                   heading whose wording each treatment can set for itself. */}
               <Reveal>
-                <AboutHeading className="eyebrow flex items-center gap-3 text-primary-strong">
-                  <span className="h-px w-8 bg-primary/40" aria-hidden="true" />
+                <AboutHeading
+                  className={
+                    extras.aboutHeadingAsSection
+                      ? "font-sans text-h4 leading-tight text-ink"
+                      : "eyebrow flex items-center gap-3 text-primary-strong"
+                  }
+                >
+                  {!extras.aboutHeadingAsSection && (
+                    <span className="h-px w-8 bg-primary/40" aria-hidden="true" />
+                  )}
                   {treatment.aboutHeading ?? sectionHeadings.aboutEyebrow}
                 </AboutHeading>
               </Reveal>
@@ -525,7 +706,8 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
                        it always has, not inside an invisible box. */
                     const tone = SECTION_TONES[section.tone ?? "plain"];
                     return (
-                    <Reveal key={section.anchor ?? section.title ?? index} delay={Math.min(index, 4) * 60}>
+                    <Fragment key={section.anchor ?? section.title ?? index}>
+                    <Reveal delay={Math.min(index, 4) * 60}>
                       {/* ── NO RULE BETWEEN SECTIONS ────────────────────
                           Each section used to open on a hairline rule. On a
                           page of three or four sections that reads as
@@ -743,30 +925,16 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
                         <SectionFigure image={section.image} className="mt-8" />
                       </div>
                     </Reveal>
+                    {pricingInline && isPricingAnchor(section.title) && pricingBlock}
+                    {isResultsAnchor(section.title) && resultsPanel}
+                    {isJourneyAnchor(section.title) && journeyPanel}
+                    </Fragment>
                     );
                   })}
                 </div>
               )}
 
-              {treatment.priceGroups && (
-                <Reveal delay={220}>
-                  <div id="pricing" className="mt-16 scroll-mt-24">
-                    <PricingHeading className="font-script text-h3 text-primary">
-                      {sectionHeadings.pricingTitle}
-                    </PricingHeading>
-                    <div className="mt-8">
-                      <PriceTable groups={treatment.priceGroups} />
-                    </div>
-                    {!isNursePerformed && (
-                      <p className="mt-6 measure font-sans text-label leading-relaxed text-muted">
-                        Final pricing is confirmed at consultation, once a doctor has
-                        assessed what you actually need. All prices are nett and
-                        inclusive of tax.
-                      </p>
-                    )}
-                  </div>
-                </Reveal>
-              )}
+              {!pricingInline && pricingBlock}
             </div>
 
             <aside id="at-a-glance" className="scroll-mt-24 lg:col-span-5">
@@ -867,7 +1035,7 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
           reformatted for consistency (see treatmentJourney.ts). Facial and
           Medi Facial aren't in the sheet, so this section simply doesn't
           render for those two rather than guessing a timeline for them. */}
-      {journey && journey.length > 0 && (
+      {journey && journey.length > 0 && !journeyInline && (
         /* ── THE DARK BAND ────────────────────────────────────────────
            The clinic sent a reference for this section — a dark panel of
            numbered columns, each with its step, its duration and a line of
@@ -969,17 +1137,16 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
           Positioned right after Treatment Journey per the client's own
           request (via Irene, WhatsApp): people should see proof of results
           right after learning what the visit itself involves. */}
+      {!resultsInline && (
       <section id="results" className="scroll-mt-24 bg-section py-16">
         <Container>
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <div>
               <ResultsHeading className="font-script text-h2 leading-heading text-primary">
-                {sectionHeadings.resultsTitle}
+                {extras.resultsTitle ?? sectionHeadings.resultsTitle}
               </ResultsHeading>
               <p className="mt-3 measure font-sans text-sm leading-relaxed text-text-secondary">
-                {resultGroup
-                  ? `Real ${treatment.name} results from our Ubud clinic. Individual results vary. Your doctor will discuss what is realistic for you.`
-                  : "See real patient results from our Ubud clinic. Individual results vary. Your doctor will discuss what is realistic for you."}
+                {resultsIntro}
               </p>
             </div>
             <Button
@@ -1033,6 +1200,7 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
           )}
         </Container>
       </section>
+      )}
 
       {/* Clinic safety commitments — the clinic's own published protocols,
           shown on every treatment page because they apply to every one. */}
@@ -1200,10 +1368,25 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
           names the treatment when the reviews really are about it — on a
           fallback page it stays about the clinic. */}
       <Testimonials
-        items={reviews}
+        items={reviewsShown}
         subject={reviewsNameThisTreatment ? treatment.name : undefined}
+        copy={
+          extras.reviewsTitle
+            ? { ...curatedCopy("testimonials"), title: extras.reviewsTitle }
+            : undefined
+        }
       />
-      <BookingSection />
+      <BookingSection
+        copy={
+          extras.closingTitle || extras.closingIntro
+            ? {
+                ...curatedCopy("booking"),
+                ...(extras.closingTitle ? { title: extras.closingTitle } : {}),
+                ...(extras.closingIntro ? { intro: extras.closingIntro } : {}),
+              }
+            : undefined
+        }
+      />
     </>
   );
 }
