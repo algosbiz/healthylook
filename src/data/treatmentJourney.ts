@@ -77,56 +77,54 @@ export const treatmentJourney: Record<string, JourneyStep[]> = {
     { label: "Preparation", duration: "5 minutes" },
     { label: "Treatment", duration: "15–30 minutes" },
   ],
-  // ── THE WHOLE PROCEDURE, NOT JUST THE TIMED PART ────────────────────
-  // XERF is not in the source spreadsheet — it is a new device, and these
-  // are the clinic's own "Our Procedures" steps from "XERF Treatment
-  // Bali.docx".
+  // ── XERF: CLINIC REVISION, 23 NOVEMBER 2026 ─────────────────────────
+  // Copy from the clinic's revised XERF document (Google Doc, "Updated
+  // 23 November 2026"), word for word. It replaces the first version of
+  // the page, built from "XERF Treatment Bali.docx"; that version is in git
+  // history. Sanity's treatment.xerf still holds the old copy and wins over
+  // this file wherever it has a value, so live does not change until the
+  // same copy is entered in Studio.
   //
-  // This held only the first three for a while, because `duration` was
-  // required and steps 4 and 5 have none, so they lived in a separate "Our
-  // XERF Procedure" section further down the page. The clinic's own note
-  // was that they belong here, which is obviously right: a reader looking
-  // for "what happens when I come in" should not find two answers in two
-  // places. `duration` is optional now and that section is gone.
-  //
-  // Step 4's copy carries a link to the resort's wellness page in Sanity.
-  // It cannot be expressed here — this file holds plain strings — which is
-  // exactly why a step also has a rich-text `body` that the CMS fills. See
-  // scripts/sanity/move-xerf-procedure-to-journey.ts, which carries the
-  // link across.
+  // The document's "What to Expect, Step by Step", six steps. A duration in
+  // brackets in the document's step heading becomes the step's duration.
   xerf: [
     {
-      label: "Consultation & facial assessment",
+      label: "Consultation",
       duration: "15 minutes",
       description: [
-        "We believe that good results don't only depend on the advancement of the machine, but also on ensuring that the patient is a good candidate and will achieve a good result, as no single technology will fit everyone. Our doctor will also explain the possible outcome, realistic expectations, and the treatment combination that you may benefit from.",
+        "Our doctor confirms whether XERF is suitable for you, explains the expected results and advises whether a combination treatment would be beneficial.",
       ],
     },
     {
-      label: "XERF skin prep ritual",
-      duration: "15–20 minutes",
+      label: "Topical Anaesthesia",
       description: [
-        "After ensuring you're an ideal candidate, your skin will be thoroughly cleansed with double cleansing. A special sheet mask will be applied not only to hydrate your skin, but also to reduce skin impedance to enhance your XERF treatment.",
+        "We double-cleanse your skin before applying numbing cream to the treatment area to help keep you comfortable during XERF.",
       ],
     },
     {
-      label: "XERF dual wave RF",
-      duration: "30–60 minutes, depending on the number of shots",
+      label: "Skin Prep with Sheet Mask",
+      duration: "10–15 minutes",
       description: [
-        "Our doctor will perform XERF, delivering radiofrequency energy in controlled pulses. XERF is equipped with an advanced cooling system, so you will only feel warmth with mild discomfort. Comfort varies for every patient; patients with thinner and drier skin tend to feel more. Areas closer to the bone, such as the jawline, may feel more intense.",
+        "We apply a special sheet mask that hydrates your skin and reduces skin impedance to enhance your XERF treatment.",
       ],
     },
     {
-      // No duration published for either of the last two, and none invented.
-      label: "Wellness elixir at Ubud Nyuh Bali Resort",
+      label: "XERF",
+      duration: "60–120 minutes, depending on the number of shots",
       description: [
-        "Before going back home, enjoy our curated wellness elixir to hydrate your body while taking in the beautiful greenery of the five-star resort.",
+        "Our doctor delivers controlled RF pulses with integrated cooling. Most patients experience warmth with mild discomfort, which may be more noticeable on thinner skin and near the jawline.",
       ],
     },
     {
-      label: "Enjoy the result",
+      label: "Wellness Elixir",
       description: [
-        "Some patients will notice immediate improvement, although the full result develops over the weeks and months as we wait for new collagen production. Some patients notice early improvements in skin smoothness and tightness within 2–4 weeks. The result will improve gradually as new collagen and elastin form, with the peak of the result after approximately 3 months.",
+        "Relax with a hydrating drink while enjoying views of the resort's greenery.",
+      ],
+    },
+    {
+      label: "Enjoy the Result",
+      description: [
+        "Partial tightening (20%) is visible immediately due to the heating effect, while the best result is achieved at around 3 months.",
       ],
     },
   ],
