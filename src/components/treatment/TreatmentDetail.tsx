@@ -293,12 +293,16 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
 
   const performedBy = treatment.performedBy ?? "Licensed doctor";
   const isDoctorPerformed = /doctor/i.test(performedBy);
+  // Also drops the "confirmed at consultation, once a doctor has assessed"
+  // note under the price list: the clinic gives no doctor consultation for
+  // nurse-performed treatments.
+  const isNursePerformed = /nurse/i.test(performedBy);
   // Hero badge. Short adjective form to match the line it sits on
   // ("From IDR 650.000 / Nurse-performed"), with a readable fallback for
   // any future value that is neither doctor, nurse nor therapist.
   const performedByBadge = isDoctorPerformed
     ? "Doctor-performed"
-    : /nurse/i.test(performedBy)
+    : isNursePerformed
       ? "Nurse-performed"
       : /therapist/i.test(performedBy)
         ? "Therapist-performed"
@@ -753,11 +757,13 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
                     <div className="mt-8">
                       <PriceTable groups={treatment.priceGroups} />
                     </div>
-                    <p className="mt-6 measure font-sans text-label leading-relaxed text-muted">
-                      Final pricing is confirmed at consultation, once a doctor has
-                      assessed what you actually need. All prices are nett and
-                      inclusive of tax.
-                    </p>
+                    {!isNursePerformed && (
+                      <p className="mt-6 measure font-sans text-label leading-relaxed text-muted">
+                        Final pricing is confirmed at consultation, once a doctor has
+                        assessed what you actually need. All prices are nett and
+                        inclusive of tax.
+                      </p>
+                    )}
                   </div>
                 </Reveal>
               )}
