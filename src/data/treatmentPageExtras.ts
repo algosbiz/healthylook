@@ -12,12 +12,8 @@
  * copy with new labels.
  */
 export type TreatmentPageExtras = {
-  /**
-   * The paragraph straight under the H1, in place of the catalogue
-   * description (which the treatment cards keep using). Rendered with the
-   * class `<slug>-answer-box`.
-   */
-  answerBox?: string;
+  // The paragraph under the H1 (the "answer box") used to live here too. It
+  // is a Studio field now, "Hero intro" on the treatment: `answerBox`.
   /** "Updated <date>" under the H1. ISO date, YYYY-MM-DD. */
   updated?: string;
   /** Style the About heading like a section heading instead of a small label. */
@@ -57,8 +53,6 @@ export type TreatmentPageExtras = {
 export const treatmentPageExtras: Record<string, TreatmentPageExtras> = {
   // Source: the clinic's revised XERF document, "Updated 23 November 2026".
   xerf: {
-    answerBox:
-      "At Healthy Look Aesthetic in Ubud, we offer genuine XERF skin tightening, always performed by our doctors. Using dual-frequency radiofrequency, XERF lifts and firms the face, jawline and neck without needles or downtime. Every treatment follows a personalized protocol, never a template.",
     updated: "2026-11-23",
     aboutHeadingAsSection: true,
     pricingAfter: "What Is XERF?",

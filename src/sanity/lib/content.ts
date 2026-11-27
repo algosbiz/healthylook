@@ -286,6 +286,7 @@ export async function getSanityTreatments(): Promise<
       h1: document.h1,
       category: document.category,
       shortDescription: document.shortDescription ?? "",
+      answerBox: document.answerBox,
       treatmentTime: document.treatmentTime,
       treatmentTimeShort: document.treatmentTimeShort,
       anaesthesia: document.anaesthesia,

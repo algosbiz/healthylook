@@ -518,9 +518,12 @@ export default async function TreatmentDetail({ treatment }: { treatment: Treatm
         // in Ubud" would be the longest thing on the page.
         title={treatment.h1 ?? treatment.name}
         crumbs={toHeroCrumbs(trail)}
-        description={extras.answerBox ?? treatment.shortDescription}
+        // "Hero intro" in Studio. `||`, not `??`: a field emptied in Studio
+        // can come back as "" rather than missing, and an empty paragraph
+        // under the H1 is worse than the catalogue line.
+        description={treatment.answerBox?.trim() || treatment.shortDescription}
         descriptionClassName={
-          extras.answerBox ? `${treatment.slug.replace(/\//g, "-")}-answer-box` : ""
+          treatment.answerBox?.trim() ? `${treatment.slug.replace(/\//g, "-")}-answer-box` : ""
         }
         titleNote={
           extras.updated ? (

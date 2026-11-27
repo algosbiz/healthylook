@@ -696,6 +696,7 @@ export type Treatment = {
   aboutHeading?: string;
   aboutHeadingLevel?: "h2" | "h3" | "h4";
   shortDescription?: string;
+  answerBox?: string;
   intro?: string;
   image?: ImageWithAlt;
   imagePosition?: "object-center" | "object-top" | "object-bottom" | "object-left" | "object-right";
@@ -1389,6 +1390,7 @@ export type AllTreatmentsQueryResult = Array<{
   aboutHeading?: string;
   aboutHeadingLevel?: "h2" | "h3" | "h4";
   shortDescription?: string;
+  answerBox?: string;
   intro?: string;
   image: {
     _type: "imageWithAlt";
@@ -1762,6 +1764,7 @@ export type SiteSettingsQueryResult = {
   aboutHeading?: string;
   aboutHeadingLevel?: "h2" | "h3" | "h4";
   shortDescription?: string;
+  answerBox?: string;
   intro?: string;
   image?: ImageWithAlt;
   imagePosition?: "object-bottom" | "object-center" | "object-left" | "object-right" | "object-top";
