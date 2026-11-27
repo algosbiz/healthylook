@@ -5054,6 +5054,13 @@
         },
         "optional": true
       },
+      "answerBox": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
       "intro": {
         "type": "objectAttribute",
         "value": {

@@ -76,7 +76,21 @@ export const treatment = defineType({
      * same field is the entire body of this treatment's card on the
      * homepage, on /ubud-bali, on /pricing and in every related-treatment
      * strip, all of which go blank. That is exactly what happened on XERF. */
-    defineField({ name: "shortDescription", title: "Catalogue description", type: "text", rows: 3, group: "overview", description: "Shown under the page title, and on every card that links to this treatment. ⚠ Emptying it leaves those cards blank. It also opens the About section on treatments that have no Introduction below. · ID: Tampil di bawah judul halaman, dan di setiap kartu yang menuju treatment ini. ⚠ Kalau dikosongkan, kartu-kartu itu jadi kosong. Teks ini juga membuka bagian About pada treatment yang tidak punya Introduction di bawah." }),
+    defineField({ name: "shortDescription", title: "Catalogue description", type: "text", rows: 3, group: "overview", description: "Shown on every card that links to this treatment, and under the page title unless “Hero intro” below is filled in. ⚠ Emptying it leaves those cards blank. It also opens the About section on treatments that have no Introduction below. · ID: Tampil di setiap kartu yang menuju treatment ini, dan di bawah judul halaman kalau “Hero intro” di bawah kosong. ⚠ Kalau dikosongkan, kartu-kartu itu jadi kosong. Teks ini juga membuka bagian About pada treatment yang tidak punya Introduction di bawah." }),
+    /* Separate from the catalogue description because the two jobs pull
+     * apart: a card needs one short line, while the paragraph under the H1
+     * is the page's direct answer to the search (the XERF revision of
+     * 23 November 2026 calls it the answer box). Empty falls back to the
+     * catalogue description, so every other treatment renders as before. */
+    defineField({
+      name: "answerBox",
+      title: "Hero intro",
+      type: "text",
+      rows: 4,
+      group: "overview",
+      description:
+        "The paragraph right under the page title, on this page only — cards keep the Catalogue description. Leave empty to show the Catalogue description there instead. · ID: Paragraf tepat di bawah judul halaman, hanya di halaman ini — kartu tetap memakai Catalogue description. Kosongkan untuk menampilkan Catalogue description di situ.",
+    }),
     defineField({ name: "intro", title: "Introduction", type: "text", rows: 6, group: "overview" }),
     defineField({ name: "image", title: "Hero image", type: "imageWithAlt", group: "overview" }),
     defineField({

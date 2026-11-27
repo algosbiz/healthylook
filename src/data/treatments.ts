@@ -125,6 +125,12 @@ export type Treatment = {
   /** Verbatim from the live site's treatments page. */
   shortDescription: string;
   /**
+   * The paragraph under the H1 on the treatment's own page, when it should
+   * say more than the card line above. Studio: "Hero intro". Falls back to
+   * `shortDescription` — see TreatmentDetail.
+   */
+  answerBox?: string;
+  /**
    * How long the appointment takes, from the clinic's own "At a glance"
    * spreadsheet — including its qualifiers, because they are the answer to
    * the question people actually ask ("60–75 minutes, depending on the type
@@ -485,9 +491,11 @@ export const treatments: Treatment[] = [
     initialResult: "Some improvement immediately",
     fullResult: "Approximately 3 months",
     performedBy: "Licensed doctor",
-    // Card copy only; the hero shows the answer box from treatmentPageExtras.
+    // Card copy only; the hero shows answerBox below.
     shortDescription:
       "A needle-free radiofrequency treatment that tightens and lifts the face, jawline, and neck at three different skin depths — no downtime, and no fat loss.",
+    answerBox:
+      "At Healthy Look Aesthetic in Ubud, we offer genuine XERF skin tightening, always performed by our doctors. Using dual-frequency radiofrequency, XERF lifts and firms the face, jawline and neck without needles or downtime. Every treatment follows a personalized protocol, never a template.",
     image: "/images/treatments/xerf.jpg",
     startingPrice: 5900000,
     priceGroups: [
